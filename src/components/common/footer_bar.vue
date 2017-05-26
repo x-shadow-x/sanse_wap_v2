@@ -1,21 +1,24 @@
 <template>
-	<ul class="footer_menu_lists">
-        <li class="footer_menu_item">
-            <router-link class="footer_menu_item_link footer_menu_home" to="/home">首页</router-link>
-        </li>
-        <li class="footer_menu_item">
-            <router-link class="footer_menu_item_link footer_menu_brand" to="/home">品牌</router-link>
-        </li>
-        <li class="footer_menu_item">
-            <router-link class="footer_menu_item_link footer_menu_tide" to="/home">潮文</router-link>
-        </li>
-        <li class="footer_menu_item">
-            <router-link class="footer_menu_item_link footer_menu_carts" to="/home">购物袋</router-link>
-        </li>
-        <li class="footer_menu_item">
-            <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>
-        </li>
-    </ul>
+	<div class="footer_bar">
+        <ul class="footer_menu_lists">
+            <li class="footer_menu_item">
+                <router-link class="footer_menu_item_link footer_menu_home" to="/home">首页</router-link>
+            </li>
+            <li class="footer_menu_item">
+                <router-link class="footer_menu_item_link footer_menu_brand" to="/home">品牌</router-link>
+            </li>
+            <li class="footer_menu_item">
+                <router-link class="footer_menu_item_link footer_menu_tide" to="/home">潮文</router-link>
+            </li>
+            <li class="footer_menu_item">
+                <router-link class="footer_menu_item_link footer_menu_carts" to="/home">购物袋</router-link>
+            </li>
+            <li class="footer_menu_item">
+                <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>
+            </li>
+        </ul>
+        <div class="footer_blank"></div>   
+    </div>
 </template>
 
 <script>
@@ -31,6 +34,10 @@ export default {
 
 <style scoped>
 
+    .footer_blank {
+        height: 1.562rem;
+    }
+
 	.footer_menu_lists {
         position: fixed;
         bottom: 0;
@@ -39,8 +46,16 @@ export default {
         height: 1.562rem;
 		display: flex;
         background: #191919;
-        font-size: 4px;
+        font-size: 9px;
 	}
+
+    [data-dpr="2"] .footer_menu_lists {
+        font-size: 18px;
+    }
+
+    [data-dpr="3"] .footer_menu_lists {
+        font-size: 27px;
+    }
 
 	.footer_menu_item {
 		flex: 1;
