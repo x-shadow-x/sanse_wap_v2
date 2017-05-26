@@ -82,13 +82,13 @@
                 </router-link>
             </li>
         </ul>
-        <footer-bar></footer-bar>
+        <!-- <footer-bar></footer-bar> -->
     </div>
-    
+
 </template>
 
 <script>
-    import footerBar from '../../components/common/footer_bar.vue';
+    // import footerBar from '../../components/common/footer_bar.vue';
 
     export default {
         data() {
@@ -141,20 +141,16 @@
                 ]
             }
         },
-        components: {
-            footerBar
-        },
+        // components: {
+        //     footerBar
+        // },
         methods: {
         },
         mounted() {
             // 头部显示阈值
             let threshold = $('#userCardBox').outerHeight() - $('#fnBox').outerHeight();
-
-            console.log(threshold);
-
             $(window).scroll(function() {
                 var opacity = $(document).scrollTop() / threshold;
-                console.log($(document).scrollTop());
                 this.headStyle['background'] = `rgba(0, 0, 0, ${opacity})`;
             }.bind(this));
         }
@@ -166,9 +162,9 @@
     .user_index_main {
         background: #efefef;
     }
-    
+
     .user_fn_list {
-        padding-bottom: 0.185185rem; 
+        padding-bottom: 0.185185rem;
     }
 
     .user_fn_item {

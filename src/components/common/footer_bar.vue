@@ -17,7 +17,7 @@
                 <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>
             </li>
         </ul>
-        <div class="footer_blank"></div>   
+        <!-- <div class="footer_blank"></div> -->
     </div>
 </template>
 

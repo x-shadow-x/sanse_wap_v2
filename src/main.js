@@ -7,7 +7,7 @@ import './styles/common.css'
 import './config/flexible_css.js'
 import './config/flexible.js'
 import axios from 'axios'
-// import store from './store'
+import store from './store'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
@@ -32,5 +32,5 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
     router,
-    // store,
+    store,
 }).$mount('#app')

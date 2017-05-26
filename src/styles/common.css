@@ -89,7 +89,9 @@ input, select {
 }
 
 html, body {
-    min-height: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 1.562rem;
 }
 body {
     color: #929292;
@@ -114,4 +116,8 @@ body {
 
 .fr {
     float: right;
+}
+
+#app {
+    min-width: 100%;
 }
