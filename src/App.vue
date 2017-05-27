@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="app">
+    <div class="main_app">
         <transition :name="transitionName">
             <router-view></router-view>
         </transition>
@@ -37,10 +37,17 @@
 </script>
 
 <style>
-    .app {
+
+    #app {
+        height: 100%;
+        overflow-y: visible;
+    }
+    
+    .main_app {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        height: 100%;
     }
 
     .slide-right-enter-active {

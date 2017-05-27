@@ -1,12 +1,15 @@
 <template>
-	<div>
-		<ul>
-			
+	<div class="brand_main">
+		<ul class="brand_list">
+			<tree-node v-for="item in brandList" :nodeData="item"></tree-node>
 		</ul>
 	</div>
 </template>
 
 <script>
+
+	import treeNode from '../../components/common/tree_node.vue';
+
 	export default {
 		data() {
 			return {
@@ -22,80 +25,74 @@
 			    let listData = response.data.data;
 
 			    listData.forEach(function(item) {
-			    	// console.log(item);
 
 			    	let tempData = {};
+			    	let tempChildren;
+
 			    	tempData.name = item.brand_name;
 			    	tempData.brandLogo = item.brand_logo;
+			    	tempData.level = 0;
 
 			    	if(item.CategoryList) {
-			    		tempData.children = that.handleList(item.CategoryList);
+			    		tempData.children = [];
+			    		tempChildren = that.handleList(item.CategoryList);
 			    	}
 
-			    	this.brandList.push(tempData);
+			    	let tempArr = [];
+
+			    	for(var item in tempChildren) {
+			    		tempData.children.push(tempChildren[item]);
+			    	}
+
+			    	that.brandList.push(tempData);
 			    });
+
 			})
 			.catch(function(err){
-				// console.log(err);
+				console.log(err);
 			});
-
-			// var data = {
-			// 	name: 'My Tree',
-			// 	children: [
-			// 		{ name: 'hello' },
-			//     	{ name: 'wat' },
-			//     	{
-			//       		name: 'child folder',
-			//       		children: [
-			// 	        	{
-			// 	          		name: 'child folder',
-			// 	          		children: [
-			// 	            		{ name: 'hello' },
-			// 	            		{ name: 'wat' }
-			// 	          		]
-			// 	        	},
-			// 		        { name: 'hello' },
-			// 		        { name: 'wat' },
-			// 		        {
-			// 		        	name: 'child folder',
-			// 		          	children: [
-			// 		            	{ name: 'hello' },
-			// 		            	{ name: 'wat' }
-			// 		          	]
-			// 		        }
-			// 	      	]
-			//     	}
-			//   	]
-			// }
-
-			
 		},
+
 		methods: {
 			handleList(categoryList) {
-
-				console.log(categoryList);
 
 				let result = {};
 
 				for(let i = 0, len = categoryList.length; i < len; i++) {
 					var item = categoryList[i];
 					if(item.parent_id <= 0) {
-						result[item.cat_id] = [];
+						result[item.cat_id] = {
+							name: item.cat_name,
+							level: item.level,
+							children: []
+						};
 					} else {
-						result[item.parent_id].push(item.cat_name);
+						result[item.parent_id].children.push({name: item.cat_name, level: item.level});
 					}
 					
 				}
-				console.log(result, '-----------');
 				return result;
 			}
+		},
+
+		components: {
+			treeNode
 		}
 	}
 </script>
 
 <style scoped>
-	div {
-		height: 736px;
-		background: #3ef4a2;
+
+	.brand_main {
+		min-height: 100%;
+		background: #000;
 	}
+
+	.brand_list {
+		color: #fff;
+		line-height: 1.690821rem;
+		padding-left: 0.241546rem;
+		margin-left: 1em;
+	}
+
 </style>
