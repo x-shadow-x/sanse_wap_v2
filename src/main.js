@@ -6,11 +6,12 @@ import $ from 'jquery'
 import './styles/common.css'
 import './config/flexible_css.js'
 import './config/flexible.js'
-import axios from 'axios'
 import store from './store'
+import axios from 'axios'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
+Vue.prototype.HOST = '/api'
 
 
 if ('addEventListener' in document) {

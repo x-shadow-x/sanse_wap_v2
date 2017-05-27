@@ -5,7 +5,7 @@
                 <router-link class="footer_menu_item_link footer_menu_home" to="/home">首页</router-link>
             </li>
             <li class="footer_menu_item">
-                <router-link class="footer_menu_item_link footer_menu_brand" to="/home">品牌</router-link>
+                <router-link class="footer_menu_item_link footer_menu_brand" to="/brand">品牌</router-link>
             </li>
             <li class="footer_menu_item">
                 <router-link class="footer_menu_item_link footer_menu_tide" to="/home">潮文</router-link>

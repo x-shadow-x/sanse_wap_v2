@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const state = {
     routerList: {
         '/home': 0,
+        '/brand': 1,
         '/user_index': 4
     }
 }

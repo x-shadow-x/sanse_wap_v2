@@ -44,10 +44,10 @@
     }
 
     .slide-right-enter-active {
-        transition: all .24s linear;
+        transition: all 1s linear;
     }
     .slide-right-leave-active {
-        transition: all .24s linear;
+        transition: all 1s linear;
     }
     .slide-right-enter, .slide-right-leave-to {
         transform: translateX(100%);
@@ -55,10 +55,10 @@
     }
 
     .slide-left-enter-active {
-        transition: all .24s linear;
+        transition: all 1s linear;
     }
     .slide-left-leave-active {
-        transition: all .24s linear;
+        transition: all 1s linear;
     }
     .slide-left-enter, .slide-left-leave-to {
         transform: translateX(-100%);
