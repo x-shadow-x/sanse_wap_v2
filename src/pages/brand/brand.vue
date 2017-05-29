@@ -1,19 +1,26 @@
 <template>
 	<div class="brand_main">
-		<ul class="brand_list">
-			<tree-node v-for="item in brandList" :nodeData="item"></tree-node>
-		</ul>
+        <div class="wrapper" id="wrapper">
+            <div class="scroller">
+                <ul class="brand_list">
+                    <tree-node v-for="item in brandList" :nodeData="item" :myScroll="myScroll"></tree-node>
+                </ul>
+            </div>
+        </div>
+
 	</div>
 </template>
 
 <script>
 
 	import treeNode from '../../components/common/tree_node.vue';
+    import  '../../plugins/iscroll.js';
 
 	export default {
 		data() {
 			return {
-				brandList: []
+				brandList: [],
+                myScroll: null
 			}
 		},
 
@@ -31,7 +38,9 @@
 
 			    	tempData.name = item.brand_name;
 			    	tempData.brandLogo = item.brand_logo;
+                    tempData.id = item.brand_id;
 			    	tempData.level = 0;
+
 
 			    	if(item.CategoryList) {
 			    		tempData.children = [];
@@ -47,10 +56,26 @@
 			    	that.brandList.push(tempData);
 			    });
 
+                console.log(that.brandList);
+
 			})
 			.catch(function(err){
 				console.log(err);
 			});
+
+            // ================================================================
+
+            function loaded() {
+                this.myScroll = new iScroll('wrapper', {
+                    useTransition: true,
+                    vScrollbar: false
+                });
+            }
+
+            // document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+            setTimeout(function() {
+                loaded.bind(this)();
+            }.bind(this), 500);
 		},
 
 		methods: {
@@ -64,12 +89,13 @@
 						result[item.cat_id] = {
 							name: item.cat_name,
 							level: item.level,
+                            id: item.cat_id,
 							children: []
 						};
 					} else {
 						result[item.parent_id].children.push({name: item.cat_name, level: item.level});
 					}
-					
+
 				}
 				return result;
 			}
@@ -84,8 +110,9 @@
 <style scoped>
 
 	.brand_main {
-		min-height: 100%;
-		background: #000;
+		height: 100vh;
+        position: relative;
+		background: #191919;
 	}
 
 	.brand_list {
@@ -94,5 +121,24 @@
 		padding-left: 0.241546rem;
 		margin-left: 1em;
 	}
+
+
+    /*------------------------------------------------*/
+    .wrapper {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        bottom: 1.562rem;
+        width: 100%;
+        background: #191919;
+        overflow: hidden;
+    }
+
+    .scroller {
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        padding: 0;
+    }
 
 </style>

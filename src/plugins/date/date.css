@@ -1,0 +1,285 @@
+body,
+div,
+ul,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+
+ul,
+li {
+    list-style: none;
+    list-style-type: none;
+}
+
+.page {
+    display: none;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#datescroll div {
+    float: left;
+    margin-left: 10%;
+    margin-top: 15px;
+    padding-right: 22px;
+}
+
+#datescroll_datetime div {
+    float: left;
+    margin-left: 10%;
+    padding-right: 22px;
+}
+
+#datescroll #yearwrapper {
+    position: absolute;
+    left: 0;
+    margin-top: 0;
+    top: 40px;
+    bottom: 0;
+    width: 80%;
+}
+
+#datescroll #monthwrapper {
+    position: absolute;
+    left: 26%;
+    margin-top: 0;
+    top: 40px;
+    bottom: 0;
+    width: 80%;
+}
+
+#datescroll #daywrapper {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    top: 40px;
+    margin-top: 0;
+    width: 80%;
+}
+
+#Hourwrapper {
+    position: absolute;
+    left: 0;
+    top: 195px;
+    bottom: 68px;
+    width: 80%;
+}
+
+#Minutewrapper {
+    position: absolute;
+    left: 26%;
+    top: 195px;
+    bottom: 68px;
+    width: 80%;
+}
+
+#Secondwrapper {
+    position: absolute;
+    left: 50%;
+    top: 195px;
+    bottom: 68px;
+    width: 80%;
+}
+
+#Hourwrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#Minutewrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#Secondwrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#Secondwrapper ul {
+    margin-top: 3px;
+}
+
+#yearwrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#monthwrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#daywrapper ul li {
+    color: #898989;
+    font-size: 16px;
+}
+
+#markyear {
+    position: relative;
+    margin-left: 76px;
+    top: -2px;
+}
+
+#markmonth {
+    position: relative;
+    margin-left: 40px;
+    top: -2px;
+}
+
+#markday {
+    position: relative;
+    margin-left: 42px;
+    top: -2px;
+}
+
+#markhour {
+    position: relative;
+    margin-left: 62px;
+    top: -2px;
+}
+
+#markminut {
+    position: relative;
+    margin-left: 58px;
+    top: -2px;
+}
+
+#marksecond {
+    position: relative;
+    margin-left: 68px;
+    top: -2px;
+}
+
+#dateheader {
+    width: 100%;
+    height: 50px;
+    background: #79C12F;
+    text-align: center;
+    color: #fff;
+    line-height: 50px;
+    font-size: 20px;
+}
+
+#dateconfirm,
+#datecancle {
+    position: absolute;
+    color: #000;
+    left: 3%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#datecancle {
+    left: auto;
+    right: 3%;
+}
+
+#dateshadow {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #000;
+    filter: alpha(Opacity=50);
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+}
+
+#datePage {
+    position: fixed;
+    bottom: 0;
+    vertical-align: middle;
+    width: 100%;
+    height: 290px;
+    background: #fff;
+    z-index: 9999999;
+}
+
+#datetitle {
+    width: 100%;
+    height: 40px;
+    background: #fff;
+    text-align: center;
+    color: #afafaf;
+    line-height: 40px;
+    position: relative;
+}
+
+#datemark {
+    left: 0;
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    top: 140px;
+    background: #fff;
+}
+
+#timemark {
+    display: none;
+}
+
+#datescroll {
+    background: #ddd;
+    width: 100%;
+    height: 250px;
+    text-align: center;
+    line-height: 50px;
+}
+
+#datescroll_datetime {
+    display: none;
+    background: #F8F8F8;
+    width: 94%;
+    margin: 10px 3%;
+    margin-top: 10px;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    height: 120px;
+    text-align: center;
+    line-height: 40px;
+}
+
+#yearwrapper ul,
+#monthwrapper ul,
+#daywrapper ul {
+    width: 40%;
+}
+
+#Hourwrapper ul,
+#Minutewrapper ul,
+#Secondwrapper ul {
+    width: 40%;
+}
+
+#dateFooter {
+    width: 100%;
+    background: #fff;
+    height: 50px;
+    bottom: 0px;
+    position: absolute;
+}

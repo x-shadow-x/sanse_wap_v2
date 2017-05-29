@@ -1,17 +1,17 @@
 <template>
 	<li :class="{first_sub_child: nodeData.level == 1}" :style="{marginLeft: (nodeData.level - 1) + 'em'}">
-        <div
-          :class="{bold: isFolder}"
-          @click="toggle">
-          <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
-          <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
+        <!-- <a :href="'#' + nodeData.id" :id="nodeData.id" :class="{bold: isFolder}" @click="toggle" class="block">
+            <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
+            <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
+        </a> -->
+
+        <div :class="{bold: isFolder}" @click="toggle($event)" class="block">
+            <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
+            <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
         </div>
         <transition name="list-toggle">
-          <ul v-show="open" v-if="isFolder">
-            <tree-node
-              class="sub_item"
-              v-for="item in nodeData.children"
-              :nodeData="item">
+          <ul v-show="open" v-if="isFolder" class="sub_list">
+            <tree-node class="sub_item" v-for="item in nodeData.children" :nodeData="item" :myScroll="myScroll">
             </tree-node>
           </ul>
         </transition>
@@ -20,10 +20,9 @@
 
 <script>
 
-	// import treeNode from './tree_node.vue';
 	export default {
     name: 'tree-node',
-		props: ['nodeData'],
+		props: ['nodeData', 'myScroll'],
 
 		data() {
 			return {
@@ -36,9 +35,14 @@
 			}
 		},
 		methods: {
-			toggle: function () {
+			toggle: function (event) {
 				if (this.isFolder) {
-					this.open = !this.open
+					this.open = !this.open;
+                    setTimeout(() => {
+                        console.log(this.myScroll.scrollToElement);
+                        this.myScroll.refresh();
+                        this.myScroll.scrollToElement(event.target, 240);
+                    }, 400);
 				}
 			}
 		}
@@ -47,36 +51,53 @@
 
 <style scoped>
 
-  .brand_logo {
-    width: 32px;
-    vertical-align: middle;
-    margin-right: 0.241546rem;
-  }
-
-  .brand_cat_text.bold {
-    font-weight: bold;
-  }
-
-  .brand_cat_text {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .first_sub_child {
-    padding-left: 1.014493rem;
-  }
-
-  .sub_item {
-      line-height: 1.207729rem;
-  }
-
-  .list-toggle-enter-active {
-        transition: all 1s linear;
+    .block {
+        display: block;
     }
+
+    .brand_logo {
+        width: 0.773rem;
+        vertical-align: middle;
+        margin-right: 0.241546rem;
+    }
+
+    .brand_cat_text.bold {
+        font-weight: bold;
+    }
+
+    .brand_cat_text {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .sub_list {
+        max-height: 7.729rem;
+        overflow: hidden;
+    }
+
+    .first_sub_child {
+        padding-left: 1.014493rem;
+    }
+
+    .sub_item {
+        line-height: 1.207729rem;
+    }
+
+    .list-toggle-enter .first_sub_child .sub_item:nth-child(even),
+    .list-toggle-leave-to .first_sub_child .sub_item:nth-child(even){
+        border: 1px solid #333;
+        box-shadow: inset 0 0 2px 2px #000;
+    }
+
+    .list-toggle-enter-active {
+        transition: all .6s linear;
+    }
+
     .list-toggle-leave-active {
-        transition: all 1s linear;
+        transition: all .4s cubic-bezier(0.1,0.9,1,1);
     }
+
     .list-toggle-enter, .list-toggle-leave-to {
-        height: 0;
+        max-height: 0;
     }
 </style>

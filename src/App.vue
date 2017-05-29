@@ -38,37 +38,40 @@
 
 <style>
 
+    html, body {
+        height: 100%;
+    }
+
     #app {
         height: 100%;
-        overflow-y: visible;
+        overflow: auto;
     }
-    
+
     .main_app {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         height: 100%;
+        overflow: visible;
     }
 
     .slide-right-enter-active {
-        transition: all 1s linear;
+        transition: all .32s;
     }
     .slide-right-leave-active {
-        transition: all 1s linear;
+        transition: all .32s;
     }
     .slide-right-enter, .slide-right-leave-to {
         transform: translateX(100%);
-        opacity: .32;
     }
 
     .slide-left-enter-active {
-        transition: all 1s linear;
+        transition: all .32s;
     }
     .slide-left-leave-active {
-        transition: all 1s linear;
+        transition: all .32s;
     }
     .slide-left-enter, .slide-left-leave-to {
         transform: translateX(-100%);
-        opacity: .32;
     }
 </style>

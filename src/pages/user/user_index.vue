@@ -56,7 +56,7 @@
 
         <ul class="user_fn_list">
             <li class="user_fn_item user_data">
-                <router-link to="/home" class="user_fn_content ofh">
+                <router-link to="/user_info" class="user_fn_content ofh">
                     <span class="fl title_text">个人资料</span>
                     <span class="fr user_fn_tip">完善信息领取100积分</span>
                 </router-link>
