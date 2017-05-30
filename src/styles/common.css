@@ -75,15 +75,6 @@ table {
     border-spacing: 0;
 }
 
-hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #cccccc;
-    margin: 1em 0;
-    padding: 0;
-}
-
 input, select {
     vertical-align: middle;
 }
@@ -91,11 +82,10 @@ input, select {
 html, body {
     height: 100%;
     box-sizing: border-box;
-    padding-bottom: 1.562rem;
 }
 body {
-    color: #929292;
-    font-size: 12px;
+    color: #333;
+    font-size: 13px;
 }
 
 [data-dpr="2"] body {
@@ -120,4 +110,16 @@ body {
 
 #app {
     min-width: 100%;
+}
+
+.confirm_btn_box {
+    line-height: 1.4rem;
+    text-align: center;
+    background: #ef8200;
+    color: #fff;
+    letter-spacing: 0.097rem;
+}
+
+.confirm_btn {
+    display: block;
 }

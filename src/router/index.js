@@ -4,6 +4,7 @@ const home = r => require.ensure([], () => r(require('../pages/home/home.vue')),
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
+const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
 
 
 export default [{
@@ -37,7 +38,13 @@ export default [{
         path: '/user_info',
         component: userInfo,
         meta: {
-            title: '会员中心'
+            title: '个人资料'
+        }
+    }, {
+        path: '/bind_phone_number',
+        component: bindPhoneNumber,
+        meta: {
+            title: '修改绑定手机号码'
         }
     }]
 }]

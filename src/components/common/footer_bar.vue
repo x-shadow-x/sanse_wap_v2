@@ -17,7 +17,7 @@
                 <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>
             </li>
         </ul>
-        <!-- <div class="footer_blank"></div> -->
+        <div class="footer_blank"></div>
     </div>
 </template>
 
@@ -35,7 +35,7 @@ export default {
 <style scoped>
 
     .footer_blank {
-        height: 1.562rem;
+        height: 1.4rem;
     }
 
 	.footer_menu_lists {
@@ -43,10 +43,10 @@ export default {
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 1.562rem;
+        height: 1.4rem;
 		display: flex;
         background: #191919;
-        font-size: 9px;
+        color: #fff;
 	}
 
     [data-dpr="2"] .footer_menu_lists {
@@ -60,6 +60,7 @@ export default {
 	.footer_menu_item {
 		flex: 1;
 		text-align: center;
+        font-size: 9px;
 	}
 
     .footer_menu_item_link {

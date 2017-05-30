@@ -10,7 +10,8 @@ const state = {
         '/home': 0,
         '/brand': 1,
         '/user_index': 4,
-        '/user_info': 5
+        '/user_info': 5,
+        '/bind_phone_number': 15
     }
 }
 
