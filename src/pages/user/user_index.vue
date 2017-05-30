@@ -16,7 +16,7 @@
                     <div class="account">13535124518</div>
                     <div class="card_type_box">
                         <span class="card_type">普通会员</span>
-                        <span class="special_right">S'pecial特权</span>
+                        <span class="special_right"></span>
                     </div>
                 </div>
             </div>
