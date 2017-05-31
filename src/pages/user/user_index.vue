@@ -105,7 +105,7 @@
                     {
                         'text': '红包',
                         'propertyValue': '0.00',
-                        'to': '/home'
+                        'to': '/red_package'
                     },
                     {
                         'text': '积分',
