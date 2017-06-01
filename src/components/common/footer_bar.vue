@@ -1,6 +1,6 @@
 <template>
 	<div class="footer_bar">
-        <ul class="footer_menu_lists">
+        <ul class="footer_menu_lists" id="footerMenuList">
             <li class="footer_menu_item">
                 <router-link class="footer_menu_item_link footer_menu_home" to="/home">首页</router-link>
             </li>
