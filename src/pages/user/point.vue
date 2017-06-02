@@ -1,33 +1,26 @@
 <template>
-	<div class="red_package_main">
+	<div class="point_main">
 		<div class="main_content" @scroll="handleScroll($event)" @touchstart="retract">
 			<div class="info_box" id="infoBox">
-				<div class="package_value" :style="{marginBottom: marginBottom + '%'}">
+				<div class="point_value" :style="{marginBottom: marginBottom + '%'}">
 					<span class="integer" :style="{fontSize: fontSize + 'px'}">{{redPackageValueInteger}}.</span>{{redPackageValueDecimals}}元
 				</div>
-				<span class="package_btn" :style="{opacity: opacity}">使用红包购物</span>
 			</div>
 			<div class="record_list_box" id="recordListBox" @touchstart.stop="spread">
 				<div class="scroller">
-					<div class="record_title_box">红包记录</div>
+					<div class="record_title_box">积分记录</div>
 					<ul class="record_list">
-						<li class="record_item" v-for="item in redPackageRecord">
-							<span class="date">{{item.display_taketime}}</span>
-							<div class="amount_box" :class="{cut_down: item.pack_type != 1}">
-								<span class="amount">{{item.amount}}</span>
+						<li class="record_item" v-for="item in pointRecord">
+							<span class="date">{{item.operDate}}</span>
+							<div class="amount_box" :class="{cut_down: item.point < 0}">
+								<span class="amount">{{item.point}}</span>
 							</div>
 							<div class="remark_box">
-								<template v-if="item.pack_type == 1">
-									<p class="remark">{{item.pack_type_name}}</p>
-									<p class="display_expire_date">{{item.display_expire_date}}后过期</p>
-								</template>
-								<template v-else>
-									<p class="remark">{{item.pack_type_name}}</p>
-								</template>
+								<p class="remark">{{item.remark}}</p>
 							</div>
 						</li>
 					</ul>
-					<div :class="{transparent: !isMore}">
+					<div :class="{transparent: !isIScroll}">
 						<div id="pullUp">
 							<span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
 						</div>
@@ -53,9 +46,9 @@
 				myScroll: null,
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
-				isMore: false, 
+				isIScroll: false,
 				redPackageValue: 756.32,
-				redPackageRecord: [],
+				pointRecord: [],
 				fontSize: FONTSIZE,
 				marginBottom: MARGINBOTTOM, //红包数值所在盒子的底部外边距范围为(-20%~10%)
 				MAXSCROLLDISTANCE: 0, // 页面主题部分所能滚动的最大距离
@@ -78,7 +71,7 @@
 			handleScroll(even) {
 				var curentFontSize = FONTSIZE - even.target.scrollTop;
 				this.opacity = ($('#recordListBox').offset().top - this.TOPTHRESHOLD) / this.MAXSCROLLDISTANCE;
-				this.marginBottom = 3 * MARGINBOTTOM * (($('#recordListBox').offset().top - this.TOPTHRESHOLD) / this.MAXSCROLLDISTANCE) - 2 * MARGINBOTTOM;
+				this.marginBottom = 2 * MARGINBOTTOM * (($('#recordListBox').offset().top - this.TOPTHRESHOLD) / this.MAXSCROLLDISTANCE) - MARGINBOTTOM;
 				this.fontSize = curentFontSize > 40 ? curentFontSize : 40;
 			},
 
@@ -105,29 +98,25 @@
 
 			function handleDate(data) {
 				data.forEach(function(item) {
-					let tempTakeTime = item.display_taketime.split(' ');
-					item.display_taketime = tempTakeTime[0].substr(6) + ' ' + tempTakeTime[1].substring(0, tempTakeTime[1].length - 2);
-					if(item.pack_type == 1) {
-						let tempExpireDate = item.display_expire_date.split(' ');
-						item.display_expire_date = tempExpireDate[0].substr(6) + ' ' + tempExpireDate[1].substring(0, tempExpireDate[1].length - 2);
-					}
+					let tempoperDate = item.operDate.split(' ');
+					item.operDate = tempoperDate[0].substr(6) + ' ' + tempoperDate[1].substring(0, tempoperDate[1].length - 2);
 				})
 			}
 
-			this.$request.get('/Get_user_red_packList/', {
+			this.$request.get('/Get_PointList/', {
 				'userId': '304014',
 				'pageIndex': '1',
 				'pageSize': '10'
 			}, (response) => {
 				let data = response.data;
-				let totalRecord = data.redPacketNum; // 红包记录总数
-				if(totalRecord > 10) {
-					this.isMore = true;
-				}
-				handleDate(data.listredPackflow);
-				
 
-				this.redPackageRecord = data.listredPackflow; // 红包记录数组
+				handleDate(data);
+				this.pointRecord = data; // 积分记录数组
+
+				if(data.length == 10) { 
+					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
+					this.isIScroll = true;
+				}
 			})
 
 
@@ -144,22 +133,6 @@
 
 			function pullUpAction () {
 
-				this.$http.get(this.HOST + '/Get_user_red_packList/MzA0MDE0&Mg==&MTA=')
-				.then((response) => {
-
-					let data = response.data.data;
-					let totalRecord = data.redPacketNum; // 红包记录总数
-					handleDate(data.listredPackflow);
-
-					this.redPackageRecord.push(...data.listredPackflow); // 红包记录数组
-					setTimeout(() => {
-						this.myScroll.refresh();
-					}, 320);
-				})
-				.catch(function(err){
-					console.log(err);
-				});
-				
 			}
 
 			function loaded() {
@@ -203,13 +176,12 @@
 			setTimeout(() => {
 				loaded.bind(this)();
 			}, 900);
-			
         }
 	}
 </script>
 
 <style scoped>
-	.red_package_main {
+	.point_main {
 		position: absolute;
 		z-index: 2;
 		left: 0;
@@ -217,7 +189,7 @@
 		top: 0;
 		bottom: 0;
 		overflow: hidden;
-		background: url('../../images/red_package/my_package_bg.jpg') center top repeat-y;
+		background: url('../../images/point/my_points_bg.jpg') center top repeat-y;
 		background-size: 100% auto;
 	}
 
@@ -231,7 +203,7 @@
 		margin-top: 32%;
 	}
 
-	.package_value {
+	.point_value {
 		color: #e47372;
 		font-size: 24px;
 		margin-bottom: 10%;
@@ -243,7 +215,7 @@
 		transition: font-size .1s;
 	}
 
-	.package_btn {
+	.point_btn {
 		display: inline-block;
 		background: #ef8200;
 		color: #fff;
@@ -352,7 +324,6 @@
 	.amount_box.cut_down:after {
 		background-image: url('../../images/user_index/amount_cut_down_arrow.png')
 	}
-
 
 	.remark_box {
 		position: absolute;

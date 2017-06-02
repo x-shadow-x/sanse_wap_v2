@@ -100,7 +100,7 @@
                     {
                         'text': '余额',
                         'propertyValue': '0.00',
-                        'to': '/home'
+                        'to': '/blance'
                     },
                     {
                         'text': '红包',
@@ -110,7 +110,7 @@
                     {
                         'text': '积分',
                         'propertyValue': '286',
-                        'to': '/home'
+                        'to': '/point'
                     },
                     {
                         'text': '优惠券',
