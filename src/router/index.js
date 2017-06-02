@@ -8,6 +8,9 @@ const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/b
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
 const redPackage = r => require.ensure([], () => r(require('../pages/user/red_package.vue')), 'user')
 const point = r => require.ensure([], () => r(require('../pages/user/point.vue')), 'user')
+const coupon = r => require.ensure([], () => r(require('../pages/user/coupon.vue')), 'user')
+const couponNoUse = r => require.ensure([], () => r(require('../pages/user/coupon_no_use.vue')), 'user')
+const couponOverdue = r => require.ensure([], () => r(require('../pages/user/coupon_overdue.vue')), 'user')
 
 
 export default [{
@@ -67,5 +70,15 @@ export default [{
         meta: {
             title: '我的积分'
         }
+    }, {
+        path: '/coupon',
+        component: coupon,
+        meta: {
+            title: '优惠券'
+        },
+        children:[
+            { path: '/coupon/no_use', component: couponNoUse, meta: {title: '优惠券'}},
+            { path: '/coupon/overdue', component: couponOverdue, meta: {title: '优惠券'}}
+        ]
     }]
 }]

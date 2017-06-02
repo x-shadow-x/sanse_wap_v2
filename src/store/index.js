@@ -11,10 +11,11 @@ const state = {
         '/brand': 1,
         '/user_index': 4,
         '/user_info': 5,
-        '/red_package': 15,
-        '/point': 16,
-        '/blance': 17,
-        '/bind_phone_number': 18
+        '/blance': 15,
+        '/red_package': 16,
+        '/point': 17,
+        '/coupon': 18,
+        '/bind_phone_number': 19
     }
 }
 

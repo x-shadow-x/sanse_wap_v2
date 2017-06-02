@@ -115,7 +115,7 @@
                     {
                         'text': '优惠券',
                         'propertyValue': '3',
-                        'to': '/home'
+                        'to': '/coupon/no_use'
                     }
                 ],
 

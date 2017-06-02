@@ -41,7 +41,6 @@
 <script>
 
 	import  '../../plugins/iscroll.js';
-	import '../../config/request.js';
 
 	const FONTSIZE = 90; // 红包整数部分数值原始字体大小
 	const MARGINBOTTOM = 10; // 红包数据值所在盒子的原始底部外边距

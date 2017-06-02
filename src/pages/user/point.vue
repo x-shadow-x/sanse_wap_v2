@@ -20,7 +20,7 @@
 							</div>
 						</li>
 					</ul>
-					<div :class="{transparent: !isIScroll}">
+					<div :class="{transparent: !isMore}">
 						<div id="pullUp">
 							<span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
 						</div>
@@ -34,7 +34,6 @@
 <script>
 
 	import  '../../plugins/iscroll.js';
-	import '../../config/request.js';
 
 	const FONTSIZE = 90; // 红包整数部分数值原始字体大小
 	const MARGINBOTTOM = 10; // 红包数据值所在盒子的原始底部外边距
@@ -46,7 +45,7 @@
 				myScroll: null,
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
-				isIScroll: false,
+				isMore: false,
 				redPackageValue: 756.32,
 				pointRecord: [],
 				fontSize: FONTSIZE,
@@ -115,7 +114,7 @@
 
 				if(data.length == 10) { 
 					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
-					this.isIScroll = true;
+					this.isMore = true;
 				}
 			})
 
