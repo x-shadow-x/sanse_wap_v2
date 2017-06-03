@@ -86,12 +86,10 @@
                         item.discount = (+item.discount).toFixed(1);
                     }
 
-                    // console.log(item.discount);
-
                     var tempTypeMoneyArr = item.type_money.split('.');
-                    if(tempTypeMoneyArr[1].length == '00') {
+                    if(tempTypeMoneyArr[1] == '00') {
                         item.type_money = tempTypeMoneyArr[0];
-                    } else {
+                    } else if(/[1-9]0/.test(tempTypeMoneyArr[1])) {
                         item.type_money = (+item.type_money).toFixed(1);
                     }
                 });
