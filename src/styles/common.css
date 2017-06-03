@@ -61,6 +61,10 @@ a {
     text-decoration: none;
 }
 
+body a:link, body a:visited, body a:hover {
+    text-decoration: none;
+}
+
 del {
     text-decoration: line-through;
 }

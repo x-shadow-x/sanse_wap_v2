@@ -1,19 +1,30 @@
 <template>
-	<div class="record_list_box" id="recordListBox">
+	<div class="record_list_box" id="couponNoUseListBox">
 		<div class="scroller">
 			<ul class="record_list">
-				<li class="record_item" v-for="item in couponRecord">
-					<img :src="item.bg_image_path" alt="优惠券背景图" class="coupon_bg">
-					<div class="coupon_value">
-						<template v-if="item.discount == '0.00'">
-							<span class="coupon_value">{{item.type_money}}</span>
-							<span class="quantifier">元</span>
-						</template>
-						<template v-else>
-							<span class="coupon_value">{{item.discount}}</span>
-							<span class="quantifier">折</span>
-						</template>
-					</div>
+				<li class="record_item" v-for="(item, index) in couponRecord" :key="item.bonus_id">
+                    <!-- <img :src="item.bg_image_path" alt="优惠券背景图" class="coupon_bg"> -->
+					<div class="coupon_box">
+                        <img src="../../images/temp_coupon.jpg" alt="优惠券背景图" class="coupon_bg">
+                        <div class="coupon_value_box">
+                            <template v-if="item.discount == '0'">
+                                <span class="coupon_value">{{item.type_money}}</span>
+                                <span class="quantifier">元</span>
+                            </template>
+                            <template v-else>
+                                <span class="coupon_value">{{item.discount}}</span>
+                                <span class="quantifier">折</span>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="intro_box">
+                        <div class="intro" :class="{spread: item.isSpread}">
+                            <p class="intro_text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        </div>
+                        <div class="intro_box_tab" @click="toggleSpread(index)">
+                            <span class="intro_box_tab_text">适用范围</span><i class="arrow_icon" :class="{spread: item.isSpread}"></i>
+                        </div>
+                    </div>
 				</li>
 			</ul>
 			<div :class="{transparent: !isMore}">
@@ -29,6 +40,8 @@
 
 	import  '../../plugins/iscroll.js';
 
+    const PAGESIZE = 5;
+
 	export default {
 
 		data() {
@@ -40,6 +53,10 @@
 		},
 
 		methods: {
+            toggleSpread(index) {
+                let tempValue = this.couponRecord[index].isSpread;
+                this.couponRecord[index].isSpread = !tempValue;
+            }
 		},
 
 		mounted() {
@@ -48,17 +65,44 @@
 				'userId': '304014',
 				'type': '1',
 				'pageIndex': '1',
-				'pageSize': '10'
+				'pageSize': PAGESIZE
 			}, (response) => {
 				let data = response.data;
+                pretreatData(data);
+				this.couponRecord = data;
 
-				this.couponRecord = data; // 积分记录数组
-
-				if(data.length == 10) { 
-					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
+				if(data.length == PAGESIZE) {
+					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求时声明的一页的条数~就认为需要分页
 					this.isMore = true;
-				}
-			})
+				} else {
+                    this.isMore = true;
+                }
+
+                setTimeout(() => {
+                    this.myScroll.refresh();
+                }, 320);
+			});
+
+            function pretreatData(data) {
+                data.forEach(function(item) {
+                    item.isSpread = false;
+                    var tempDiscountArr = item.discount.split('.');
+                    if(tempDiscountArr[1] == '00') {
+                        item.discount = tempDiscountArr[0];
+                    } else {
+                        item.discount = (+item.discount).toFixed(1);
+                    }
+
+                    // console.log(item.discount);
+
+                    var tempTypeMoneyArr = item.type_money.split('.');
+                    if(tempTypeMoneyArr[1].length == '00') {
+                        item.type_money = tempTypeMoneyArr[0];
+                    } else {
+                        item.type_money = (+item.type_money).toFixed(1);
+                    }
+                });
+            }
 
 			var pullUpEl,
 				pullUpOffset,
@@ -66,15 +110,35 @@
 				tempLoad = 0;
 
 			function pullUpAction () {
+                this.$request.get('/Get_MemberInfo_BonusList/', {
+                    'userId': '304014',
+                    'type': '1',
+                    'pageIndex': '1',
+                    'pageSize': PAGESIZE
+                }, (response) => {
+                    let data = response.data;
+                    pretreatData(data);
+                    this.couponRecord.push(...data);
 
+                    if(data.length == PAGESIZE) {
+                        // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
+                        this.isMore = true;
+                    } else {
+                        this.isMore = true;
+                    }
+
+                    setTimeout(() => {
+                        this.myScroll.refresh();
+                    }, 320);
+                })
 			}
 
 			function loaded() {
-				pullUpEl = document.getElementById('pullUp');	
+				pullUpEl = document.getElementById('pullUp');
 				pullUpOffset = pullUpEl.offsetHeight;
 				var that = this;
-				
-				this.myScroll = new iScroll('recordListBox', {
+
+				this.myScroll = new iScroll('couponNoUseListBox', {
 					useTransition: true,
 					vScrollbar: false,
 					onRefresh: function () {
@@ -97,19 +161,15 @@
 					onScrollEnd: function () {
 						if (pullUpEl.className.match('flip')) {
 							pullUpEl.className = 'loading';
-							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';				
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
 							pullUpAction.bind(that)();	// Execute custom function (ajax call?)
 						}
 					}
 				});
-				
-				setTimeout(function () { document.getElementById('recordListBox').style.left = '0'; }, 800);
 			}
 
 			document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-			setTimeout(() => {
-				loaded.bind(this)();
-			}, 900);
+            loaded.bind(this)();
         }
 	}
 </script>
@@ -136,22 +196,93 @@
 	}
 
 	.record_item {
-		position: relative;
-		font-size: 0;
-		padding: 0.386473rem 0;
-		line-height: 16px;
+		margin: 0 auto 30px auto;
 	}
+
+    .coupon_box {
+        position: relative;
+        font-size: 0;
+    }
 
 	.coupon_bg {
 		width: 100%;
 	}
+
+    .coupon_value_box {
+        position: absolute;
+        color: #fff;
+        left: 10px;
+        bottom: 20px;
+    }
+
+    .coupon_value {
+        font-size: 50px;
+    }
+
+    .quantifier {
+        display: inline-block;
+        vertical-align: top;
+        font-size: 16px;
+    }
+
+    .intro_box {
+        border-radius: 0 0 10px 10px;
+        background: #fff;
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    .intro {
+        margin: 0 6%;
+        line-height: 16px;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height .4s cubic-bezier(0, .9, 1, 1);
+    }
+
+    .intro.spread {
+        transition: max-height 1.2s;
+        max-height: 320px;
+    }
+
+    .intro_text {
+        border-bottom: 1px solid #efefef;
+        padding: 0.29rem 0;
+    }
+
+    .intro_box_tab {
+        line-height: 0.773rem;
+        text-align: center;
+    }
+
+    .intro_box_tab_text,
+    .arrow_icon {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .intro_box_tab_text {
+        margin-right: 0.121rem;
+    }
+
+    .arrow_icon {
+        width: 10px;
+        height: 10px;
+        background: url('../../images/common/pull_arrow.png') center no-repeat;
+        background-size: 10px auto;
+        transition: transform .32s;
+    }
+
+    .arrow_icon.spread {
+        transform:rotate(180deg);
+    }
 
 	.transparent {
 		visibility: hidden;
 	}
 
 	#pullUp {
-		line-height:40px;
+		line-height: 40px;
 		text-align: center;
 	}
 

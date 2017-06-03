@@ -19,14 +19,29 @@
 	export default {
 
 		data() {
-			return {}
-		},
+            return {
+                transitionName: 'slide-right'
+            }
+        },
 
 		methods: {
 		},
 
 		mounted() {
-        }
+        },
+        watch: {
+            '$route' (to, from) {
+                let routerList = this.$store.state.routerList;
+                let nextPath = to.path;
+                let current = from.path;
+
+                if(routerList[nextPath] < routerList[current]) {
+                    this.transitionName = 'slide-right';
+                } else {
+                    this.transitionName = 'slide-left';
+                }
+            }
+        },
 	}
 </script>
 
@@ -57,7 +72,6 @@
 		display: inline-block;
 		flex: 1;
 	    text-align: center;
-	    font-size: 9px;
 	}
 
 	.router-link-active {

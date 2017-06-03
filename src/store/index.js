@@ -15,7 +15,9 @@ const state = {
         '/red_package': 16,
         '/point': 17,
         '/coupon': 18,
-        '/bind_phone_number': 19
+        '/bind_phone_number': 19,
+        '/coupon/no_use': 30,
+        '/coupon/overdue': 31,
     }
 }
 
