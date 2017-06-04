@@ -52,7 +52,7 @@
 				myScroll: null,
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
-				isMore: false, 
+				isMore: false,
 				redPackageValue: 756.32,
 				redPackageRecord: [],
 				fontSize: FONTSIZE,
@@ -96,7 +96,7 @@
 					$('.main_content').animate({scrollTop: 0}, 500);
 					this.isSpread = false;
 				}
-				
+
 			}
 		},
 
@@ -113,18 +113,17 @@
 				})
 			}
 
-			this.$request.get('/Get_user_red_packList/', {
+			this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
 				'userId': '304014',
 				'pageIndex': '1',
-				'pageSize': '10'
+				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
 				let data = response.data;
 				let totalRecord = data.redPacketNum; // 红包记录总数
-				if(totalRecord > 10) {
+				if(totalRecord > this.$interface.PAGE_SIZE) {
 					this.isMore = true;
 				}
 				handleDate(data.listredPackflow);
-				
 
 				this.redPackageRecord = data.listredPackflow; // 红包记录数组
 			})
@@ -143,29 +142,31 @@
 
 			function pullUpAction () {
 
-				this.$http.get(this.HOST + '/Get_user_red_packList/MzA0MDE0&Mg==&MTA=')
-				.then((response) => {
+                this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
+                    'userId': '304014',
+                    'pageIndex': '2',
+                    'pageSize': this.$interface.PAGE_SIZE
+                }, (response) => {
+                    let data = response.data;
+                    let totalRecord = data.redPacketNum; // 红包记录总数
+                    if(totalRecord > this.$interface.PAGE_SIZE) {
+                        this.isMore = true;
+                    }
+                    handleDate(data.listredPackflow);
 
-					let data = response.data.data;
-					let totalRecord = data.redPacketNum; // 红包记录总数
-					handleDate(data.listredPackflow);
+                    this.redPackageRecord.push(...data.listredPackflow); // 红包记录数组
+                    setTimeout(() => {
+                        this.myScroll.refresh();
+                    }, 320);
+                })
 
-					this.redPackageRecord.push(...data.listredPackflow); // 红包记录数组
-					setTimeout(() => {
-						this.myScroll.refresh();
-					}, 320);
-				})
-				.catch(function(err){
-					console.log(err);
-				});
-				
 			}
 
 			function loaded() {
-				pullUpEl = document.getElementById('pullUp');	
+				pullUpEl = document.getElementById('pullUp');
 				pullUpOffset = pullUpEl.offsetHeight;
 				var that = this;
-				
+
 				this.myScroll = new iScroll('recordListBox', {
 					useTransition: true,
 					vScrollbar: false,
@@ -189,12 +190,12 @@
 					onScrollEnd: function () {
 						if (pullUpEl.className.match('flip')) {
 							pullUpEl.className = 'loading';
-							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';				
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
 							pullUpAction.bind(that)();	// Execute custom function (ajax call?)
 						}
 					}
 				});
-				
+
 				setTimeout(function () { document.getElementById('recordListBox').style.left = '0'; }, 800);
 			}
 
@@ -202,7 +203,7 @@
 			setTimeout(() => {
 				loaded.bind(this)();
 			}, 900);
-			
+
         }
 	}
 </script>

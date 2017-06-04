@@ -7,6 +7,7 @@ import './styles/common.css'
 import './config/flexible_css.js'
 import './config/flexible.js'
 import request from './config/request.js'
+import interfaceConfig from './config/interface_config.js'
 import store from './store'
 import axios from 'axios'
 
@@ -14,6 +15,7 @@ Vue.config.productionTip = false
 Vue.prototype.$http = axios
 Vue.prototype.HOST = '/api'
 Vue.prototype.$request = request
+Vue.prototype.$interface = interfaceConfig
 
 
 if ('addEventListener' in document) {

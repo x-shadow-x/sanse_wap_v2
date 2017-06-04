@@ -27,43 +27,36 @@
 		mounted() {
 
 			var that = this;
-			this.$http.get(this.HOST + '/GetBrandWithCategory_List/MA==')
-			.then(function(response){
-			    let listData = response.data.data;
+            this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORYLIST, {
+                'brand_id': '0'
+            }, (response) => {
+                let listData = response.data;
 
-			    listData.forEach(function(item) {
+                listData.forEach((item) => {
 
-			    	let tempData = {};
-			    	let tempChildren;
+                    let tempData = {};
+                    let tempChildren;
 
-			    	tempData.name = item.brand_name;
-			    	tempData.brandLogo = item.brand_logo;
+                    tempData.name = item.brand_name;
+                    tempData.brandLogo = item.brand_logo;
                     tempData.id = item.brand_id;
-			    	tempData.level = 0;
+                    tempData.level = 0;
 
 
-			    	if(item.CategoryList) {
-			    		tempData.children = [];
-			    		tempChildren = that.handleList(item.CategoryList);
-			    	}
+                    if(item.CategoryList) {
+                        tempData.children = [];
+                        tempChildren = that.handleList(item.CategoryList);
+                    }
 
-			    	let tempArr = [];
+                    let tempArr = [];
 
-			    	for(var item in tempChildren) {
-			    		tempData.children.push(tempChildren[item]);
-			    	}
+                    for(var item in tempChildren) {
+                        tempData.children.push(tempChildren[item]);
+                    }
 
-			    	that.brandList.push(tempData);
-			    });
-
-                console.log(that.brandList);
-
-			})
-			.catch(function(err){
-				console.log(err);
-			});
-
-            // ================================================================
+                    this.brandList.push(tempData);
+                });
+            })
 
             function loaded() {
                 this.myScroll = new iScroll('wrapper', {

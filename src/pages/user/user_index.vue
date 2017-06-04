@@ -34,7 +34,7 @@
         <div class="box">
             <div class="my_order ofh">
                 <span class="title_text fl">我的订单</span>
-                <router-link to="/hpme" class="check_all_order fr">
+                <router-link to="/all_orders" class="check_all_order fr">
                     <span class="check_all_order_text">查看全部</span>
                     <i class="link_icon"></i>
                 </router-link>
@@ -82,13 +82,11 @@
                 </router-link>
             </li>
         </ul>
-        <!-- <footer-bar></footer-bar> -->
     </div>
 
 </template>
 
 <script>
-    // import footerBar from '../../components/common/footer_bar.vue';
 
     export default {
         data() {
@@ -140,11 +138,6 @@
                     }
                 ]
             }
-        },
-        // components: {
-        //     footerBar
-        // },
-        methods: {
         },
         mounted() {
             // 头部显示阈值

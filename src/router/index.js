@@ -3,14 +3,17 @@ import App from '../App'
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
-const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
-const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
+
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
 const redPackage = r => require.ensure([], () => r(require('../pages/user/red_package.vue')), 'user')
 const point = r => require.ensure([], () => r(require('../pages/user/point.vue')), 'user')
 const coupon = r => require.ensure([], () => r(require('../pages/user/coupon.vue')), 'user')
 const couponNoUse = r => require.ensure([], () => r(require('../pages/user/coupon_no_use.vue')), 'user')
 const couponOverdue = r => require.ensure([], () => r(require('../pages/user/coupon_overdue.vue')), 'user')
+const allOrders = r => require.ensure([], () => r(require('../pages/user/all_orders.vue')), 'orders')
+
+const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
+const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
 
 
 export default [{
@@ -41,18 +44,6 @@ export default [{
             title: '会员中心'
         }
     }, {
-        path: '/user_info',
-        component: userInfo,
-        meta: {
-            title: '个人资料'
-        }
-    }, {
-        path: '/bind_phone_number',
-        component: bindPhoneNumber,
-        meta: {
-            title: '修改绑定手机号码'
-        }
-    }, {
         path: '/blance',
         component: blance,
         meta: {
@@ -76,9 +67,36 @@ export default [{
         meta: {
             title: '优惠券'
         },
-        children:[
-            { path: '/coupon/no_use', component: couponNoUse, meta: {title: '优惠券'}},
-            { path: '/coupon/overdue', component: couponOverdue, meta: {title: '优惠券'}}
-        ]
+        children: [{
+            path: '/coupon/no_use',
+            component: couponNoUse,
+            meta: {
+                title: '优惠券'
+            }
+        }, {
+            path: '/coupon/overdue',
+            component: couponOverdue,
+            meta: {
+                title: '优惠券'
+            }
+        }]
+    }, {
+        path: '/user_info',
+        component: userInfo,
+        meta: {
+            title: '个人资料'
+        }
+    }, {
+        path: '/bind_phone_number',
+        component: bindPhoneNumber,
+        meta: {
+            title: '修改绑定手机号码'
+        }
+    }, {
+        path: '/all_orders',
+        component: allOrders,
+        meta: {
+            title: '全部订单'
+        }
     }]
 }]

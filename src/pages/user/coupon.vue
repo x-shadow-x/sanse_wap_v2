@@ -24,11 +24,6 @@
             }
         },
 
-		methods: {
-		},
-
-		mounted() {
-        },
         watch: {
             '$route' (to, from) {
                 let routerList = this.$store.state.routerList;

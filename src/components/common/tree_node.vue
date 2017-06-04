@@ -21,7 +21,7 @@
 <script>
 
 	export default {
-    name: 'tree-node',
+        name: 'tree-node',
 		props: ['nodeData', 'myScroll'],
 
 		data() {

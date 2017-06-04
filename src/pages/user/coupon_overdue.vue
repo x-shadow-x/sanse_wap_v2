@@ -33,8 +33,6 @@
 
     import  '../../plugins/iscroll.js';
 
-    const PAGESIZE = 5;
-
     export default {
 
         data() {
@@ -54,17 +52,17 @@
 
         mounted() {
 
-            this.$request.get('/Get_MemberInfo_BonusList/', {
+            this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
                 'userId': '304014',
                 'type': '4',
                 'pageIndex': '1',
-                'pageSize': PAGESIZE
+                'pageSize': this.$interface.PAGE_SIZE
             }, (response) => {
                 let data = response.data;
                 pretreatData(data);
                 this.couponRecord = data;
 
-                if(data.length == PAGESIZE) {
+                if(data.length == this.$interface.PAGE_SIZE) {
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求时声明的一页的条数~就认为需要分页
                     this.isMore = true;
                 } else {
@@ -101,17 +99,17 @@
                 tempLoad = 0;
 
             function pullUpAction () {
-                this.$request.get('/Get_MemberInfo_BonusList/', {
+                this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
                     'userId': '304014',
                     'type': '1',
                     'pageIndex': '1',
-                    'pageSize': PAGESIZE
+                    'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {
                     let data = response.data;
                     pretreatData(data);
                     this.couponRecord.push(...data);
 
-                    if(data.length == PAGESIZE) {
+                    if(data.length == this.$interface.PAGE_SIZE) {
                         // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                         this.isMore = true;
                     } else {

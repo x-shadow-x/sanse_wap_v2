@@ -89,7 +89,7 @@
 					$('.main_content').animate({scrollTop: 0}, 500);
 					this.isSpread = false;
 				}
-				
+
 			}
 		},
 
@@ -102,17 +102,17 @@
 				})
 			}
 
-			this.$request.get('/Get_User_AccountList/', {
+			this.$request.get(this.$interface.GET_USER_ACCOUNT_LIST, {
 				'userId': '304014',
 				'pageIndex': '1',
-				'pageSize': '10'
+				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
 				let data = response.data;
 
 				handleDate(data);
 				this.blanceRecord = data; // 积分记录数组
 
-				if(data.length == 10) { 
+				if(data.length == 10) {
 					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
 					this.isMore = true;
 				}
@@ -135,10 +135,10 @@
 			}
 
 			function loaded() {
-				pullUpEl = document.getElementById('pullUp');	
+				pullUpEl = document.getElementById('pullUp');
 				pullUpOffset = pullUpEl.offsetHeight;
 				var that = this;
-				
+
 				this.myScroll = new iScroll('recordListBox', {
 					useTransition: true,
 					vScrollbar: false,
@@ -162,12 +162,12 @@
 					onScrollEnd: function () {
 						if (pullUpEl.className.match('flip')) {
 							pullUpEl.className = 'loading';
-							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';				
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
 							pullUpAction.bind(that)();	// Execute custom function (ajax call?)
 						}
 					}
 				});
-				
+
 				setTimeout(function () { document.getElementById('recordListBox').style.left = '0'; }, 800);
 			}
 
