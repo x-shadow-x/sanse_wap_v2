@@ -121,19 +121,16 @@
                     {
                         'text': '待付款',
                         'iconUrl': require('../../images/user_index/pay_icon.png'),
-                        'propertyValue': '0.00',
-                        'to': '/home'
+                        'to': '/order_no_pay'
                     },
                     {
                         'text': '待发货',
                         'iconUrl': require('../../images/user_index/send_goods_icon.png'),
-                        'propertyValue': '0.00',
-                        'to': '/home'
+                        'to': '/orders_no_send'
                     },
                     {
                         'text': '待收货',
                         'iconUrl': require('../../images/user_index/receive_goods_icon.png'),
-                        'propertyValue': '286',
                         'to': '/home'
                     }
                 ]
