@@ -112,7 +112,7 @@
 				handleDate(data);
 				this.blanceRecord = data; // 积分记录数组
 
-				if(data.length == 10) {
+				if(data.length == this.$interface.PAGE_SIZE) {
 					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
 					this.isMore = true;
 				}

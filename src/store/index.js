@@ -25,7 +25,8 @@ const state = {
         '/bind_phone_number': 30,
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
-    }
+    },
+    isShowLoad: false
 }
 
 export default new Vuex.Store({

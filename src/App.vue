@@ -4,20 +4,25 @@
             <router-view></router-view>
         </transition>
         <footer-bar></footer-bar>
+        <load :show="this.$store.state.isShowLoad"></load>
     </div>
 </template>
 
 <script>
     import footerBar from './components/common/footer_bar.vue';
+    import load from './components/common/load.vue';
+
     export default {
         name: 'app',
         data() {
             return {
-                transitionName: 'slide-right'
+                transitionName: 'slide-right',
+                isShowLoad: false
             }
         },
         components: {
-            footerBar
+            footerBar,
+            load
         },
         watch: {
             '$route' (to, from) {

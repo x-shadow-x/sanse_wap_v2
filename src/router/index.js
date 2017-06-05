@@ -10,7 +10,9 @@ const point = r => require.ensure([], () => r(require('../pages/user/point.vue')
 const coupon = r => require.ensure([], () => r(require('../pages/user/coupon.vue')), 'user')
 const couponNoUse = r => require.ensure([], () => r(require('../pages/user/coupon_no_use.vue')), 'user')
 const couponOverdue = r => require.ensure([], () => r(require('../pages/user/coupon_overdue.vue')), 'user')
+
 const allOrders = r => require.ensure([], () => r(require('../pages/user/all_orders.vue')), 'orders')
+const orderDetail = r => require.ensure([], () => r(require('../pages/user/order_detail.vue')), 'orders')
 
 const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
 const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
@@ -97,6 +99,12 @@ export default [{
         component: allOrders,
         meta: {
             title: '全部订单'
+        }
+    }, {
+        path: '/order_detail/:order_id',
+        component: orderDetail,
+        meta: {
+            title: '订单详情'
         }
     }]
 }]

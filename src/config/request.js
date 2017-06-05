@@ -49,15 +49,21 @@ function queryEncoded(params) {
 */
 function apiAxios (method, url, params, success, failure) {
 	method = method.toUpperCase();
-
+	let headerInfo = null;
 	if(method == 'GET' && params) {
+		if(params && params.header) {
+			headerInfo = params.header;
+			delete params.header;
+		}
+
 		url = url + queryEncoded(params);
 	}
-
+	
 	axios({
 		method: method,
 		url: url,
 		data: method === 'POST' || method === 'PUT' ? params : null,
+		headers: headerInfo ? headerInfo : null,
 	    // params: method === 'GET' || method === 'DELETE' ? params : null,
 	    baseURL: root,
 	    withCredentials: false

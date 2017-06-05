@@ -1,11 +1,13 @@
-const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
+const SHOW_LOAD = 'SHOW_LOAD'
+const HIDE_LOAD = 'HIDE_LOAD'
 
 export default {
-    [TOGGLE_SIDEBAR](state, payload) {
-        if (payload.spreadSidebar == true) {
-            state.spreadSidebar = true;
-        } else {
-            state.spreadSidebar = false;
-        }
+
+    [SHOW_LOAD](state) {
+    	state.isShowLoad = true;
+    },
+    
+    [HIDE_LOAD](state) {
+    	state.isShowLoad = false;
     }
 }
