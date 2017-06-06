@@ -19,6 +19,7 @@ const orderDetail = r => require.ensure([], () => r(require('../pages/user/order
 
 const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
 const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
+const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'user')
 
 
 export default [{
@@ -126,6 +127,12 @@ export default [{
         component: orderDetail,
         meta: {
             title: '订单详情'
+        }
+    }, {
+        path: '/address_manager',
+        component: addressManager,
+        meta: {
+            title: '地址管理'
         }
     }]
 }]

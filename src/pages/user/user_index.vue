@@ -62,7 +62,7 @@
                 </router-link>
             </li>
             <li class="user_fn_item location_manager">
-                <router-link to="/home" class="user_fn_content ofh">
+                <router-link to="/address_manager" class="user_fn_content ofh">
                     <span class="fl title_text">地址管理</span>
                 </router-link>
             </li>
