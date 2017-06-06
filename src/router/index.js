@@ -14,6 +14,7 @@ const couponOverdue = r => require.ensure([], () => r(require('../pages/user/cou
 const allOrders = r => require.ensure([], () => r(require('../pages/user/all_orders.vue')), 'orders')
 const ordersNoPay = r => require.ensure([], () => r(require('../pages/user/orders_no_pay.vue')), 'orders')
 const ordersNoSend = r => require.ensure([], () => r(require('../pages/user/orders_no_send.vue')), 'orders')
+const ordersNoReceive = r => require.ensure([], () => r(require('../pages/user/orders_no_receive.vue')), 'orders')
 const orderDetail = r => require.ensure([], () => r(require('../pages/user/order_detail.vue')), 'orders')
 
 const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
@@ -113,6 +114,12 @@ export default [{
         component: ordersNoSend,
         meta: {
             title: '待发货订单'
+        }
+    }, {
+        path: '/orders_no_receive',
+        component: ordersNoReceive,
+        meta: {
+            title: '待收货订单'
         }
     }, {
         path: '/order_detail/:order_id',

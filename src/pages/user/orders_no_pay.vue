@@ -250,7 +250,7 @@
 
     .filter_tab {
         display: flex;
-        line-height: 1rem;
+        line-height: 1.4rem;
         text-align: center;
         border-bottom: 1px solid #e6e6e6;
     }
@@ -275,7 +275,7 @@
     .record_list_box {
         position: absolute;
         width: 100%;
-        top: 1rem;
+        top: 1.4rem;
         bottom: 0;
         left: 0;
         overflow: hidden;
@@ -372,6 +372,7 @@
         background-size: 100% auto;
         margin-right: 0.193237rem;
     }
+
     .pullUpLabel {
         display: inline-block;
         vertical-align: middle;
@@ -379,7 +380,7 @@
 
     .empty_orders_tip_contain {
         position: absolute;
-        top: 1rem;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
@@ -387,22 +388,26 @@
 
     .empty_orders_tip_box {
         position: absolute;
-        top: 30%;
+        top: 36%;
         left: 50%;
         transform: translate(-50%, -50%);
         background: url('../../images/orders_common/orders_no_pay_empty.png') center  15% no-repeat;
-        background-size: 40px auto;
-        padding-top: 1.449rem;
+        background-size: 60px auto;
+        padding-top: 70px;
         color: #939393;
         text-align: center;
     }
 
     .link {
-        display: inline-block;
+        position: absolute;
+        left: 50%;
+        top: 100%;
+        transform: translateX(-50%);
+        white-space: nowrap;
         text-align: center;
         background: #ef8200;
         color: #fff;
-        padding: 0.242rem 0.966rem;
+        padding: 0.338164rem 1.111111rem;
         margin-top: 0.483rem;
     }
 </style>

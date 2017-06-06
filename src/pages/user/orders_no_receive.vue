@@ -6,11 +6,6 @@
                     {{item.text}}
                 </li>
             </ul>
-            <ul class="sub_filter_tab">
-                <li class="sub_filter_tab_item" :class="{active: item.isActive}" v-for="(item, index) in subFilterTab" @click="handleSubFilter(index)">
-                    {{item.text}}
-                </li>
-            </ul>
         </div>
         <div class="record_list_box" id="recordListBox">
             <div class="scroller">
@@ -36,7 +31,7 @@
                 </ul>
                 <div v-else class="empty_orders_tip_contain">
                     <div class="empty_orders_tip_box">
-                        <p class="empty_orders_tip">暂无订单</p>
+                        <p class="empty_orders_tip">暂无待收货</p>
                         <router-link to="/home" class="link" v-if="orderType == 1">去挑选</router-link>
                     </div>
                 </div>
@@ -61,7 +56,7 @@
                 myScroll: null,
                 isMore: false,
                 orderType: 1, // 1：手机订单~ 2：店铺订单
-                orderStatus: 10, // 10：未完成~ 5：已完成~ 4：退货
+                orderStatus: 3, // 1：待收货
                 pageIndex: 1,
                 dataInterface: '',
                 orderRecord: [],
@@ -77,23 +72,6 @@
                         'isActive': false
                     }
                 ],
-                subFilterTab: [
-                    {
-                        'text': '未完成',
-                        'type': '10',
-                        'isActive': true
-                    },
-                    {
-                        'text': '已完成',
-                        'type': '5',
-                        'isActive': false
-                    },
-                    {
-                        'text': '退货',
-                        'type': '4',
-                        'isActive': false
-                    }
-                ],
                 showLoad: false
             }
         },
@@ -101,7 +79,6 @@
         methods: {
             handleFilter(index) {
                 this.pageIndex = 1;
-
                 let currentItem = this.filterTab[index];
                 if(currentItem.isActive) {
                     return;
@@ -137,53 +114,7 @@
                     if(data.length == this.$interface.PAGE_SIZE) {
                         this.isMore = true;
                     }
-                    
-                    setTimeout(() => {
-                        this.myScroll.refresh();
-                    }, 320);
-                });
 
-                
-            },
-
-            handleSubFilter(index) {
-                this.pageIndex = 1;
-
-                let currentItem = this.subFilterTab[index];
-                if(currentItem.isActive) {
-                    return;
-                }
-                this.subFilterTab.forEach(function(item) {
-                    item.isActive = false;
-                });
-                currentItem.isActive = true;
-                this.orderStatus = currentItem.type;
-
-                this.$store.commit('SHOW_LOAD');
-
-                this.$request.get(this.dataInterface, {
-                    'header': {
-                        'platform_src': 'WAP',
-                        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
-                        'systype': 'wap'
-                    },
-                    'userId': '304014',
-                    'orderStatus': this.orderStatus,
-                    'pageSize': this.$interface.PAGE_SIZE,
-                    'pageIndex': this.pageIndex++
-                }, (response) => {
-
-                    this.$store.commit('HIDE_LOAD');
-
-                    let data = response.data;
-
-                    this.orderRecord = data;
-
-                    if(data.length == this.$interface.PAGE_SIZE) {
-                        // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
-                        this.isMore = true;
-                    }
-                    
                     setTimeout(() => {
                         this.myScroll.refresh();
                     }, 320);
@@ -214,7 +145,7 @@
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                     this.isMore = true;
                 }
-                
+
                 setTimeout(() => {
                     this.myScroll.refresh();
                 }, 320);
@@ -242,7 +173,6 @@
                     this.orderRecord.push(...data);
 
                     if(data.length == this.$interface.PAGE_SIZE) {
-                        // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                         this.isMore = true;
                     } else {
                         this.isMore = false;
@@ -283,7 +213,7 @@
                         if (pullUpEl.className.match('flip')) {
                             pullUpEl.className = 'loading';
                             pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
-                            pullUpAction.bind(that)();  // Execute custom function (ajax call?)
+                            pullUpAction.bind(that)();
                         }
                     }
                 });
@@ -318,16 +248,14 @@
         width: 100%;
     }
 
-    .filter_tab,
-    .sub_filter_tab {
+    .filter_tab {
         display: flex;
         line-height: 1.4rem;
         text-align: center;
         border-bottom: 1px solid #e6e6e6;
     }
 
-    .filter_tab_item,
-    .sub_filter_tab_item{
+    .filter_tab_item {
         flex: 1;
         text-align: center;
         position: relative;
@@ -335,22 +263,19 @@
         color: #626262;
     }
 
-    .filter_tab_item + .filter_tab_item,
-    .sub_filter_tab_item + .sub_filter_tab_item {
+    .filter_tab_item + .filter_tab_item {
         border-left: 1px solid #efefef;
     }
 
-    .filter_tab_item.active,
-    .sub_filter_tab_item.active {
+    .filter_tab_item.active {
         background: #fff;
         color: #333;
     }
 
-
     .record_list_box {
         position: absolute;
         width: 100%;
-        top: 2.8rem;
+        top: 1.4rem;
         bottom: 0;
         left: 0;
         overflow: hidden;
@@ -360,8 +285,8 @@
         position: absolute;
         z-index: 1;
         width: 100%;
-        min-height: 100%;
         padding: 0;
+        min-height: 100%;
     }
 
     .record_list {
@@ -447,7 +372,7 @@
         background-size: 100% auto;
         margin-right: 0.193237rem;
     }
-
+    
     .pullUpLabel {
         display: inline-block;
         vertical-align: middle;
@@ -463,10 +388,10 @@
 
     .empty_orders_tip_box {
         position: absolute;
-        top: 32%;
+        top: 36%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: url('../../images/orders_common/orders_empty.png') center  15% no-repeat;
+        background: url('../../images/orders_common/orders_no_send_empty.png') center  15% no-repeat;
         background-size: 60px auto;
         padding-top: 70px;
         color: #939393;

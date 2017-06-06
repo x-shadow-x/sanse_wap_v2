@@ -131,7 +131,7 @@
                     {
                         'text': '待收货',
                         'iconUrl': require('../../images/user_index/receive_goods_icon.png'),
-                        'to': '/home'
+                        'to': '/orders_no_receive'
                     }
                 ]
             }
