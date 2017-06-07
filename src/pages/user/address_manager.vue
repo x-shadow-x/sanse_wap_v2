@@ -1,5 +1,5 @@
 <template>
-	<div class="address_manager_contain">
+	<div class="address_manager_main">
 		<router-link to="/address_add" class="address_add_router">
 			<span class="address_add_router_text">添加新地址</span>
 		</router-link>
@@ -74,7 +74,7 @@
 </script>
 
 <style scoped>
-	.address_manager_contain {
+	.address_manager_main {
 		position: fixed;
 		z-index: 12;
 		left: 0;

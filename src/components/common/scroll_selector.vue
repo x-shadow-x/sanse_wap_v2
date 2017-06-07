@@ -1,11 +1,11 @@
 <template>
-	<div>
-        <input type="text" @click.self="showScrollSelector($event)">
+	<div class="scroll_selector_main">
+        <input type="text" @click.self="showScrollSelector($event)" :placeholder="placeholderText" class="scroll_selector_input">
 		<div id="dateshadow"></div>
 		<div id="datePage" class="page">
 			<section>
 				<div id="datetitle">
-					<h1>选择日期</h1>
+					<h1>{{scrollerTitle}}</h1>
 					<span id="dateconfirm" @click="getValue">确定</span>
 					<span id="datecancle" @click="hideScrollSelector">取消</span>
 				</div>
@@ -22,17 +22,17 @@
 	            <div id="datescroll">
 	            	<div id="yearwrapper">
 	            		<ul>
-	            			<li v-for="item in tempLevel1">{{item.text}}</li>
+	            			<li v-for="item in primaryScrollerData">{{item.text}}</li>
 	            		</ul>
 	            	</div>
 	            	<div id="monthwrapper">
 		            	<ul>
-		            		<li v-for="item in tempLevel2">{{item.text}}</li>
+		            		<li v-for="item in secondryScrollerData">{{item.text}}</li>
 		            	</ul>
 		            </div>
 	            	<div id="daywrapper">
 	            		<ul>
-	            			<li v-for="item in tempLevel3">{{item.text}}</li>
+	            			<li v-for="item in tertiaryScrollerData">{{item.text}}</li>
 	            		</ul>
 	            	</div>
 	            </div>
@@ -46,99 +46,6 @@
 	export default {
 		data() {
 			return {
-				tempLevel1: [
-					{
-						'text': ''
-					},{
-						'text': ''
-					},{
-						'text': '北京'
-					},{
-						'text': '北京2'
-					},{
-						'text': '北京3'
-					},{
-						'text': '北京4'
-					},{
-						'text': '北京5'
-					},{
-						'text': '北京6'
-					},{
-						'text': '北京7'
-					},{
-						'text': '北京8'
-					},{
-						'text': '北京9'
-					},{
-						'text': '北京10'
-					},{
-						'text': ''
-					},{
-						'text': ''
-					}
-				],
-				tempLevel2: [
-					{
-						'text': ''
-					},{
-						'text': ''
-					},{
-						'text': '北京'
-					},{
-						'text': '北京2'
-					},{
-						'text': '北京3'
-					},{
-						'text': '北京4'
-					},{
-						'text': '北京5'
-					},{
-						'text': '北京6'
-					},{
-						'text': '北京7'
-					},{
-						'text': '北京8'
-					},{
-						'text': '北京9'
-					},{
-						'text': '北京10'
-					},{
-						'text': ''
-					},{
-						'text': ''
-					}
-				],
-				tempLevel3: [
-					{
-						'text': ''
-					},{
-						'text': ''
-					},{
-						'text': '北京'
-					},{
-						'text': '北京2'
-					},{
-						'text': '北京3'
-					},{
-						'text': '北京4'
-					},{
-						'text': '北京5'
-					},{
-						'text': '北京6'
-					},{
-						'text': '北京7'
-					},{
-						'text': '北京8'
-					},{
-						'text': '北京9'
-					},{
-						'text': '北京10'
-					},{
-						'text': ''
-					},{
-						'text': ''
-					}
-				],
                 indexY: 2,
                 indexM: 2,
                 indexD: 2,
@@ -148,6 +55,7 @@
                 opts: null
 			}
 		},
+        props: ['placeholderText', 'scrollerTitle', 'primaryScrollerData', 'secondryScrollerData', 'tertiaryScrollerData'],
 
 		methods: {
             initScroll() {
@@ -1083,6 +991,10 @@
 		mounted() {
 			this.initScroll();
 			this.initScrollContain();
+
+            console.log(this.primaryScrollerData);
+            console.log(this.secondryScrollerData);
+            console.log(this.tertiaryScrollerData);
 		}
 	}
 </script>

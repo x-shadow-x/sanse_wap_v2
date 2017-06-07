@@ -10,4 +10,5 @@ export default {
     'GET_ALL_ORDER_ENTITY': '/Get_ALLOrderEntity/', // 订单详情
     'GET_USER_ADDRESS_LIST': '/GetUserAddressList/', // 用户地址列表
     'UPDATE_ADDRESS_IS_DEFAULT': '/Update_AddressIsDefault/', // 更新默认地址
+    'GET_ADDRESS_LIST': '/GetAddressList', // 获取省市区数据
 }
