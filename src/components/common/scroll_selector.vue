@@ -958,16 +958,22 @@
             },
 
             init_iScrll() {
-                var strY = $("#yearwrapper ul li:eq(" + this.indexY + ")").html().substr(0, $("#yearwrapper ul li:eq(" + this.indexY + ")").html().length - 1);
-                var strM = $("#monthwrapper ul li:eq(" + this.indexM + ")").html().substr(0, $("#monthwrapper ul li:eq(" + this.indexM + ")").html().length - 1);
+                var strY = $("#yearwrapper ul li:eq(" + this.indexY + ")").html();
+                var strM = $("#monthwrapper ul li:eq(" + this.indexM + ")").html();
 
                 this.yearScroll = new iScroll("yearwrapper", {
                     snap: "li",
                     vScrollbar: false,
                     onScrollEnd: () => {
                         this.indexY = (this.yearScroll.y / 50) * (-1) + 2;
-                        this.dayScroll.refresh();
-                        this.$emit('increment')
+
+                        this.$emit('primaryScrollerEnd', this.indexY);
+                        this.monthScroll.scrollToElement(document.querySelector('#monthwrapper li:nth-child(1)'), 320);
+                        this.dayScroll.scrollToElement(document.querySelector('#daywrapper li:nth-child(1)'), 320);
+                        setTimeout(() => {
+                            this.monthScroll.refresh();
+                            this.dayScroll.refresh();
+                        }, 500);
                     }
                 });
                 this.monthScroll = new iScroll("monthwrapper", {
@@ -975,8 +981,12 @@
                     vScrollbar: false,
                     onScrollEnd: () => {
                         this.indexM = (this.monthScroll.y / 50) * (-1) + 2;
-                        this.dayScroll.refresh();
-                        this.$emit('increment')
+
+                        this.$emit('secondryScrollerEnd', this.indexM);
+                        this.dayScroll.scrollToElement(document.querySelector('#daywrapper li:nth-child(1)'), 320);
+                        setTimeout(() => {
+                            this.dayScroll.refresh();
+                        }, 500);
                     }
                 });
                 this.dayScroll = new iScroll("daywrapper", {
@@ -986,6 +996,16 @@
                         this.indexD = (this.dayScroll.y / 50) * (-1) + 2;
                     }
                 });
+
+                this.indexY = (this.yearScroll.y / 50) * (-1) + 2;
+
+                this.$emit('primaryScrollerEnd', this.indexY);
+                this.monthScroll.scrollToElement(document.querySelector('#monthwrapper li:nth-child(1)'), 320);
+                this.dayScroll.scrollToElement(document.querySelector('#daywrapper li:nth-child(1)'), 320);
+                setTimeout(() => {
+                    this.monthScroll.refresh();
+                    this.dayScroll.refresh();
+                }, 500);
             }
 
 		},

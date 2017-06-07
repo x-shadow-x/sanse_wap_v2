@@ -1,5 +1,5 @@
 <template>
-	<div class="load_box" v-if="show">
+	<div class="load_box" v-if="show" @click.stop="">
 		<span class="load"></span>
 	</div>
 </template>

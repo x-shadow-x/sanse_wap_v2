@@ -12,12 +12,14 @@
 
 		<div class="info_input_box">
 			<span class="info_name">所在地区：</span>
-			<scroller-selector 
-			:placeholderText="'省-市-区'" 
+			<scroller-selector
+			:placeholderText="'省-市-区'"
 			:scrollerTitle="'选择地址'"
-			:primaryScrollerData="primaryScrollerData" 
-			:secondryScrollerData="secondryScrollerData" 
-			:tertiaryScrollerData="tertiaryScrollerData"></scroller-selector>
+			:primaryScrollerData="primaryScrollerData"
+			:secondryScrollerData="secondryScrollerData"
+			:tertiaryScrollerData="tertiaryScrollerData"
+            @primaryScrollerEnd="primaryScrollerEnd"
+            @secondryScrollerEnd="secondryScrollerEnd"></scroller-selector>
 		</div>
 
 		<div class="info_input_box">
@@ -50,13 +52,28 @@
 				tertiaryScrollerData: []
 			}
 		},
+        methods: {
+
+            filling(data) {
+                data.unshift({'text': '', 'regionId': ''}, {'text': '', 'regionId': ''});
+                data.push(...[{'text': '', 'regionId': ''}, {'text': '', 'regionId': ''}]);
+            },
+
+            primaryScrollerEnd(index) {
+                let regionId = this.primaryScrollerData[index].regionId;
+                this.secondryScrollerData = this.primaryMap[regionId];
+                this.tertiaryScrollerData = this.secondryMap[this.secondryScrollerData[2].regionId];
+            },
+
+            secondryScrollerEnd(index) {
+
+                let regionId = this.secondryScrollerData[index].regionId;
+                console.log(regionId);
+                this.tertiaryScrollerData = this.secondryMap[regionId];
+            }
+        },
 		mounted() {
-
-			function filling(data) {
-				data.unshift({'text': '', 'regionId': ''}, {'text': '', 'regionId': ''});
-				data.push(...[{'text': '', 'regionId': ''}, {'text': '', 'regionId': ''}]);
-			}
-
+            this.$store.commit('SHOW_LOAD');
 			function handleData(data) {
 				data.forEach((item) => {
 					let parentId = item.parentId;
@@ -84,23 +101,36 @@
 				});
 
 				// 对滚动数据列表首尾各添加两个填充的数据
-				filling(this.primaryScrollerData);
+				this.filling(this.primaryScrollerData);
+
+                let tempPrimaryMap = this.primaryMap;
+
+                for(let key in tempPrimaryMap) {
+                    this.filling(tempPrimaryMap[key]);
+                }
+
+                let tempSecondryMap = this.secondryMap;
+
+                for(let key in tempSecondryMap) {
+                    this.filling(tempSecondryMap[key]);
+                }
 
 				this.primaryIndex = this.primaryScrollerData[2].regionId;
 
 				this.secondryScrollerData.push(...(this.primaryMap[this.primaryIndex]));
-				filling(this.secondryScrollerData);
+				// this.filling(this.secondryScrollerData);
 
 				this.secondryIndex = this.secondryScrollerData[2].regionId;
-				
+
 				this.tertiaryScrollerData.push(...(this.secondryMap[this.secondryIndex]));
-				filling(this.tertiaryScrollerData);
+				// this.filling(this.tertiaryScrollerData);
 			}
 
 			this.$request.get(this.$interface.GET_ADDRESS_LIST, null, (response) => {
 
 				handleData.bind(this)(response.data);
-				
+                this.$store.commit('HIDE_LOAD');
+
 			})
 		},
 		components: {
