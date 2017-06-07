@@ -26,7 +26,8 @@ const state = {
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
     },
-    isShowLoad: false
+    isShowLoad: false,
+    isShowAlert: false
 }
 
 export default new Vuex.Store({

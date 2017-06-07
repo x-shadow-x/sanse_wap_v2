@@ -2,14 +2,16 @@ import App from '../App'
 
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
-const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 
+const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
 const redPackage = r => require.ensure([], () => r(require('../pages/user/red_package.vue')), 'user')
 const point = r => require.ensure([], () => r(require('../pages/user/point.vue')), 'user')
 const coupon = r => require.ensure([], () => r(require('../pages/user/coupon.vue')), 'user')
 const couponNoUse = r => require.ensure([], () => r(require('../pages/user/coupon_no_use.vue')), 'user')
 const couponOverdue = r => require.ensure([], () => r(require('../pages/user/coupon_overdue.vue')), 'user')
+const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
+const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
 
 const allOrders = r => require.ensure([], () => r(require('../pages/user/all_orders.vue')), 'orders')
 const ordersNoPay = r => require.ensure([], () => r(require('../pages/user/orders_no_pay.vue')), 'orders')
@@ -17,9 +19,8 @@ const ordersNoSend = r => require.ensure([], () => r(require('../pages/user/orde
 const ordersNoReceive = r => require.ensure([], () => r(require('../pages/user/orders_no_receive.vue')), 'orders')
 const orderDetail = r => require.ensure([], () => r(require('../pages/user/order_detail.vue')), 'orders')
 
-const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
-const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
-const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'user')
+const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'address')
+const addressAdd = r => require.ensure([], () => r(require('../pages/user/address_add.vue')), 'address')
 
 
 export default [{
@@ -133,6 +134,12 @@ export default [{
         component: addressManager,
         meta: {
             title: '地址管理'
+        }
+    }, {
+        path: '/address_add',
+        component: addressAdd,
+        meta: {
+            title: '新增地址'
         }
     }]
 }]

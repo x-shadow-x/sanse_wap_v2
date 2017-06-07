@@ -8,4 +8,6 @@ export default {
     'GET_APP_VARIOUSTYPE_ORDER_LIST': '/Get_APP_VariousType_OrderList/', // 个人中心手机订单
     'GET_MWIN_ORDER_LIST': '/Get_MWIN_OrderList_ByMemberId/', // 个人中心店铺订单
     'GET_ALL_ORDER_ENTITY': '/Get_ALLOrderEntity/', // 订单详情
+    'GET_USER_ADDRESS_LIST': '/GetUserAddressList/', // 用户地址列表
+    'UPDATE_ADDRESS_IS_DEFAULT': '/Update_AddressIsDefault/', // 更新默认地址
 }

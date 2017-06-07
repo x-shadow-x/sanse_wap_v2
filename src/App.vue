@@ -5,12 +5,14 @@
         </transition>
         <footer-bar></footer-bar>
         <load :show="this.$store.state.isShowLoad"></load>
+        <alert :isShowAlert="this.$store.isShowAlert"></alert>
     </div>
 </template>
 
 <script>
     import footerBar from './components/common/footer_bar.vue';
     import load from './components/common/load.vue';
+    import alert from './components/common/alert.vue'
 
     export default {
         name: 'app',
@@ -22,7 +24,8 @@
         },
         components: {
             footerBar,
-            load
+            load,
+            alert
         },
         watch: {
             '$route' (to, from) {
