@@ -14,12 +14,14 @@
 			<span class="info_name">所在地区：</span>
 			<scroller-selector
 			:placeholderText="'省-市-区'"
-			:scrollerTitle="'选择地址'"
+            :scrollerTitle="'选择地址'"
+			:scrollValue="distinctAddress"
 			:primaryScrollerData="primaryScrollerData"
 			:secondryScrollerData="secondryScrollerData"
 			:tertiaryScrollerData="tertiaryScrollerData"
             @primaryScrollerEnd="primaryScrollerEnd"
-            @secondryScrollerEnd="secondryScrollerEnd"></scroller-selector>
+            @secondryScrollerEnd="secondryScrollerEnd"
+            @getValue="getValue"></scroller-selector>
 		</div>
 
 		<div class="info_input_box">
@@ -60,16 +62,20 @@
             },
 
             primaryScrollerEnd(index) {
+                index = Math.ceil(index);
                 let regionId = this.primaryScrollerData[index].regionId;
                 this.secondryScrollerData = this.primaryMap[regionId];
                 this.tertiaryScrollerData = this.secondryMap[this.secondryScrollerData[2].regionId];
             },
 
             secondryScrollerEnd(index) {
-
+                index = Math.ceil(index);
                 let regionId = this.secondryScrollerData[index].regionId;
-                console.log(regionId);
                 this.tertiaryScrollerData = this.secondryMap[regionId];
+            },
+
+            getValue(value) {
+                this.distinctAddress = value;
             }
         },
 		mounted() {

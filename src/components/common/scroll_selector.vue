@@ -1,6 +1,6 @@
 <template>
 	<div class="scroll_selector_main">
-        <input type="text" @click.self="showScrollSelector($event)" :placeholder="placeholderText" class="scroll_selector_input">
+        <input type="text" @click.self="showScrollSelector($event)" :placeholder="placeholderText" class="scroll_selector_input" v-model="scrollValue">
 		<div id="dateshadow"></div>
 		<div id="datePage" class="page">
 			<section>
@@ -55,7 +55,7 @@
                 opts: null
 			}
 		},
-        props: ['placeholderText', 'scrollerTitle', 'primaryScrollerData', 'secondryScrollerData', 'tertiaryScrollerData'],
+        props: ['placeholderText', 'scrollerTitle', 'primaryScrollerData', 'secondryScrollerData', 'tertiaryScrollerData', 'scrollValue'],
 
 		methods: {
             initScroll() {
@@ -921,6 +921,7 @@
 
                 $("#datePage").hide();
                 $("#dateshadow").hide();
+                this.$emit('getValue', datestr);
                 console.log(datestr);
             },
 
