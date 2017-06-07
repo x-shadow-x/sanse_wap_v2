@@ -967,6 +967,7 @@
                     onScrollEnd: () => {
                         this.indexY = (this.yearScroll.y / 50) * (-1) + 2;
                         this.dayScroll.refresh();
+                        this.$emit('increment')
                     }
                 });
                 this.monthScroll = new iScroll("monthwrapper", {
@@ -975,6 +976,7 @@
                     onScrollEnd: () => {
                         this.indexM = (this.monthScroll.y / 50) * (-1) + 2;
                         this.dayScroll.refresh();
+                        this.$emit('increment')
                     }
                 });
                 this.dayScroll = new iScroll("daywrapper", {
@@ -991,10 +993,6 @@
 		mounted() {
 			this.initScroll();
 			this.initScrollContain();
-
-            console.log(this.primaryScrollerData);
-            console.log(this.secondryScrollerData);
-            console.log(this.tertiaryScrollerData);
 		}
 	}
 </script>
