@@ -19,7 +19,7 @@
 				</div>
 				<div class="handle_box">
 					<router-link :to="{ path:'/address_edit', query: {addressId:item.address_id, index: index} }" class="address_edit_router"></router-link>
-					<span class="delete_address" @click.stop="deleteAddress"></span>
+					<span class="delete_address" @click.stop="deleteAddress(index)"></span>
 					<span class="default_address_tip" v-if="item.IsDefault == 1">默认地址</span>
 					<span class="default_address_setting" v-else>设置默认</span>
 				</div>
@@ -45,24 +45,42 @@
 				isShowConfirm: false,
 				tipTitleF: '',
 				tipContentF: '',
-				confirmCbName: ''
+				confirmCbName: '',
+				confirmCbParams: {}
 			}
 		},
 
 		methods: {
-			deleteAddress() {
+
+			/**
+			 * 点击删除按钮后弹出用户确认弹框~根据用户的选择做不同的处理
+			 * 此处选择的方式是在触发弹框的函数里指定将来用户选择确定按钮时执行的回调函数的名字和需要使用的参数
+			 * 然后在confirm组件中对用户的不同的操作分别触发不同的事件传递回此父组件
+			 * 然后在确认按钮对应的事件中调用指定的回调函数并传入相应的参数
+			 */
+			deleteAddress(index) {
 				this.tipTitleF = '确认要删除吗？';
 				this.isShowConfirm = true;
 				this.confirmCbName = 'removeAddress';
+				this.confirmCbParams.index = index;
 			},
 
-			removeAddress() {
-				console.log(123);
+			removeAddress(index) {
+				this.$store.commit('SHOW_LOAD');
+
+				let selectedAddress = this.addressList[index];
+
+				this.$request.get(this.$interface.DEL_ADDRESS, {
+					'addressId': selectedAddress.address_id
+				}, (response) => {
+					this.addressList.splice(index, 1);
+					this.$store.commit('HIDE_LOAD');
+				});
 			},
 
 			confirmEvent() {
 				this.isShowConfirm = false;
-				this[this.confirmCbName]();
+				this[this.confirmCbName](this.confirmCbParams.index);
 			},
 
 			cancelEvent() {

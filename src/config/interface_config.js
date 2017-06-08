@@ -13,4 +13,5 @@ export default {
     'GET_ADDRESS_LIST': '/GetAddressList', // 获取省市区数据
     'ADD_ADDRESS': '/Add_Address/', // 新增地址上传数据
     'EDIT_ADDRESS': '/Edit_Address/', // 编辑地址上传数据
+    'DEL_ADDRESS': '/Del_Address//', // 编辑地址上传数据
 }
