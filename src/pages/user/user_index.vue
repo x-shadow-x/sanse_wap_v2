@@ -34,7 +34,7 @@
         <div class="box">
             <div class="my_order ofh">
                 <span class="title_text fl">我的订单</span>
-                <router-link to="/all_orders" class="check_all_order fr">
+                <router-link to="/orders_all" class="check_all_order fr">
                     <span class="check_all_order_text">查看全部</span>
                     <i class="link_icon"></i>
                 </router-link>
@@ -67,7 +67,7 @@
                 </router-link>
             </li>
             <li class="user_fn_item my_collection">
-                <router-link to="/home" class="user_fn_content ofh">
+                <router-link to="/my_collection" class="user_fn_content ofh">
                     <span class="fl title_text">我的收藏</span>
                 </router-link>
             </li>

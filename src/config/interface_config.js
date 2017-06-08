@@ -13,5 +13,6 @@ export default {
     'GET_ADDRESS_LIST': '/GetAddressList', // 获取省市区数据
     'ADD_ADDRESS': '/Add_Address/', // 新增地址上传数据
     'EDIT_ADDRESS': '/Edit_Address/', // 编辑地址上传数据
-    'DEL_ADDRESS': '/Del_Address//', // 编辑地址上传数据
+    'DEL_ADDRESS': '/Del_Address/', // 编辑地址上传数据
+    'GET_FAVOURITE_GOODS_LIST': '/Get_FavoriteGoodsList/', // 获取收藏列表数据
 }

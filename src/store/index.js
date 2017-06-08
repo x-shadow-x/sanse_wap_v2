@@ -14,7 +14,7 @@ const state = {
         '/red_package': 16,
         '/point': 17,
         '/coupon': 18,
-        '/all_orders': 19,
+        '/orders_all': 19,
         '/orders_no_pay': 20,
         '/orders_no_send': 21,
         '/orders_no_receive': 22,

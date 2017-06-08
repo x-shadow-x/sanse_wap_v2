@@ -13,7 +13,7 @@ const couponOverdue = r => require.ensure([], () => r(require('../pages/user/cou
 const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
 const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
 
-const allOrders = r => require.ensure([], () => r(require('../pages/user/all_orders.vue')), 'orders')
+const ordersAll = r => require.ensure([], () => r(require('../pages/user/orders_all.vue')), 'orders')
 const ordersNoPay = r => require.ensure([], () => r(require('../pages/user/orders_no_pay.vue')), 'orders')
 const ordersNoSend = r => require.ensure([], () => r(require('../pages/user/orders_no_send.vue')), 'orders')
 const ordersNoReceive = r => require.ensure([], () => r(require('../pages/user/orders_no_receive.vue')), 'orders')
@@ -22,6 +22,8 @@ const orderDetail = r => require.ensure([], () => r(require('../pages/user/order
 const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'address')
 const addressAdd = r => require.ensure([], () => r(require('../pages/user/address_add.vue')), 'address')
 const addressEdit = r => require.ensure([], () => r(require('../pages/user/address_edit.vue')), 'address')
+
+const myCollection = r => require.ensure([], () => r(require('../pages/user/my_collection.vue')), 'collection')
 
 
 export default [{
@@ -101,8 +103,8 @@ export default [{
             title: '修改绑定手机号码'
         }
     }, {
-        path: '/all_orders',
-        component: allOrders,
+        path: '/orders_all',
+        component: ordersAll,
         meta: {
             title: '全部订单'
         }
@@ -147,6 +149,12 @@ export default [{
         component: addressEdit,
         meta: {
             title: '编辑地址'
+        }
+    }, {
+        path: '/my_collection',
+        component: myCollection,
+        meta: {
+            title: '我的收藏'
         }
     }]
 }]
