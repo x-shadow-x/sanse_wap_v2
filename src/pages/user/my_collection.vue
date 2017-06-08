@@ -5,7 +5,19 @@
                 <ul class="record_list" v-if="collectionRecord.length > 0">
                     <li class="record_item" v-for="item in collectionRecord">
                         <router-link :to="'/order_detail/' + item.order_id">
-                            
+                            <div class="goods_img_box">
+                                <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+                            </div>
+                            <div class="goods_info_box">
+                                <span class="goods_name">{{item.goods_name}}</span>
+                                <span class="goods_sn">{{item.goods_sn}}</span>
+                                <div class="price_box">
+                                    <span class="money_tip">￥</span>
+                                    <span class="price">{{item.price}}</span>
+                                </div>
+                                <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
+                                <span class="cancel_collection">取消收藏</span>
+                            </div>
                         </router-link>
                     </li>
                 </ul>
@@ -207,14 +219,12 @@
         overflow: visible;
         background: #fff;
         box-sizing: border-box;
-        padding-top: 2rem;
-        padding-top: 0.29rem;
     }
 
     .record_list_box {
         position: absolute;
         width: 100%;
-        top: 1.4rem;
+        top: 0;
         bottom: 0;
         left: 0;
         overflow: hidden;
@@ -226,20 +236,6 @@
         width: 100%;
         padding: 0;
         min-height: 100%;
-    }
-
-    .record_list {
-        padding: 0.483092rem 2% 0 2%;
-    }
-
-    .record_item {
-        position: relative;
-        padding: 6px 0;
-        line-height: 24px;
-        border: 1px solid #959595;
-        border-radius: 4px;
-        position: relative;
-        margin-bottom: 0.483092rem;
     }
 
     .transparent {
@@ -297,5 +293,103 @@
         color: #fff;
         padding: 0.338164rem 1.111111rem;
         margin-top: 0.483rem;
+    }
+
+    .record_list {
+    }
+
+    .record_item {
+        position: relative;
+        padding: 0.29rem 0.242rem;
+        line-height: 1;
+        border-bottom: 1px solid #d8d8d8;
+    }
+
+    .goods_img_box {
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        width: 36.1%;
+        padding-top: 36.1%;
+    }
+
+    .goods_img {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+    }
+
+    .goods_info_box {
+        position: absolute;
+        left: 36.1%;
+        top: 0.338rem;
+        bottom: 0.29rem;
+        font-size: 12px;
+        width: 58.3%;
+        box-sizing: border-box;
+        padding: 20px 0 24px 12px;
+    }
+
+    .goods_name {
+        position: absolute;
+        top: 0;
+        left: 12px;
+        font-weight: bold;
+        font-size: 14px;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .goods_sn {
+        color: #888;
+    }
+
+    .price_box {
+        position: relative;
+        font-weight: bolder;
+        font-size: 0;
+        padding: 0.242rem 0 0.386rem 0;
+        margin-bottom: 0.386rem;
+    }
+
+    .price_box:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 20px;
+        height: 3px;
+        background: #000;
+    }
+
+    .money_tip {
+        display: inline-block;
+        vertical-align: text-top;
+        font-size: 9px;
+    }
+
+    .price {
+        display: inline-block;
+        vertical-align: text-top;
+        font-size: 14px;
+    }
+
+    .collection_time {
+        color: #888;
+    }
+
+    .cancel_collection {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        color: #888;
+        background: url('../../images/my_collection/del_collection.png') left center no-repeat;
+        background-size: 14px auto;
+        padding-left: 16px;
+        line-height: 14px;
     }
 </style>

@@ -137,13 +137,13 @@
                     if(data.length == this.$interface.PAGE_SIZE) {
                         this.isMore = true;
                     }
-                    
+
                     setTimeout(() => {
                         this.myScroll.refresh();
                     }, 320);
                 });
 
-                
+
             },
 
             handleSubFilter(index) {
@@ -183,7 +183,7 @@
                         // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                         this.isMore = true;
                     }
-                    
+
                     setTimeout(() => {
                         this.myScroll.refresh();
                     }, 320);
@@ -214,7 +214,7 @@
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                     this.isMore = true;
                 }
-                
+
                 setTimeout(() => {
                     this.myScroll.refresh();
                 }, 320);
@@ -307,8 +307,6 @@
         overflow: visible;
         background: #fff;
         box-sizing: border-box;
-        padding-top: 2rem;
-        padding-top: 0.29rem;
     }
 
     .filter_box {

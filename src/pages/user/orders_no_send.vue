@@ -237,8 +237,6 @@
         overflow: visible;
         background: #fff;
         box-sizing: border-box;
-        padding-top: 2rem;
-        padding-top: 0.29rem;
     }
 
     .filter_box {
@@ -372,7 +370,7 @@
         background-size: 100% auto;
         margin-right: 0.193237rem;
     }
-    
+
     .pullUpLabel {
         display: inline-block;
         vertical-align: middle;
