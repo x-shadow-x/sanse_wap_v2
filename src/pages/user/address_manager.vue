@@ -25,20 +25,48 @@
 				</div>
 			</li>
 		</ul>
+		<confirm 
+		:isShowConfirm="isShowConfirm" 
+		:tipTitleF="tipTitleF" 
+		:tipContentF="tipContentF" 
+		@confirmEvent="confirmEvent" 
+		@cancelEvent="cancelEvent"></confirm>
 	</div>
 </template>
 
 <script>
 
+	import confirm from '../../components/common/confirm.vue';
+
 	export default {
 		data() {
 			return {
-				addressList: []
+				addressList: [],
+				isShowConfirm: false,
+				tipTitleF: '',
+				tipContentF: '',
+				confirmCbName: ''
 			}
 		},
+
 		methods: {
 			deleteAddress() {
-				this.$store.commit('SHOW_ALERT');
+				this.tipTitleF = '确认要删除吗？';
+				this.isShowConfirm = true;
+				this.confirmCbName = 'removeAddress';
+			},
+
+			removeAddress() {
+				console.log(123);
+			},
+
+			confirmEvent() {
+				this.isShowConfirm = false;
+				this[this.confirmCbName]();
+			},
+
+			cancelEvent() {
+				this.isShowConfirm = false;
 			},
 
 			selectAddress(index) {
@@ -61,6 +89,7 @@
 				});
 			}
 		},
+
 		mounted() {
 			this.$request.get(this.$interface.GET_USER_ADDRESS_LIST, {
 				'userId': '304014'
@@ -69,6 +98,10 @@
 
 				this.addressList = data;
 			});
+		},
+
+		components: {
+			confirm
 		}
 	}
 </script>
