@@ -18,7 +18,7 @@
 					详细地址：{{item.address}}
 				</div>
 				<div class="handle_box">
-					<router-link to="/home" class="address_edit_router"></router-link>
+					<router-link :to="{ path:'/address_edit', query: {addressId:item.address_id, index: index} }" class="address_edit_router"></router-link>
 					<span class="delete_address" @click.stop="deleteAddress"></span>
 					<span class="default_address_tip" v-if="item.IsDefault == 1">默认地址</span>
 					<span class="default_address_setting" v-else>设置默认</span>
@@ -68,7 +68,7 @@
 				let data = response.data;
 
 				this.addressList = data;
-			})
+			});
 		}
 	}
 </script>

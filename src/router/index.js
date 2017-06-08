@@ -21,6 +21,7 @@ const orderDetail = r => require.ensure([], () => r(require('../pages/user/order
 
 const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'address')
 const addressAdd = r => require.ensure([], () => r(require('../pages/user/address_add.vue')), 'address')
+const addressEdit = r => require.ensure([], () => r(require('../pages/user/address_edit.vue')), 'address')
 
 
 export default [{
@@ -140,6 +141,12 @@ export default [{
         component: addressAdd,
         meta: {
             title: '新增地址'
+        }
+    }, {
+        path: '/address_edit',
+        component: addressEdit,
+        meta: {
+            title: '编辑地址'
         }
     }]
 }]
