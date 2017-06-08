@@ -131,6 +131,11 @@
                     this.isMore = true;
                 }
 
+                let lastRecord = data[data.length - 1];
+
+                this.goodsId = lastRecord.goods_id;
+                this.color_id = lastRecord.color_id;
+
                 setTimeout(() => {
                     this.myScroll.refresh();
                 }, 320);
