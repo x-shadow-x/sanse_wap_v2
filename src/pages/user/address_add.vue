@@ -30,13 +30,15 @@
 		</div>
 
 		<div class="confirm_btn_box">
-            <span class="confirm_btn">完成</span>
+            <span class="confirm_btn" @click="submitInfo">完成</span>
         </div>
+        <err-tip :errText="errText" :isShowErrTip="isShowErrTip" @hideErrTip="hideErrTip"></err-tip>
 	</div>
 </template>
 
 <script>
 	import scrollerSelector from '../../components/common/scroll_selector.vue';
+	import errTip from '../../components/common/err_tip.vue';
 
 	export default {
 		data() {
@@ -44,9 +46,12 @@
 				consignee: '',
 				mobile: '',
 				distinctAddress: '',
+				distinctAddressId: 0,
 				address: '',
 				primaryIndex: '',
 				secondryIndex: '',
+				errText: '',
+				isShowErrTip: false,
 				primaryScrollerData: [],
 				primaryMap: {}, // 市区列表数据是根据当前选中的省来对应给出的，此处做一个省级map~将隶属于不同省的市按省的id归类
 				secondryScrollerData: [],
@@ -74,10 +79,57 @@
                 this.tertiaryScrollerData = this.secondryMap[regionId];
             },
 
-            getValue(value) {
-                this.distinctAddress = value;
+            getValue(data) {
+                this.distinctAddress = data.text;
+                if(data.level == 2) {
+                	this.distinctAddressId = this.secondryScrollerData[data.index].regionId;
+                } else if(data.level == 3) {
+                	this.distinctAddressId = this.tertiaryScrollerData[data.index].regionId;
+                }
+            },
+
+            hideErrTip() {
+            	this.isShowErrTip = false;
+            },
+
+            validate() {
+            	if(this.consignee == '') {
+            		this.errText = '请输入收件人';
+            	} else if(this.mobile == '') {
+            		this.errText = '请输入手机号';
+            	} else if(!(/^1[34578]\d{9}$/.test(this.mobile))) {
+            		this.errText = '手机号格式错误';
+            	} else if(this.distinctAddress == '') {
+            		this.errText = '请选择地区';
+            	} else if(this.address == '') {
+            		this.errText = '请输入地址';
+            	} else {
+            		return true;
+            	}
+
+            	this.isShowErrTip = true;
+            	return false;
+
+            },
+
+            submitInfo() {
+            	if(this.validate()) {
+            		this.$store.commit('SHOW_LOAD');
+            		this.$request.get(this.$interface.ADD_ADDRESS, {
+            			'userId':'304014',
+            			'consignee': this.consignee,
+            			'district': this.distinctAddressId,
+            			'address': this.address,
+            			'mobile': this.mobile,
+            			'zipcode': ' '
+            		}, (response) => {
+		                this.$store.commit('HIDE_LOAD');
+		                this.$router.back(-1);
+					})
+            	}
             }
         },
+
 		mounted() {
             this.$store.commit('SHOW_LOAD');
 			function handleData(data) {
@@ -122,14 +174,10 @@
                 }
 
 				this.primaryIndex = this.primaryScrollerData[2].regionId;
-
-				this.secondryScrollerData.push(...(this.primaryMap[this.primaryIndex]));
-				// this.filling(this.secondryScrollerData);
+				this.secondryScrollerData = this.primaryMap[this.primaryIndex];
 
 				this.secondryIndex = this.secondryScrollerData[2].regionId;
-
-				this.tertiaryScrollerData.push(...(this.secondryMap[this.secondryIndex]));
-				// this.filling(this.tertiaryScrollerData);
+				this.tertiaryScrollerData = this.secondryMap[this.secondryIndex];
 			}
 
 			this.$request.get(this.$interface.GET_ADDRESS_LIST, null, (response) => {
@@ -140,7 +188,8 @@
 			})
 		},
 		components: {
-			scrollerSelector
+			scrollerSelector,
+			errTip
 		}
 	}
 </script>

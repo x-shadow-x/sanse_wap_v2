@@ -11,4 +11,6 @@ export default {
     'GET_USER_ADDRESS_LIST': '/GetUserAddressList/', // 用户地址列表
     'UPDATE_ADDRESS_IS_DEFAULT': '/Update_AddressIsDefault/', // 更新默认地址
     'GET_ADDRESS_LIST': '/GetAddressList', // 获取省市区数据
+    'ADD_ADDRESS': '/Add_Address/', // 新增地址上传数据
+    'EDIT_ADDRESS': '/Edit_Address/', // 编辑地址上传数据
 }

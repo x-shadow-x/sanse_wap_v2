@@ -915,14 +915,20 @@
             },
 
             getValue() {
-                var datestr = $("#yearwrapper ul li:eq(" + this.indexY + ")").html() + "-" +
-                    $("#monthwrapper ul li:eq(" + this.indexM + ")").html() + "-" +
-                    $("#daywrapper ul li:eq(" + Math.round(this.indexD) + ")").html();
+                var datestr = '';
+                var primaryText = $("#yearwrapper ul li:eq(" + this.indexY + ")").html();
+                var secondryText = $("#monthwrapper ul li:eq(" + this.indexM + ")").html();
+                var tertiaryText = $("#daywrapper ul li:eq(" + Math.round(this.indexD) + ")").html();
+                if(tertiaryText != '') {
+                    datestr = primaryText + "-" + secondryText + "-" + tertiaryText;
+                    this.$emit('getValue', {'text': datestr, 'level': 3, 'index': this.indexD});
+                } else {
+                    datestr = primaryText + "-" + secondryText;
+                    this.$emit('getValue', {'text': datestr, 'level': 2, 'index': this.indexM});
+                }
 
                 $("#datePage").hide();
                 $("#dateshadow").hide();
-                this.$emit('getValue', datestr);
-                console.log(datestr);
             },
 
             hideScrollSelector() {
