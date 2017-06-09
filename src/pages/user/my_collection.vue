@@ -4,25 +4,27 @@
             <div class="scroller">
                 <ul class="record_list" v-if="collectionRecord.length > 0">
                     <li class="record_item" v-for="(item, index) in collectionRecord">
-                        <div class="goods_img_box">
-                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
-                        </div>
-                        <div class="goods_info_box">
-                            <span class="goods_name">{{item.goods_name}}</span>
-                            <span class="goods_sn">{{item.alias_goods_sn}}</span>
-                            <div class="price_box">
-                                <span class="money_tip">￥</span>
-                                <span class="price">{{item.price}}</span>
+                        <router-link :to="'/home?args=' + item.order_id">
+                            <div class="goods_img_box">
+                                <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
                             </div>
-                            <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
-                            <span class="cancel_collection" @click.stop="deleteCollection(index)">取消收藏</span>
-                        </div>
+                            <div class="goods_info_box">
+                                <span class="goods_name">{{item.goods_name}}</span>
+                                <span class="goods_sn">{{item.alias_goods_sn}}</span>
+                                <div class="price_box">
+                                    <span class="money_tip">￥</span>
+                                    <span class="price">{{item.price}}</span>
+                                </div>
+                                <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
+                            </div>
+                        </router-link>
+                        <span class="cancel_collection" @click.stop="deleteCollection(index)">取消收藏</span>
                     </li>
                 </ul>
                 <div v-else class="empty_collection_tip_contain">
                     <div class="empty_collection_tip_box">
                         <p class="empty_collection_tip">暂无收藏商品</p>
-                        <router-link to="/home" class="link" v-if="orderType == 1">去挑选</router-link>
+                        <router-link to="/brand" class="link" v-if="orderType == 1">去挑选</router-link>
                     </div>
                 </div>
                 <div :class="{transparent: !isMore}">
@@ -72,18 +74,22 @@
                 this.confirmCbName = 'removeCollection';
                 this.confirmCbParams.index = index;
             },
+
             confirmEvent() {
                 this.isShowConfirm = false;
                 this[this.confirmCbName](this.confirmCbParams.index);
             },
+
             cancelEvent() {
                 this.isShowConfirm = false;
             },
+
             removeCollection(index) {
+
                 this.$store.commit('SHOW_LOAD');
 
                 let selectedCollectionRecord = this.collectionRecord[index];
-                console.log(selectedCollectionRecord.goods_id, '----------', selectedCollectionRecord.color_id);
+
                 this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
                     'userId': '304014',
                     'goodsId': selectedCollectionRecord.goods_id,
@@ -107,6 +113,10 @@
                 'colorId': this.colorId
             }, (response) => {
                 let data = response.data;
+
+                if(data.length == 0) {
+                    return;
+                }
 
                 this.collectionRecord = data; // 积分记录数组
 
@@ -377,8 +387,8 @@
 
     .cancel_collection {
         position: absolute;
-        bottom: 0;
-        right: 0;
+        bottom: 0.289855rem;
+        right: 4%;
         color: #888;
         background: url('../../images/my_collection/del_collection.png') left center no-repeat;
         background-size: 14px auto;
