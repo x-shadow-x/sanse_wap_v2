@@ -72,7 +72,7 @@
                 </router-link>
             </li>
             <li class="user_fn_item help_center">
-                <router-link to="/home" class="user_fn_content ofh">
+                <router-link to="/help_center" class="user_fn_content ofh">
                     <span class="fl title_text">帮助中心</span>
                 </router-link>
             </li>

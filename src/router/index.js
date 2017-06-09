@@ -25,6 +25,9 @@ const addressEdit = r => require.ensure([], () => r(require('../pages/user/addre
 
 const myCollection = r => require.ensure([], () => r(require('../pages/user/my_collection.vue')), 'collection')
 
+const helpCenter = r => require.ensure([], () => r(require('../pages/user/help_center.vue')), 'helpCenter')
+const helpCenterContent = r => require.ensure([], () => r(require('../pages/user/help_center_content.vue')), 'helpCenter')
+
 
 export default [{
     path: '/',
@@ -156,5 +159,48 @@ export default [{
         meta: {
             title: '我的收藏'
         }
+    }, {
+        path: '/help_center',
+        component: helpCenter,
+        meta: {
+            title: '帮助中心'
+        },
+        children: [{
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '关于SANSE APP'
+            }
+        }, {
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '如何使用SANSE APP'
+            }
+        }, {
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '线上购物新手指南-浏览商品'
+            }
+        }, {
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '线上购物新手指南-如何下单'
+            }
+        }, {
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '线上购物新手指南-售前须知'
+            }
+        }, {
+            path: '/help_center/help_center_content',
+            component: helpCenterContent,
+            meta: {
+                title: '线上购物新手指南-售后须知'
+            }
+        }]
     }]
 }]
