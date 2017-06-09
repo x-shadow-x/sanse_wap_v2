@@ -3,22 +3,20 @@
         <div class="record_list_box" id="recordListBox">
             <div class="scroller">
                 <ul class="record_list" v-if="collectionRecord.length > 0">
-                    <li class="record_item" v-for="item in collectionRecord">
-                        <router-link :to="'/order_detail/' + item.order_id">
-                            <div class="goods_img_box">
-                                <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+                    <li class="record_item" v-for="(item, index) in collectionRecord">
+                        <div class="goods_img_box">
+                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+                        </div>
+                        <div class="goods_info_box">
+                            <span class="goods_name">{{item.goods_name}}</span>
+                            <span class="goods_sn">{{item.alias_goods_sn}}</span>
+                            <div class="price_box">
+                                <span class="money_tip">￥</span>
+                                <span class="price">{{item.price}}</span>
                             </div>
-                            <div class="goods_info_box">
-                                <span class="goods_name">{{item.goods_name}}</span>
-                                <span class="goods_sn">{{item.goods_sn}}</span>
-                                <div class="price_box">
-                                    <span class="money_tip">￥</span>
-                                    <span class="price">{{item.price}}</span>
-                                </div>
-                                <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
-                                <span class="cancel_collection">取消收藏</span>
-                            </div>
-                        </router-link>
+                            <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
+                            <span class="cancel_collection" @click.stop="deleteCollection(index)">取消收藏</span>
+                        </div>
                     </li>
                 </ul>
                 <div v-else class="empty_collection_tip_contain">
@@ -34,6 +32,12 @@
                 </div>
             </div>
         </div>
+        <confirm 
+        :isShowConfirm="isShowConfirm" 
+        :tipTitleF="tipTitleF" 
+        :tipContentF="tipContentF" 
+        @confirmEvent="confirmEvent" 
+        @cancelEvent="cancelEvent"></confirm>
     </div>
 </template>
 
@@ -41,6 +45,7 @@
 <script>
 
     import  '../../plugins/iscroll.js';
+    import confirm from '../../components/common/confirm.vue';
 
     export default {
         data() {
@@ -51,63 +56,42 @@
                 orderStatus: 1, // 1：待付款
                 goodsId: 0,
                 colorId: 0,
-                dataInterface: '',
                 collectionRecord: [],
-                filterTab: [
-                    {
-                        'text': '手机订单',
-                        'type': '1',
-                        'isActive': true
-                    },
-                    {
-                        'text': '店铺订单',
-                        'type': '2',
-                        'isActive': false
-                    }
-                ],
-                showLoad: false
+                showLoad: false,
+                isShowConfirm: false,
+                tipTitleF: '',
+                tipContentF: '',
+                confirmCbParams: {}
             }
         },
 
         methods: {
-            handleFilter(index) {
-                this.pageIndex = 1;
-                let currentItem = this.filterTab[index];
-                if(currentItem.isActive) {
-                    return;
-                }
-                this.filterTab.forEach(function(item) {
-                    item.isActive = false;
-                });
-                currentItem.isActive = true;
-                this.orderType = currentItem.type;
-
+            deleteCollection(index) {
+                this.tipTitleF = '确认要删除吗？';
+                this.isShowConfirm = true;
+                this.confirmCbName = 'removeCollection';
+                this.confirmCbParams.index = index;
+            },
+            confirmEvent() {
+                this.isShowConfirm = false;
+                this[this.confirmCbName](this.confirmCbParams.index);
+            },
+            cancelEvent() {
+                this.isShowConfirm = false;
+            },
+            removeCollection(index) {
                 this.$store.commit('SHOW_LOAD');
 
-                // 此处分页不是靠pageIndex~而是提供当前页中最后一条数据的goodsId和colorId然后后台这两个参数返回下一页的数据
-                // favType字段目前固定写2~cookieId此处先给定一个值~之后对接时与userId一样由php接口返回并做全局配置
-                this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
+                let selectedCollectionRecord = this.collectionRecord[index];
+                console.log(selectedCollectionRecord.goods_id, '----------', selectedCollectionRecord.color_id);
+                this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
                     'userId': '304014',
+                    'goodsId': selectedCollectionRecord.goods_id,
                     'cookieId': '23456006805d970d5438a354dc019fc295614979',
-                    'favType': 2,
-                    'pageSize': this.$interface.PAGE_SIZE,
-                    'goodsId': this.goodsId,
-                    'colorId': this.colorId
+                    'colorId': selectedCollectionRecord.color_id
                 }, (response) => {
-
+                    this.collectionRecord.splice(index, 1);
                     this.$store.commit('HIDE_LOAD');
-
-                    let data = response.data;
-
-                    this.collectionRecord = data;
-
-                    if(data.length == this.$interface.PAGE_SIZE) {
-                        this.isMore = true;
-                    }
-
-                    setTimeout(() => {
-                        this.myScroll.refresh();
-                    }, 320);
                 });
             }
         },
@@ -209,6 +193,10 @@
 
             document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
             loaded.bind(this)();
+        },
+
+        components: {
+            confirm
         }
     }
 </script>
@@ -349,7 +337,7 @@
         text-overflow: ellipsis;
     }
 
-    .goods_sn {
+    .alias_goods_sn {
         color: #888;
     }
 

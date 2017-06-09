@@ -15,4 +15,5 @@ export default {
     'EDIT_ADDRESS': '/Edit_Address/', // 编辑地址上传数据
     'DEL_ADDRESS': '/Del_Address/', // 编辑地址上传数据
     'GET_FAVOURITE_GOODS_LIST': '/Get_FavoriteGoodsList/', // 获取收藏列表数据
+    'DELETE_FAVOURITE_GOODS': '/Delete_FavoriteGoods/', // 删除选中的收藏商品
 }
