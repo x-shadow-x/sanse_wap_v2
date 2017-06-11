@@ -11,7 +11,7 @@
                 <router-link class="footer_menu_item_link footer_menu_tide" to="/home">潮文</router-link>
             </li>
             <li class="footer_menu_item">
-                <router-link class="footer_menu_item_link footer_menu_carts" to="/home">购物袋</router-link>
+                <router-link class="footer_menu_item_link footer_menu_carts" to="/shopping_bag">购物袋</router-link>
             </li>
             <li class="footer_menu_item">
                 <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>

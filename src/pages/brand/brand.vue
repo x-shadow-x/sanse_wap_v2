@@ -121,7 +121,7 @@
         position: absolute;
         z-index: 1;
         top: 0;
-        bottom: 1.562rem;
+        bottom: 1.4rem;
         width: 100%;
         background: #191919;
         overflow: hidden;

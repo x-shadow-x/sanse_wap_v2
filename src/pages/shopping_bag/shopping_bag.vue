@@ -1,29 +1,51 @@
 <template>
-    <div class="my_collection_main">
+    <div class="shopping_bag_main">
+        <div class="batch_processing_box">
+            <div class="select_all_box">
+                <span class="select_btn" :class="{active: selectAll}" @click="handleSelectedItem(index)"></span>
+                <span>全选</span>
+            </div>
+            <div class="edit_all_box" @click="toggleEditAll">
+                <transition name="slide-right">
+                    <span class="edit_all_btn" v-if="!isEditAllStatus">编辑全部</span>
+                </transition>
+                <transition name="slide-right">
+                    <span class="complete_edit_all_btn" v-if="isEditAllStatus">完成</span>
+                </transition>
+            </div>
+        </div>
         <div class="record_list_box" id="recordListBox">
             <div class="scroller">
-                <ul class="record_list" v-if="collectionRecord.length > 0">
-                    <li class="record_item" v-for="(item, index) in collectionRecord">
-                        <router-link :to="'/home?args=' + item.order_id">
+                <ul class="record_list" v-if="shoppingbagRecord.length > 0">
+                    <li class="record_item" v-for="(item, index) in shoppingbagRecord" :key="item.goods_id">
+                        <div class="select_box">
+                            <span class="select_btn" :class="{active: item.selected}" @click="handleSelectedItem(index)"></span>
+                        </div>
+                        <router-link to="'/home" class="goods_link">
                             <div class="goods_img_box">
                                 <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
                             </div>
-                            <div class="goods_info_box">
-                                <span class="goods_name">{{item.goods_name}}</span>
-                                <span class="goods_sn">{{item.alias_goods_sn}}</span>
-                                <div class="price_box">
-                                    <span class="money_tip">￥</span>
-                                    <span class="price">{{item.price}}</span>
-                                </div>
-                                <span class="collection_time">收藏时间 {{item.add_fav_time.split(' ')[0]}}</span>
-                            </div>
                         </router-link>
-                        <span class="cancel_collection" @click.stop="deleteCollection(index)">取消收藏</span>
+                        <div class="goods_info_box">
+                            <h2 class="goods_name">{{item.goods_name}}</h2>
+                            <div class="goods_color">颜色: {{item.goods_color}}</div>
+                            <div class="goods_size">尺码: {{item.goods_size}}</div>
+                            <div class="price_box">
+                                <div class="old_price_box">
+                                    <span class="money_tip">￥</span><span class="price">{{item.market_price}}</span>
+                                </div>
+                                <div class="current_price_box">
+                                    <span class="money_tip">￥</span><span class="price">{{item.price}}</span>
+                                </div>
+                            </div>
+                            <span class="goods_num">数量: {{item.number}}</span>
+                        </div>
+                        <span class="edit_btn" @click.stop="deleteCollection(index)">编辑</span>
                     </li>
                 </ul>
-                <div v-else class="empty_collection_tip_contain">
-                    <div class="empty_collection_tip_box">
-                        <p class="empty_collection_tip">暂无收藏商品</p>
+                <div v-else class="empty_tip_contain">
+                    <div class="empty_tip_box">
+                        <p>购物袋暂无商品</p>
                         <router-link to="/brand" class="link">去挑选</router-link>
                     </div>
                 </div>
@@ -56,9 +78,11 @@
                 isMore: false,
                 goodsId: 0,
                 colorId: 0,
-                collectionRecord: [],
+                shoppingbagRecord: [],
                 showLoad: false,
                 isShowConfirm: false,
+                isEditAllStatus: false,
+                selectAll: true,
                 tipTitleF: '',
                 tipContentF: '',
                 confirmCbParams: {}
@@ -66,6 +90,31 @@
         },
 
         methods: {
+            handleData(data) {
+                data.forEach(function(item) {
+                    var tempArr = item.goods_attr.split(' \r\n');
+                    item.goods_color = tempArr[0].split(':')[1];
+                    item.goods_size = tempArr[1].split(':')[1];
+                    item.selected = true;
+                });
+            },
+
+            toggleEditAll() {
+                this.isEditAllStatus = !this.isEditAllStatus;
+            },
+
+            handleSelectedItem(index) {
+                let currentItem = this.shoppingbagRecord[index];
+                currentItem.selected = !currentItem.selected;
+                this.checkIsAllSelected();
+            },
+
+            checkIsAllSelected() {
+                this.selectAll = this.shoppingbagRecord.every(function(item) {
+                    return item.selected;
+                })
+            },
+
             deleteCollection(index) {
                 this.tipTitleF = '确认要删除吗？';
                 this.isShowConfirm = true;
@@ -86,7 +135,7 @@
 
                 this.$store.commit('SHOW_LOAD');
 
-                let selectedCollectionRecord = this.collectionRecord[index];
+                let selectedCollectionRecord = this.shoppingbagRecord[index];
 
                 this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
                     'userId': '304014',
@@ -94,7 +143,7 @@
                     'cookieId': '23456006805d970d5438a354dc019fc295614979',
                     'colorId': selectedCollectionRecord.color_id
                 }, (response) => {
-                    this.collectionRecord.splice(index, 1);
+                    this.shoppingbagRecord.splice(index, 1);
                     this.$store.commit('HIDE_LOAD');
                 });
             }
@@ -102,13 +151,9 @@
 
         mounted() {
 
-            this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
+            this.$request.get(this.$interface.GET_BUY_CAR_GOOD_LIST, {
                 'userId': '304014',
-                'cookieId': '23456006805d970d5438a354dc019fc295614979',
-                'favType': 2,
-                'pageSize': this.$interface.PAGE_SIZE,
-                'goodsId': this.goodsId,
-                'colorId': this.colorId
+                'cookieId': '23456006805d970d5438a354dc019fc295614979'
             }, (response) => {
                 let data = response.data;
 
@@ -116,7 +161,9 @@
                     return;
                 }
 
-                this.collectionRecord = data; // 积分记录数组
+                this.handleData(data);
+
+                this.shoppingbagRecord = data;
 
                 if(data.length == this.$interface.PAGE_SIZE) {
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
@@ -149,7 +196,7 @@
                 }, (response) => {
                     let data = response.data;
 
-                    this.collectionRecord.push(...data);
+                    this.shoppingbagRecord.push(...data);
 
                     if(data.length == this.$interface.PAGE_SIZE) {
                         this.isMore = true;
@@ -210,15 +257,11 @@
 </script>
 
 <style scoped>
-    .my_collection_main {
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        z-index: 2;
-        height: 100%;
-        overflow: visible;
+    .shopping_bag_main {
+        position: relative;
         background: #fff;
+        height: 100vh;
+        margin-top: 48px;
         box-sizing: border-box;
     }
 
@@ -226,7 +269,7 @@
         position: absolute;
         width: 100%;
         top: 0;
-        bottom: 0;
+        bottom: 1.4rem;
         left: 0;
         overflow: hidden;
     }
@@ -263,7 +306,7 @@
         vertical-align: middle;
     }
 
-    .empty_collection_tip_contain {
+    .empty_tip_contain {
         position: absolute;
         top: 0;
         left: 0;
@@ -271,12 +314,12 @@
         bottom: 0;
     }
 
-    .empty_collection_tip_box {
+    .empty_tip_box {
         position: absolute;
         top: 36%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: url('../../images/my_collection/collection_empty_icon.png') center 15% no-repeat;
+        background: url('../../images/shopping_bag/shopping_bag_empty_icon.png') center 15% no-repeat;
         background-size: 60px auto;
         padding-top: 70px;
         color: #939393;
@@ -296,19 +339,100 @@
         margin-top: 0.483rem;
     }
 
+    .batch_processing_box {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 16px 3%;
+        line-height: 16px;
+    }
+
+    .select_all_box {
+        display: inline-block;
+    }
+
+    .select_all_box .select_btn {
+        display: inline-block;
+        position: static;
+        width: 10vw;
+        height: 16px;
+        vertical-align: middle;
+    }
+
+    .edit_all_box {
+        position: absolute;
+        right: 3%;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: right;
+    }
+
+    .edit_all_btn,
+    .complete_edit_all_btn{
+        display: inline-block;
+        line-height: 16px;
+        background: url('../../images/common/edit_icon.png') left center no-repeat;
+        background-size: 16px auto;
+        padding-left: 20px;
+    }
+
+    .complete_edit_all_btn {
+        background-image: url('../../images/common/complete_icon.png');
+    }
+
+    .record_list {
+        padding: 0 3% 3% 3%;
+    }
+
     .record_item {
         position: relative;
         padding: 0.29rem 0.242rem;
-        line-height: 1;
-        border-bottom: 1px solid #d8d8d8;
+        border: 1px solid #d8d8d8;
+        border-radius: 4px;
     }
 
-    .goods_img_box {
+    .select_box {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        vertical-align: middle;
+        width: 10%;
+        padding-left: 0.242rem;
+    }
+
+    .select_btn {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: url('../../images/common/checkbox_icon.png') center no-repeat;
+        background-size: 16px auto;
+    }
+
+    .select_btn.active {
+        background-image: url('../../images/common/checkbox_icon_active.png');
+    }
+
+    .goods_link {
         display: inline-block;
         vertical-align: middle;
         position: relative;
-        width: 36.1%;
-        padding-top: 36.1%;
+        width: 36%;
+        padding-top: 36%;
+        margin-left: 10%;
+
+    }
+
+    .goods_img_box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
     }
 
     .goods_img {
@@ -321,11 +445,11 @@
 
     .goods_info_box {
         position: absolute;
-        left: 36.1%;
+        left: 46%;
         top: 0.338rem;
         bottom: 0.29rem;
         font-size: 12px;
-        width: 58.3%;
+        width: 48%;
         box-sizing: border-box;
         padding: 20px 0 24px 12px;
     }
@@ -334,7 +458,7 @@
         position: absolute;
         top: 0;
         left: 12px;
-        font-weight: bold;
+        font-weight: bolder;
         font-size: 14px;
         width: 100%;
         overflow: hidden;
@@ -342,26 +466,28 @@
         text-overflow: ellipsis;
     }
 
-    .alias_goods_sn {
-        color: #888;
+    .goods_color,
+    .goods_size {
+        line-height: 0.435rem;
     }
 
     .price_box {
         position: relative;
         font-weight: bolder;
         font-size: 0;
-        padding: 0.242rem 0 0.386rem 0;
+        padding: 0.072rem 0 0.386rem 0;
         margin-bottom: 0.386rem;
+        line-height: 0.29rem;
     }
 
-    .price_box:after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 20px;
-        height: 3px;
-        background: #000;
+    .old_price_box {
+        color: #888;
+        font-weight: normal;
+    }
+
+    .old_price_box .price {
+        text-decoration: line-through;
+        font-size: 13px;
     }
 
     .money_tip {
@@ -376,18 +502,39 @@
         font-size: 14px;
     }
 
-    .collection_time {
-        color: #888;
+    .goods_num {
+        position: absolute;
+        left: 12px;
+        bottom: 0;
+        line-height: 14px;
     }
 
-    .cancel_collection {
+    .edit_btn {
         position: absolute;
         bottom: 0.289855rem;
         right: 4%;
         color: #888;
-        background: url('../../images/my_collection/del_collection.png') left center no-repeat;
-        background-size: 14px auto;
-        padding-left: 16px;
+        text-decoration: underline;
         line-height: 14px;
+    }
+
+    .slide-left-enter-active {
+        transition: all .32s linear;
+    }
+    .slide-left-leave-active {
+        transition: all 0s;
+    }
+    .slide-left-enter, .slide-left-leave-to {
+        transform: translateX(-100%);
+    }
+
+    .slide-right-enter-active {
+        transition: all .32s linear;
+    }
+    .slide-right-leave-active {
+        transition: all 0s;
+    }
+    .slide-right-enter, .slide-right-leave-to {
+        transform: translateX(100%);
     }
 </style>

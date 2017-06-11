@@ -2,6 +2,7 @@ import App from '../App'
 
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
+const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
 
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
@@ -49,6 +50,12 @@ export default [{
         component: brand,
         meta: {
             title: '品牌'
+        }
+    }, {
+        path: '/shopping_bag',
+        component: shoppingBag,
+        meta: {
+            title: '购物袋'
         }
     }, {
         path: '/user_index',
