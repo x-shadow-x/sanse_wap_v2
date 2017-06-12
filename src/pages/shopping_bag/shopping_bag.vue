@@ -1,6 +1,6 @@
 <template>
     <div class="shopping_bag_main">
-        <div class="batch_processing_box">
+        <div class="batch_processing_box" v-if="shoppingbagRecord.length > 0">
             <div class="select_all_box">
                 <span class="select_btn" :class="{active: selectAll}" @click="handleSelectedAll"></span>
                 <span>全选</span>
@@ -40,7 +40,7 @@
                                         <span class="edit_btn" @click="item.isEdit = true;">编辑</span>
                                 </div>
                                 <div class="edit_box">
-                                    <span class="remove_goods_btn" @click.stop="deleteCollection(index)"></span>
+                                    <span class="remove_goods_btn" @click.stop="deleteGoods(index)"></span>
                                     <div class="goods_color">颜色: {{item.goods_color}}</div>
                                     <div class="goods_size">尺码: {{item.goods_size}}</div>
                                     <div class="edit_num_box">
@@ -49,7 +49,7 @@
                                         <span class="add num_edit_btn" :class="{disable: item.product_number <= 0}" @click="addGoods(index)"></span>
                                     </div>
                                     <div class="product_number">库存: {{item.product_number}}</div>
-                                    <span class="complete_btn" @click="item.isEdit = false;">完成</span>
+                                    <span class="complete_btn" @click="item.isEdit = false;" v-if="!isEditAllStatus">完成</span>
                                 </div>
                             </div>
                         </div>
@@ -68,17 +68,17 @@
                 </div>
             </div>
         </div>
-        <div class="bottom_handle_box">
+        <div class="bottom_handle_box" v-if="shoppingbagRecord.length > 0">
             <div class="balance_box" v-if="!isEditAllStatus">
                 <div class="subtotal_box">
                     <span>小计：</span><span class="money_tip">¥</span><span class="price">{{totalPrice}}</span>
                 </div>
                 <div class="balance_btn_box">
-                    结算<span>(1)</span>
+                    结算<span>({{totalNum}})</span>
                 </div>
             </div>
             <div class="remove_all_goods_box" v-else>
-                <div class="remove_all_goods_btn">删除</div>
+                <div class="batch_remove_goods_btn" @click="batchDeleteGoods">删除</div>
             </div>
         </div>
         <confirm
@@ -108,6 +108,7 @@
                 isEditAllStatus: false,
                 selectAll: true,
                 totalPrice: 0,
+                totalNum: 0,
                 tipTitleF: '',
                 tipContentF: '',
                 confirmCbParams: {}
@@ -125,10 +126,12 @@
                 });
             },
 
-            culatePrice(data) {
+            culateTotal(data) {
                 this.totalPrice = 0;
+                this.totalNum = 0;
                 data.forEach((item) => {
                     this.totalPrice = this.totalPrice + item.price * item.number;
+                    this.totalNum = +item.number + this.totalNum;
                 });
 
                 this.totalPrice = this.totalPrice.toFixed(2);
@@ -149,6 +152,15 @@
 
             toggleEditAll() {
                 this.isEditAllStatus = !this.isEditAllStatus;
+                if(this.isEditAllStatus) {
+                    this.shoppingbagRecord.forEach((item) => {
+                        item.isEdit = true;
+                    });
+                } else {
+                    this.shoppingbagRecord.forEach((item) => {
+                        item.isEdit = false;
+                    });
+                }
             },
 
             handleSelectedItem(index) {
@@ -163,11 +175,17 @@
                 })
             },
 
-            deleteCollection(index) {
+            deleteGoods(index) {
                 this.tipTitleF = '确认要删除吗？';
                 this.isShowConfirm = true;
-                this.confirmCbName = 'removeCollection';
+                this.confirmCbName = 'removeGoods';
                 this.confirmCbParams.index = index;
+            },
+
+            batchDeleteGoods() {
+                this.tipTitleF = '确认要删除吗？';
+                this.isShowConfirm = true;
+                this.confirmCbName = 'batchRemoveGoods';
             },
 
             confirmEvent() {
@@ -179,19 +197,36 @@
                 this.isShowConfirm = false;
             },
 
-            removeCollection(index) {
+            removeGoods(index) {
 
                 this.$store.commit('SHOW_LOAD');
 
                 let selectedCollectionRecord = this.shoppingbagRecord[index];
 
-                this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
-                    'userId': '304014',
-                    'goodsId': selectedCollectionRecord.goods_id,
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
-                    'colorId': selectedCollectionRecord.color_id
+                this.$request.get(this.$interface.DEL_BUY_GOODS, {
+                    'recId': selectedCollectionRecord.rec_id
                 }, (response) => {
                     this.shoppingbagRecord.splice(index, 1);
+                    this.culateTotal(this.shoppingbagRecord);
+                    this.$store.commit('HIDE_LOAD');
+                });
+            },
+
+            batchRemoveGoods() {
+                let postStr = '';
+                let tempArr = [];
+                this.$store.commit('SHOW_LOAD');
+
+                this.shoppingbagRecord.forEach((item) => {
+                    tempArr.push(JSON.stringify({'RecID': item.rec_id, 'Number': item.number, 'IsDel': 1}));
+                });
+
+                postStr = '[' + tempArr.join(',') + ']';
+
+                this.$request.get(this.$interface.BATCH_OPTIMIZE_BUY_CAR, {
+                    'postStr': postStr
+                }, (response) => {
+                    this.shoppingbagRecord = [];
                     this.$store.commit('HIDE_LOAD');
                 });
             },
@@ -204,7 +239,7 @@
                     currentItem.product_number = +currentItem.product_number + 1;
                 }
 
-                this.culatePrice(this.shoppingbagRecord);
+                this.culateTotal(this.shoppingbagRecord);
             },
 
             addGoods(index) {
@@ -215,7 +250,7 @@
                     currentItem.product_number = +currentItem.product_number - 1;
                 }
 
-                this.culatePrice(this.shoppingbagRecord);
+                this.culateTotal(this.shoppingbagRecord);
             }
         },
 
@@ -235,7 +270,7 @@
 
                 this.shoppingbagRecord = data;
 
-                this.culatePrice(data);
+                this.culateTotal(data);
 
                 if(data.length == this.$interface.PAGE_SIZE) {
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
@@ -561,7 +596,7 @@
     }
 
     .edit_box {
-        left: 50%;
+        left: 51%;
     }
 
     .goods_name {
@@ -725,7 +760,7 @@
         text-align: right;
     }
 
-    .remove_all_goods_btn {
+    .batch_remove_goods_btn {
         display: inline-block;
         vertical-align: middle;
         background: #ef8200;
