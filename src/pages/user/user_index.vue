@@ -55,6 +55,11 @@
         </div>
 
         <ul class="user_fn_list">
+            <li class="user_fn_item my_commission">
+                <router-link to="/my_commission" class="user_fn_content ofh">
+                    <span class="fl title_text">我的提成</span>
+                </router-link>
+            </li>
             <li class="user_fn_item user_data">
                 <router-link to="/user_info" class="user_fn_content ofh">
                     <span class="fl title_text">个人资料</span>
@@ -169,6 +174,10 @@
 
     .user_fn_item:last-child .user_fn_content {
         border: none;
+    }
+
+    .my_commission {
+        background-image: url('../../images/user_index/commission_icon.png');
     }
 
     .location_manager {

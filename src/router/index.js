@@ -11,8 +11,11 @@ const point = r => require.ensure([], () => r(require('../pages/user/point.vue')
 const coupon = r => require.ensure([], () => r(require('../pages/user/coupon.vue')), 'user')
 const couponNoUse = r => require.ensure([], () => r(require('../pages/user/coupon_no_use.vue')), 'user')
 const couponOverdue = r => require.ensure([], () => r(require('../pages/user/coupon_overdue.vue')), 'user')
-const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'user')
-const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'user')
+
+const myCommission = r => require.ensure([], () => r(require('../pages/user/my_commission.vue')), 'commission')
+
+const userInfo = r => require.ensure([], () => r(require('../pages/user/user_info.vue')), 'userInfo')
+const bindPhoneNumber = r => require.ensure([], () => r(require('../pages/user/bind_phone_number.vue')), 'userInfo')
 
 const ordersAll = r => require.ensure([], () => r(require('../pages/user/orders_all.vue')), 'orders')
 const ordersNoPay = r => require.ensure([], () => r(require('../pages/user/orders_no_pay.vue')), 'orders')
@@ -100,6 +103,12 @@ export default [{
                 title: '优惠券'
             }
         }]
+    }, {
+        path: '/my_commission',
+        component: myCommission,
+        meta: {
+            title: '我的提成'
+        }
     }, {
         path: '/user_info',
         component: userInfo,
