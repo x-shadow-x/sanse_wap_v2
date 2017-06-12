@@ -60,14 +60,14 @@ export default {
 	.footer_menu_item {
 		flex: 1;
 		text-align: center;
-        font-size: 9px;
+        font-size:8px;
 	}
 
     .footer_menu_item_link {
         display: block;
-        background: url('../../images/footer_bar/home_icon.png') center 0.219rem no-repeat;
-        background-size: 0.781rem;
-        padding-top: 1.094rem;
+        background: url('../../images/footer_bar/home_icon.png') center 0.2rem no-repeat;
+        background-size: 0.75rem;
+        padding-top: 1rem;
     }
 
     .footer_menu_home {

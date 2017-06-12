@@ -2,22 +2,18 @@
     <div class="shopping_bag_main">
         <div class="batch_processing_box">
             <div class="select_all_box">
-                <span class="select_btn" :class="{active: selectAll}" @click="handleSelectedItem(index)"></span>
+                <span class="select_btn" :class="{active: selectAll}" @click="handleSelectedAll"></span>
                 <span>全选</span>
             </div>
             <div class="edit_all_box" @click="toggleEditAll">
-                <transition name="slide-right">
-                    <span class="edit_all_btn" v-if="!isEditAllStatus">编辑全部</span>
-                </transition>
-                <transition name="slide-right">
-                    <span class="complete_edit_all_btn" v-if="isEditAllStatus">完成</span>
-                </transition>
+                <span class="edit_all_btn" v-if="!isEditAllStatus">编辑全部</span>
+                <span class="complete_edit_all_btn" v-else>完成</span>
             </div>
         </div>
         <div class="record_list_box" id="recordListBox">
             <div class="scroller">
                 <ul class="record_list" v-if="shoppingbagRecord.length > 0">
-                    <li class="record_item" v-for="(item, index) in shoppingbagRecord" :key="item.goods_id">
+                    <li class="record_item" :class="{edit_status: item.isEdit}" v-for="(item, index) in shoppingbagRecord" :key="item.goods_id">
                         <div class="select_box">
                             <span class="select_btn" :class="{active: item.selected}" @click="handleSelectedItem(index)"></span>
                         </div>
@@ -26,21 +22,37 @@
                                 <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
                             </div>
                         </router-link>
-                        <div class="goods_info_box">
-                            <h2 class="goods_name">{{item.goods_name}}</h2>
-                            <div class="goods_color">颜色: {{item.goods_color}}</div>
-                            <div class="goods_size">尺码: {{item.goods_size}}</div>
-                            <div class="price_box">
-                                <div class="old_price_box">
-                                    <span class="money_tip">￥</span><span class="price">{{item.market_price}}</span>
+                        <div class="info_area">
+                            <div class="info_swiper" :class="{edit_status: item.isEdit}">
+                                <div class="goods_info">
+                                    <h2 class="goods_name">{{item.goods_name}}</h2>
+                                        <div class="goods_color">颜色: {{item.goods_color}}</div>
+                                        <div class="goods_size">尺码: {{item.goods_size}}</div>
+                                        <div class="price_box">
+                                            <div class="old_price_box">
+                                                <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+                                            </div>
+                                            <div class="current_price_box">
+                                                <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+                                            </div>
+                                        </div>
+                                        <span class="goods_num">数量: {{item.number}}</span>
+                                        <span class="edit_btn" @click="item.isEdit = true;">编辑</span>
                                 </div>
-                                <div class="current_price_box">
-                                    <span class="money_tip">￥</span><span class="price">{{item.price}}</span>
+                                <div class="edit_box">
+                                    <span class="remove_goods_btn" @click.stop="deleteCollection(index)"></span>
+                                    <div class="goods_color">颜色: {{item.goods_color}}</div>
+                                    <div class="goods_size">尺码: {{item.goods_size}}</div>
+                                    <div class="edit_num_box">
+                                        <span class="subtract num_edit_btn" :class="{disable: item.number <= 1}" @click="subtractGoods(index)"></span>
+                                        <span class="goods_num_result">{{item.number}}</span>
+                                        <span class="add num_edit_btn" :class="{disable: item.product_number <= 0}" @click="addGoods(index)"></span>
+                                    </div>
+                                    <div class="product_number">库存: {{item.product_number}}</div>
+                                    <span class="complete_btn" @click="item.isEdit = false;">完成</span>
                                 </div>
                             </div>
-                            <span class="goods_num">数量: {{item.number}}</span>
                         </div>
-                        <span class="edit_btn" @click.stop="deleteCollection(index)">编辑</span>
                     </li>
                 </ul>
                 <div v-else class="empty_tip_contain">
@@ -56,6 +68,19 @@
                 </div>
             </div>
         </div>
+        <div class="bottom_handle_box">
+            <div class="balance_box" v-if="!isEditAllStatus">
+                <div class="subtotal_box">
+                    <span>小计：</span><span class="money_tip">¥</span><span class="price">{{totalPrice}}</span>
+                </div>
+                <div class="balance_btn_box">
+                    结算<span>(1)</span>
+                </div>
+            </div>
+            <div class="remove_all_goods_box" v-else>
+                <div class="remove_all_goods_btn">删除</div>
+            </div>
+        </div>
         <confirm
         :isShowConfirm="isShowConfirm"
         :tipTitleF="tipTitleF"
@@ -64,7 +89,6 @@
         @cancelEvent="cancelEvent"></confirm>
     </div>
 </template>
-
 
 <script>
 
@@ -83,6 +107,7 @@
                 isShowConfirm: false,
                 isEditAllStatus: false,
                 selectAll: true,
+                totalPrice: 0,
                 tipTitleF: '',
                 tipContentF: '',
                 confirmCbParams: {}
@@ -96,7 +121,30 @@
                     item.goods_color = tempArr[0].split(':')[1];
                     item.goods_size = tempArr[1].split(':')[1];
                     item.selected = true;
+                    item.isEdit = false;
                 });
+            },
+
+            culatePrice(data) {
+                this.totalPrice = 0;
+                data.forEach((item) => {
+                    this.totalPrice = this.totalPrice + item.price * item.number;
+                });
+
+                this.totalPrice = this.totalPrice.toFixed(2);
+            },
+
+            handleSelectedAll() {
+                this.selectAll = !this.selectAll;
+                if(this.selectAll) {
+                    this.shoppingbagRecord.forEach(function(item) {
+                        item.selected = true;
+                    });
+                } else {
+                    this.shoppingbagRecord.forEach(function(item) {
+                        item.selected = false;
+                    });
+                }
             },
 
             toggleEditAll() {
@@ -146,6 +194,28 @@
                     this.shoppingbagRecord.splice(index, 1);
                     this.$store.commit('HIDE_LOAD');
                 });
+            },
+
+            subtractGoods(index) {
+                let currentItem = this.shoppingbagRecord[index];
+                if(currentItem.number > 1) {
+                    // 未到最小值~可以减少
+                    currentItem.number = +currentItem.number - 1;
+                    currentItem.product_number = +currentItem.product_number + 1;
+                }
+
+                this.culatePrice(this.shoppingbagRecord);
+            },
+
+            addGoods(index) {
+                let currentItem = this.shoppingbagRecord[index];
+                if(currentItem.product_number > 0 ) {
+                    // 未超过库存量~可以继续添加
+                    currentItem.number = +currentItem.number + 1;
+                    currentItem.product_number = +currentItem.product_number - 1;
+                }
+
+                this.culatePrice(this.shoppingbagRecord);
             }
         },
 
@@ -164,6 +234,8 @@
                 this.handleData(data);
 
                 this.shoppingbagRecord = data;
+
+                this.culatePrice(data);
 
                 if(data.length == this.$interface.PAGE_SIZE) {
                     // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
@@ -260,16 +332,15 @@
     .shopping_bag_main {
         position: relative;
         background: #fff;
-        height: 100vh;
-        margin-top: 48px;
+        height: 100%;
         box-sizing: border-box;
     }
 
     .record_list_box {
         position: absolute;
         width: 100%;
-        top: 0;
-        bottom: 1.4rem;
+        top: 48px;
+        bottom: 2.8rem;
         left: 0;
         overflow: hidden;
     }
@@ -380,6 +451,7 @@
 
     .complete_edit_all_btn {
         background-image: url('../../images/common/complete_icon.png');
+        margin-left: 20px;
     }
 
     .record_list {
@@ -391,6 +463,12 @@
         padding: 0.29rem 0.242rem;
         border: 1px solid #d8d8d8;
         border-radius: 4px;
+        margin-bottom: 3%;
+    }
+
+    .record_item.edit_status {
+        border-color: #ef8200;
+        box-shadow: 0 0 0 1px #ef8200 inset;
     }
 
     .select_box {
@@ -443,21 +521,53 @@
         transform: translate(-50%, -50%);
     }
 
-    .goods_info_box {
+    .info_area {
         position: absolute;
         left: 46%;
         top: 0.338rem;
         bottom: 0.29rem;
         font-size: 12px;
-        width: 48%;
+        margin-left: 12px;
+        width: 50%;
         box-sizing: border-box;
-        padding: 20px 0 24px 12px;
+        overflow: hidden;
+    }
+
+    .info_swiper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 200%;
+        transition: transform .24s linear;
+    }
+
+    .info_swiper.edit_status {
+        transform: translateX(-50%);
+    }
+
+    .goods_info,
+    .edit_box {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        box-sizing: border-box;
+    }
+
+    .goods_info {
+        padding-top: 20px;
+    }
+
+    .edit_box {
+        left: 50%;
     }
 
     .goods_name {
         position: absolute;
         top: 0;
-        left: 12px;
+        left: 0;
         font-weight: bolder;
         font-size: 14px;
         width: 100%;
@@ -488,53 +598,140 @@
     .old_price_box .price {
         text-decoration: line-through;
         font-size: 13px;
+        line-height: 13px;
     }
 
     .money_tip {
         display: inline-block;
         vertical-align: text-top;
-        font-size: 9px;
+        font-size: 8px;
+        line-height: 8px;
     }
 
     .price {
         display: inline-block;
         vertical-align: text-top;
         font-size: 14px;
+        line-height: 14px;
     }
 
-    .goods_num {
+    .goods_num,
+    .product_number {
         position: absolute;
-        left: 12px;
+        left: 0;
         bottom: 0;
         line-height: 14px;
     }
 
-    .edit_btn {
+    .edit_btn,
+    .complete_btn {
         position: absolute;
-        bottom: 0.289855rem;
-        right: 4%;
+        bottom: 0;
+        right: 12px;
         color: #888;
         text-decoration: underline;
         line-height: 14px;
     }
 
-    .slide-left-enter-active {
-        transition: all .32s linear;
-    }
-    .slide-left-leave-active {
-        transition: all 0s;
-    }
-    .slide-left-enter, .slide-left-leave-to {
-        transform: translateX(-100%);
+    .complete_btn {
+        color: #333;
+        text-decoration: none;
     }
 
-    .slide-right-enter-active {
-        transition: all .32s linear;
+    .edit_num_box {
+        font-size: 0;
+        margin-top: 0.338164rem;
     }
-    .slide-right-leave-active {
-        transition: all 0s;
+
+    .num_edit_btn {
+        width: 32px;
+        height: 32px;
+        display: inline-block;
+        vertical-align: middle;
+        border: 1px solid #efefef;
+        background: url('../../images/common/add_icon.png') center no-repeat;
+        background-size: 14px auto;
     }
-    .slide-right-enter, .slide-right-leave-to {
-        transform: translateX(100%);
+
+    .subtract {
+        background-image: url('../../images/common/subtract_icon.png');
+    }
+
+    .subtract.disable {
+        background-image: url('../../images/common/subtract_disable_icon.png');
+    }
+
+    .add.disable {
+        background-image: url('../../images/common/add_disable_icon.png');
+    }
+
+    .goods_num_result {
+        display: inline-block;
+        vertical-align: middle;
+        width: 70px;
+        height: 32px;
+        line-height: 32px;
+        border-top: 1px solid #efefef;
+        border-bottom: 1px solid #efefef;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .bottom_handle_box {
+        position: fixed;
+        left: 0;
+        bottom: 1.4rem;
+        width: 100%;
+        line-height: 1.4rem;
+        font-size: 0;
+        box-shadow: 0 1px 0 0 #efefef inset;
+    }
+
+    .remove_goods_btn {
+        position: absolute;
+        right: 12px;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        background: url('../../images/shopping_bag/del_goods_item_icon.png') right top no-repeat;
+        background-size: 16px auto;
+    }
+
+    .balance_btn_box {
+        background: #ef8200;
+        color: #fff;
+        display: inline-block;
+        vertical-align: middle;
+        width: 40%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .subtotal_box {
+        font-weight: bold;
+        display: inline-block;
+        vertical-align: middle;
+        width: 60%;
+        box-sizing: border-box;
+        padding-left: 3%;
+        font-size: 12px;
+    }
+
+    .subtotal_box .money_tip {
+        margin-left: 5px;
+    }
+
+    .remove_all_goods_box {
+        text-align: right;
+    }
+
+    .remove_all_goods_btn {
+        display: inline-block;
+        vertical-align: middle;
+        background: #ef8200;
+        color: #fff;
+        width: 40%;
+        text-align: center;
+        font-size: 12px;
     }
 </style>
