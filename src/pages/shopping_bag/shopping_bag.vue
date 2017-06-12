@@ -73,9 +73,9 @@
                 <div class="subtotal_box">
                     <span>小计：</span><span class="money_tip">¥</span><span class="price">{{totalPrice}}</span>
                 </div>
-                <div class="balance_btn_box">
+                <router-link to="settle_accounts" class="balance_btn_box">
                     结算<span>({{totalNum}})</span>
-                </div>
+                </router-link>
             </div>
             <div class="remove_all_goods_box" v-else>
                 <div class="batch_remove_goods_btn" @click="batchDeleteGoods">删除</div>

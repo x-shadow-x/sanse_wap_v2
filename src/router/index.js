@@ -1,8 +1,11 @@
 import App from '../App'
 
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
+
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
+
 const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
+const settleAccounts = r => require.ensure([], () => r(require('../pages/shopping_bag/settle_accounts.vue')), 'shoppingBag')
 
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
@@ -59,6 +62,12 @@ export default [{
         component: shoppingBag,
         meta: {
             title: '购物袋'
+        }
+    }, {
+        path: '/settle_accounts',
+        component: settleAccounts,
+        meta: {
+            title: '结算'
         }
     }, {
         path: '/user_index',
