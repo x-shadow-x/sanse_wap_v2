@@ -170,8 +170,7 @@
 
 				setTimeout(function () { document.getElementById('recordListBox').style.left = '0'; }, 800);
 			}
-
-			document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+			
 			setTimeout(() => {
 				loaded.bind(this)();
 			}, 900);

@@ -58,6 +58,10 @@
 
                     this.brandList.push(tempData);
                 });
+
+                setTimeout(() => {
+                    loaded.bind(this)();
+                }, 320);
             })
 
             function loaded() {
@@ -66,11 +70,6 @@
                     vScrollbar: false
                 });
             }
-
-            // document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-            setTimeout(function() {
-                loaded.bind(this)();
-            }.bind(this), 500);
 		},
 
 		methods: {
@@ -105,9 +104,15 @@
 <style scoped>
 
 	.brand_main {
-		height: 100vh;
-        position: relative;
-		background: #191919;
+		
+
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: #191919;
+        overflow: hidden;
 	}
 
 	.brand_list {

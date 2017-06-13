@@ -283,6 +283,7 @@
                 this.color_id = lastRecord.color_id;
 
                 setTimeout(() => {
+                    loaded.bind(this)();
                     this.myScroll.refresh();
                 }, 320);
             });
@@ -353,8 +354,6 @@
 
             }
 
-            document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-            loaded.bind(this)();
         },
 
         components: {
@@ -365,9 +364,14 @@
 
 <style scoped>
     .shopping_bag_main {
-        position: relative;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 1.4rem;
+        z-index: 2;
+        overflow: visible;
         background: #fff;
-        height: 100%;
         box-sizing: border-box;
     }
 
