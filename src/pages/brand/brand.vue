@@ -41,7 +41,7 @@
                     tempData.name = item.brand_name;
                     tempData.brandLogo = item.brand_logo;
                     tempData.id = item.brand_id;
-                    tempData.cat_id = item.cat_id;
+                    tempData.catId = item.cat_id;
                     tempData.level = 0;
 
 
@@ -87,7 +87,7 @@
 							children: []
 						};
 					} else {
-						result[item.parent_id].children.push({name: item.cat_name, level: item.level, cat_id: item.cat_id});
+						result[item.parent_id].children.push({name: item.cat_name, level: item.level, to: '/goods_list', query: {catId: item.cat_id, funcType: 'CA'}});
 					}
 
 				}

@@ -1,18 +1,14 @@
+<!-- 递归树组件,如果叶子节点需要做跳转~则需指明isLink为true并在父组件中提供to字段和query字段~
+to为叶子节点对应的跳转地址~query为对应的路由参数-->
+
 <template>
 	<li :class="{first_sub_child: nodeData.level == 1}" :style="{marginLeft: (nodeData.level - 1) + 'em'}">
-        <!-- <a :href="'#' + nodeData.id" :id="nodeData.id" :class="{bold: isFolder}" @click="toggle" class="block">
-            <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
-            <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
-        </a> -->
-            
-        
         <div :class="{bold: isFolder}" @click="toggle($event)" class="block">
             <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
-            <router-link v-if="!isFolder && isLink" :to="{ path:'/goods_list', query: {catId:nodeData.cat_id} }">
+            <router-link v-if="!isFolder && isLink" :to="{ path:nodeData.to, query: nodeData.query }">
                 <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
             </router-link>
             <span class="brand_cat_text" :class="{bold: nodeData.level == 0}" v-else>{{nodeData.name}}</span>
-            
         </div>
 
         <transition name="list-toggle">
@@ -45,7 +41,6 @@
 				if (this.isFolder) {
 					this.open = !this.open;
                     setTimeout(() => {
-                        console.log(this.myScroll.scrollToElement);
                         this.myScroll.refresh();
                         this.myScroll.scrollToElement(event.target, 240);
                     }, 400);

@@ -10,6 +10,7 @@ const state = {
         '/home': 0,
         '/brand': 1,
         '/goods_list': 5,
+        '/goods_search': 6,
         '/shopping_bag': 3,
         '/settle_accounts': 6,
         '/user_index': 4,

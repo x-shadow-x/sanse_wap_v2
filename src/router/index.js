@@ -4,6 +4,7 @@ const home = r => require.ensure([], () => r(require('../pages/home/home.vue')),
 
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
 const goodsList = r => require.ensure([], () => r(require('../pages/brand/goods_list.vue')), 'goods')
+const goodsSearch = r => require.ensure([], () => r(require('../pages/brand/goods_search.vue')), 'goods')
 
 const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
 const settleAccounts = r => require.ensure([], () => r(require('../pages/shopping_bag/settle_accounts.vue')), 'shoppingBag')
@@ -63,6 +64,12 @@ export default [{
         component: goodsList,
         meta: {
             title: '商品列表'
+        }
+    }, {
+        path: '/goods_search',
+        component: goodsSearch,
+        meta: {
+            title: '搜索商品'
         }
     }, {
         path: '/shopping_bag',
