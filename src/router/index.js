@@ -3,6 +3,7 @@ import App from '../App'
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
 
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
+const goodsList = r => require.ensure([], () => r(require('../pages/brand/goods_list.vue')), 'goods')
 
 const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
 const settleAccounts = r => require.ensure([], () => r(require('../pages/shopping_bag/settle_accounts.vue')), 'shoppingBag')
@@ -56,6 +57,12 @@ export default [{
         component: brand,
         meta: {
             title: '品牌'
+        }
+    }, {
+        path: '/goods_list',
+        component: goodsList,
+        meta: {
+            title: '商品列表'
         }
     }, {
         path: '/shopping_bag',

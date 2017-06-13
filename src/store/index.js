@@ -9,8 +9,9 @@ const state = {
     routerList: {
         '/home': 0,
         '/brand': 1,
+        '/goods_list': 5,
         '/shopping_bag': 3,
-        '/settle_accounts': 5,
+        '/settle_accounts': 6,
         '/user_index': 4,
         '/blance': 15,
         '/red_package': 16,

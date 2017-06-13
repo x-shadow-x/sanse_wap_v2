@@ -3,7 +3,7 @@
         <div class="wrapper" id="wrapper">
             <div class="scroller">
                 <ul class="brand_list">
-                    <tree-node v-for="item in brandList" :nodeData="item" :myScroll="myScroll"></tree-node>
+                    <tree-node v-for="item in brandList" :nodeData="item" :myScroll="myScroll" :isLink="isLink"></tree-node>
                 </ul>
             </div>
         </div>
@@ -20,6 +20,7 @@
 		data() {
 			return {
 				brandList: [],
+                isLink: true, // 用以指示tree-node到达叶子节点后是否需要跳转
                 myScroll: null
 			}
 		},
@@ -40,6 +41,7 @@
                     tempData.name = item.brand_name;
                     tempData.brandLogo = item.brand_logo;
                     tempData.id = item.brand_id;
+                    tempData.cat_id = item.cat_id;
                     tempData.level = 0;
 
 
@@ -86,7 +88,7 @@
 							children: []
 						};
 					} else {
-						result[item.parent_id].children.push({name: item.cat_name, level: item.level});
+						result[item.parent_id].children.push({name: item.cat_name, level: item.level, cat_id: item.cat_id});
 					}
 
 				}

@@ -4,14 +4,20 @@
             <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
             <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
         </a> -->
-
+            
+        
         <div :class="{bold: isFolder}" @click="toggle($event)" class="block">
             <img :src="nodeData.brandLogo" alt="" v-if="nodeData.brandLogo" class="brand_logo">
-            <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
+            <router-link v-if="!isFolder && isLink" :to="{ path:'/goods_list', query: {catId:nodeData.cat_id} }">
+                <span class="brand_cat_text" :class="{bold: nodeData.level == 0}">{{nodeData.name}}</span>
+            </router-link>
+            <span class="brand_cat_text" :class="{bold: nodeData.level == 0}" v-else>{{nodeData.name}}</span>
+            
         </div>
+
         <transition name="list-toggle">
           <ul v-show="open" v-if="isFolder" class="sub_list">
-            <tree-node class="sub_item" v-for="item in nodeData.children" :nodeData="item" :myScroll="myScroll">
+            <tree-node class="sub_item" v-for="item in nodeData.children" :nodeData="item" :myScroll="myScroll" :isLink="isLink">
             </tree-node>
           </ul>
         </transition>
@@ -22,7 +28,7 @@
 
 	export default {
         name: 'tree-node',
-		props: ['nodeData', 'myScroll'],
+		props: ['nodeData', 'myScroll', 'isLink'],
 
 		data() {
 			return {
@@ -45,7 +51,8 @@
                     }, 400);
 				}
 			}
-		}
+		},
+
 	}
 </script>
 
