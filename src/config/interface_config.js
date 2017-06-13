@@ -21,4 +21,5 @@ export default {
     'DEL_BUY_GOODS': '/DelBuyGood/', // 购物袋列表页删除选中的商品
     'BATCH_OPTIMIZE_BUY_CAR': '/BatchOptimize_BuyCar/', // 购物袋列表页商品批量删除
     'GET_BRAND_WITH_CATEGORY_PLUS_LIST': '/GetBrandWithCategoryPlus_List/', // 获取商品列表页顶部分类类别
+    'GET_APP_PROPERTY_LIST': '/Get_APP_Property_List/', // 获取商品能被用于做过滤条件的属性
 }
