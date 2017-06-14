@@ -7,8 +7,8 @@
 						<span class="categoey_item_text">{{item.cat_name}}</span>
 					</li>
 					<li v-if="restCategoryList.length > 0" class="categoey_item rest_items" @click.stop="handleRestItem">
-						<span class="rest_btn" :class="{active: isRestBtnActive}"></span>
-						<ul class="rest_item_list" v-if="isRestBtnActive">
+						<span class="rest_btn" :class="{active: toggleMap.isRestBtnActive}"></span>
+						<ul class="rest_item_list" v-if="toggleMap.isRestBtnActive">
 							<li v-for="(restItem, index) in restCategoryList" :key="restItem.cat_id" class="rest_item" @click.stop="selectRestItem(index)">
 								{{restItem.cat_name}}
 							</li>
@@ -22,24 +22,46 @@
 			<div class="sort_box">
 				<div class="sort_result_box" @click.stop="toggleSortList">
 					<span class="sort_result">{{sortResult}}</span>
-					<i class="arr_icon" :class="{active: isShowSortList}"></i>
+					<i class="arr_icon" :class="{active: toggleMap.isShowSortList}"></i>
 				</div>
-				<ul class="sort_list" v-if="isShowSortList">
+				<ul class="sort_list" v-if="toggleMap.isShowSortList">
 					<li v-for="(item, index) in sortList" class="sort_item" :class="{active: item.isSelected}" @click.stop="selectSortItem(index)">{{item.text}}</li>
 				</ul>
 			</div>
 			<div class="filter_box">
-				<div class="filter_btn_box">
+				<div class="filter_btn_box" @click.stop="toggleFilterList">
 					<span class="filter_btn">筛选</span>
-					<i class="arr_icon" :class="{active: isShowFilterList}"></i>
+					<i class="arr_icon" :class="{active: toggleMap.isShowFilterList}"></i>
 				</div>
 
-				<div class="filter_list_hover">
-					<div class="filter_list">
-						
+				<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
+					<div class="filter_list_box">
+						<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
+							<div class="filter_list">
+								<div class="prototype_box" v-for="goodPropertyItem in goodPropertyListArray">
+									<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
+									<ul class="prototype_list">
+										<li class="prototype_item" v-for="item in goodPropertyItem.GoodPropertyArray">{{item.attr_value}}</li>
+									</ul>
+								</div>
+								<div class="prototype_box" v-if="colorPropertyListArray.length > 0">
+									<h2 class="prototype_title">颜色</h2>
+									<ul class="prototype_list">
+										<li class="prototype_item" v-for="item in colorPropertyListArray">{{item.PropertyName}}</li>
+									</ul>
+								</div>
+							</div>
+							<div class="handle_btn_box">
+								<span class="btn reset_btn">重新筛选</span>
+								<span class="btn confirm_btn">重新筛选</span>
+							</div>
+						</template>
+						<template v-else>
+							<i class="empty_filter_icon"></i>
+							<span class="empty_filter_tip">暂无筛选条件！</span>
+						</template>
 					</div>
 				</div>
-				
 			</div>
 		</div>
 	</div>
@@ -78,9 +100,14 @@
 						sortType: 4
 					}
 				],
-				isRestBtnActive: false,
-				isShowSortList: false,
-				isShowFilterList: false
+				colorPropertyListArray: [],
+				goodPropertyListArray: [],
+				toggleMap: {
+					isRestBtnActive: false,
+					isShowSortList: false,
+					isShowFilterList: false
+				}
+				
 				
 			}
 		},
@@ -95,7 +122,8 @@
 
 		methods: {
 			selectCategory(index) {
-				this.isRestBtnActive = false;
+				this.reset();
+				this.toggleMap.isRestBtnActive = false;
 
 				this.categoryList.forEach((item) => {
 					item.isSelected = false;
@@ -105,25 +133,34 @@
 			},
 
 			handleRestItem() {
+				this.reset();
 				this.categoryList.forEach((item) => {
 					item.isSelected = false;
 				});
 
-				this.isRestBtnActive = !this.isRestBtnActive;
+				this.toggleMap.isRestBtnActive = !this.toggleMap.isRestBtnActive;
 			},
 
 			selectRestItem(index) {
-				this.isRestBtnActive = false;
+				this.reset();
+				this.toggleMap.isRestBtnActive = false;
 				this.categoryList.splice(1, 0, this.restCategoryList.splice(index, 1)[0]);
 				this.categoryList[1].isSelected = true;
 				this.restCategoryList.push(this.categoryList.pop())
 			},
 
 			toggleSortList() {
-				this.isShowSortList = !this.isShowSortList;
+				this.reset('isShowSortList');
+				this.toggleMap.isShowSortList = !this.toggleMap.isShowSortList;
+			},
+
+			toggleFilterList() {
+				this.reset('isShowFilterList');
+				this.toggleMap.isShowFilterList = !this.toggleMap.isShowFilterList;
 			},
 
 			selectSortItem(index) {
+				this.reset();
 				let currentItem = this.sortList[index];
 				if(currentItem.isSelected) {
 					return;
@@ -134,12 +171,17 @@
 
 				currentItem.isSelected = true;
 
-				this.isShowSortList = false;
+				this.toggleMap.isShowSortList = false;
 			},
 
-			reset() {
-				this.isRestBtnActive = false;
-				this.isShowSortList = false;
+			reset(expectKey) {
+
+				for(let key in this.toggleMap) {
+					if(key == expectKey) {
+						continue;
+					}
+					this.toggleMap[key] = false;
+				}
 			}
 		},
 
@@ -158,18 +200,17 @@
 				this.categoryList = data.slice(0, 4);
 				this.restCategoryList = data.slice(4);
 			});
-
-
-
+			console.log(this.$route.query.keyWord || ' ', '--------------');
 			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
 				'funcType': this.$route.query.funcType,
 				'catId': this.$route.query.catId || 0,
-				'keyWord': encodeURI(this.$route.query.searchKey || ' '),
-				'currentBrandId': 2 //临时值
+				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+				'currentBrandId': this.$route.query.brandId
 				
 			}, (response) => {
-				let data = response.data[0].CategoryList;
-				console.log(data);
+				let data = response.data;
+				this.colorPropertyListArray = data.ColorPropertyListArray;
+				this.goodPropertyListArray = data.GoodPropertyListArray;
 			});
 		}
 	}
@@ -178,7 +219,7 @@
 <style scoped>
 	.goods_list_main {
 		position: fixed;
-	    z-index: 12;
+	    z-index: 2;
 	    left: 0;
 	    right: 0;
 	    top: 0;
@@ -193,7 +234,7 @@
 		top: 0;
 		width: 100%;
 		border-bottom: 1px solid #efefef;
-		z-index: 2;
+		z-index: 3;
 	}
 
 	.category_box {
@@ -293,8 +334,7 @@
 		top: 1.4rem;
 		width: 96%;
 		line-height: 1rem;
-		left: 50%;
-		transform: translateX(-50%);
+		left: 2%;
 		border: 1px solid #efefef;
 		text-align: right;
 	}
@@ -356,5 +396,132 @@
 	.filter_btn {
 		display: inline-block;
 		vertical-align: middle;
+	}
+
+	.filter_list_out_box {
+		position: fixed;
+		right: -100%;
+		width: 100%;
+		top: 2.6rem;
+		bottom: 0;
+		overflow: hidden;
+		background: rgba(0, 0, 0, .6);
+		opacity: 0;
+		transition: opacity .4s, right 0s .4s;
+	}
+
+	.filter_list_out_box.show {
+		transition: opacity .32s, right 0s;
+		right: 0;
+		opacity: 1;
+	}
+
+	.filter_list_box {
+		position: absolute;
+		right: -100%;
+		top: 0;
+		bottom: 0;
+		width: 80%;
+		background: #fff;
+		overflow: hidden;
+		transition: right .4s;
+	}
+
+	.filter_list_out_box.show .filter_list_box {
+		right: 0;
+	}
+
+	.filter_list {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		top: 0;
+		bottom: 1.84rem;
+		overflow: auto;
+	}
+
+	.prototype_box {
+		font-size: 0;
+		padding: 0 0.386473rem;
+		padding-bottom: 4%;
+		text-align: left;
+	}
+
+	.prototype_box + .prototype_box {
+		border-top: 1px solid #efefef;
+	}
+
+	.prototype_title {
+		font-size: 12px;
+		line-height: 1;
+		margin-top: 4%;
+		margin-bottom: 1%;
+		text-align: left;
+	}
+
+	.prototype_list {
+		margin-left: -3%;
+		line-height: 1.2rem;
+	}
+
+	.prototype_item {
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 12px;
+		text-align: center;
+		background: #efefef;
+		color: #7f7f7f;
+		border-radius: 4px;
+		width: 30.3%;
+		margin-left: 3%;
+		margin-top: 3%;
+	}
+
+	.handle_btn_box {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		box-sizing: border-box;
+		bottom: 0;
+		padding: .32rem 0.386473rem;
+		background: #fff;
+		font-size: 0;
+		text-align: center;
+		line-height: 1.2rem;
+		border-top: 1px solid #efefef;
+	}
+
+	.btn {
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 12px;
+		background: #efefef;
+		color: #7f7f7f;
+		width: 50%;
+	}
+
+	.confirm_btn {
+		background: #ef8200;
+		color: #fff;
+	}
+
+	.empty_filter_icon,
+	.empty_filter_tip {
+		position: absolute;
+		left: 50%;
+		top: 45%;
+		transform: translate(-50%, -50%);
+	}
+
+	.empty_filter_icon {
+		width: 64px;
+		height: 64px;
+		background: url('../../images/goods_list/empty_filter_icon.png') center no-repeat;
+		background-size: 100% auto;
+	}
+
+	.empty_filter_tip {
+		top: 55%;
+		color: #7f7f7f;
 	}
 </style>

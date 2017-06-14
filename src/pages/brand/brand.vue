@@ -87,7 +87,7 @@
 							children: []
 						};
 					} else {
-						result[item.parent_id].children.push({name: item.cat_name, level: item.level, to: '/goods_list', query: {catId: item.cat_id, funcType: 'CA'}});
+						result[item.parent_id].children.push({name: item.cat_name, level: item.level, to: '/goods_list', query: {catId: item.cat_id, funcType: 'CA', brandId: item.brand_id}});
 					}
 
 				}
