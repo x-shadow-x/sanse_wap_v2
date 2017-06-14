@@ -35,25 +35,25 @@
 				</div>
 
 				<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
-					<div class="filter_list_box">
+					<div class="filter_list_box" @click.stop="">
 						<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
 							<div class="filter_list">
-								<div class="prototype_box" v-for="goodPropertyItem in goodPropertyListArray">
+								<div class="prototype_box" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
 									<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
 									<ul class="prototype_list">
-										<li class="prototype_item" v-for="item in goodPropertyItem.GoodPropertyArray">{{item.attr_value}}</li>
+										<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index">{{item.attr_value}}</li>
 									</ul>
 								</div>
-								<div class="prototype_box" v-if="colorPropertyListArray.length > 0">
+								<div class="prototype_box" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
 									<h2 class="prototype_title">颜色</h2>
 									<ul class="prototype_list">
-										<li class="prototype_item" v-for="item in colorPropertyListArray">{{item.PropertyName}}</li>
+										<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
 									</ul>
 								</div>
 							</div>
 							<div class="handle_btn_box">
-								<span class="btn reset_btn">重新筛选</span>
-								<span class="btn confirm_btn">重新筛选</span>
+								<span class="btn" @click="resetFilter">重新筛选</span>
+								<span class="btn confirm_btn" @click="confirmFilter">确认</span>
 							</div>
 						</template>
 						<template v-else>
@@ -106,9 +106,9 @@
 					isRestBtnActive: false,
 					isShowSortList: false,
 					isShowFilterList: false
-				}
-				
-				
+				},
+				propsFilterStr: '',
+				colorFilterStr: ''
 			}
 		},
 
@@ -174,6 +174,36 @@
 				this.toggleMap.isShowSortList = false;
 			},
 
+			/**
+			 * 还要自己实现事件代理~嗷呜
+			 * @param  {[type]} e [description]
+			 * @return {[type]}   [description]
+			 */
+			handleSelectProp(e, type) {
+				let target = e.target;
+				if(target.nodeName == 'LI') {
+					// 颜色过滤条件和其他过滤添加是平级独立的~其他过滤条件合并成一个过滤字符串
+					if(type == 'color') {
+						this.colorFilterStr = $(target).attr('data-colorcat-id');
+					} else {
+						this.propsFilterStr = this.propsFilterStr == '' ? $(target).attr('data-attr-id') : this.propsFilterStr + ',' + $(target).attr('data-attr-id');
+					}
+
+					$(target).addClass('active').siblings('li').removeClass('active');
+					
+				}
+				console.log(this.propsFilterStr, '----------', this.colorFilterStr);
+			},
+
+			resetFilter() {
+				$('.prototype_item').removeClass('active');
+				this.propsFilterStr = '';
+			},
+
+			confirmFilter() {
+				console.log(456);
+			},
+
 			reset(expectKey) {
 
 				for(let key in this.toggleMap) {
@@ -200,7 +230,7 @@
 				this.categoryList = data.slice(0, 4);
 				this.restCategoryList = data.slice(4);
 			});
-			console.log(this.$route.query.keyWord || ' ', '--------------');
+
 			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
 				'funcType': this.$route.query.funcType,
 				'catId': this.$route.query.catId || 0,
@@ -475,6 +505,11 @@
 		width: 30.3%;
 		margin-left: 3%;
 		margin-top: 3%;
+	}
+
+	.prototype_item.active {
+		background: #ef8200;
+		color: #fff;
 	}
 
 	.handle_btn_box {
