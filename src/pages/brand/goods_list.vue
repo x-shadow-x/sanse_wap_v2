@@ -18,7 +18,7 @@
 			</div>
 			<router-link to="/goods_search" class="search_btn"></router-link>
 		</div>
-		<div class="filter_bar">
+		<div class="filter_bar" :class="{hide: hideFilterBar}">
             <div class="filter_bar_box">
                 <span class="new_good_icon"></span>
     			<div class="sort_box">
@@ -35,39 +35,37 @@
     					<span class="filter_btn">筛选</span>
     					<i class="arr_icon" :class="{active: toggleMap.isShowFilterList}"></i>
     				</div>
-
-    				
     			</div>
             </div>
 		</div>
 		<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
-    					<div class="filter_list_box" @click.stop="">
-    						<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
-    							<div class="filter_list">
-    								<div class="prototype_box" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
-    									<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
-    									<ul class="prototype_list">
-    										<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index">{{item.attr_value}}</li>
-    									</ul>
-    								</div>
-    								<div class="prototype_box" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
-    									<h2 class="prototype_title">颜色</h2>
-    									<ul class="prototype_list">
-    										<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
-    									</ul>
-    								</div>
-    							</div>
-    							<div class="handle_btn_box">
-    								<span class="btn" @click="resetFilter">重新筛选</span>
-    								<span class="btn confirm_btn" @click="confirmFilter">确认</span>
-    							</div>
-    						</template>
-    						<template v-else>
-    							<i class="empty_filter_icon"></i>
-    							<span class="empty_filter_tip">暂无筛选条件！</span>
-    						</template>
-    					</div>
-    				</div>
+			<div class="filter_list_box" @click.stop="">
+				<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
+					<div class="filter_list">
+						<div class="prototype_box" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
+							<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
+							<ul class="prototype_list">
+								<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index">{{item.attr_value}}</li>
+							</ul>
+						</div>
+						<div class="prototype_box" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
+							<h2 class="prototype_title">颜色</h2>
+							<ul class="prototype_list">
+								<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
+							</ul>
+						</div>
+					</div>
+					<div class="handle_btn_box">
+						<span class="btn" @click="resetFilter">重新筛选</span>
+						<span class="btn confirm_btn" @click="confirmFilter">确认</span>
+					</div>
+				</template>
+				<template v-else>
+					<i class="empty_filter_icon"></i>
+					<span class="empty_filter_tip">暂无筛选条件！</span>
+				</template>
+			</div>
+		</div>
 
         <div class="goods_list_box" id="goodsListBox">
             <div class="scroller">
@@ -148,8 +146,10 @@
 				},
 				propsFilterStr: '',
 				colorFilterStr: '',
-                isMore: false,
+                isMore: true,
                 myScroll: null,
+                currentY: 0, // 记录开始滑动时候iscroll
+                hideFilterBar: false,
                 goodsList: [],
                 pageIndex: 1
 			}
@@ -324,7 +324,7 @@
 					'pageSize': this.$interface.PAGE_SIZE
 				}, (response) => {
 					let data = response.data;
-					this.goodsList = data.dataList;
+					this.goodsList.push(...data.dataList);
 
 					setTimeout(() => {
 						this.myScroll.refresh();
@@ -347,6 +347,12 @@
                         }
                     },
                     onScrollMove: function () {
+                    	if(this.y < that.currentY - 30) {
+                    		that.hideFilterBar = true;
+                    	} else if(this.y > that.currentY + 30) {
+                    		that.hideFilterBar = false;
+                    	}
+
                         if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
                             pullUpEl.className = 'flip';
                             pullUpEl.querySelector('.pullUpLabel').innerHTML = '释放加载';
@@ -358,6 +364,7 @@
                         }
                     },
                     onScrollEnd: function () {
+                    	that.currentY = this.y;
                         if (pullUpEl.className.match('flip')) {
                             pullUpEl.className = 'loading';
                             pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
@@ -495,6 +502,11 @@
 		text-align: right;
         z-index: 4;
         background: #fff;
+        transition: transform .32s;
+	}
+
+	.filter_bar.hide {
+		transform: translateY(-100%);
 	}
 
     .filter_bar_box {
