@@ -46,6 +46,7 @@
 			return {
 				myScroll: null,
 				isMore: false,
+                pageIndex: 1,
 				couponRecord: []
 			}
 		},
@@ -62,7 +63,7 @@
 			this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
 				'userId': '304014',
 				'type': '1',
-				'pageIndex': '1',
+				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
 				let data = response.data;
@@ -73,7 +74,7 @@
 					// 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求时声明的一页的条数~就认为需要分页
 					this.isMore = true;
 				} else {
-                    this.isMore = true;
+                    this.isMore = false;
                 }
 
                 setTimeout(() => {
@@ -109,7 +110,7 @@
                 this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
                     'userId': '304014',
                     'type': '1',
-                    'pageIndex': '1',
+                    'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {
                     let data = response.data;
@@ -120,7 +121,7 @@
                         // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                         this.isMore = true;
                     } else {
-                        this.isMore = true;
+                        this.isMore = false;
                     }
 
                     setTimeout(() => {

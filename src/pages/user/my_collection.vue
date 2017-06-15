@@ -126,7 +126,7 @@
                 let lastRecord = data[data.length - 1];
 
                 this.goodsId = lastRecord.goods_id;
-                this.color_id = lastRecord.color_id;
+                this.colorId = lastRecord.color_id;
 
                 setTimeout(() => {
                     this.myScroll.refresh();
@@ -148,6 +148,10 @@
                     'colorId': this.colorId
                 }, (response) => {
                     let data = response.data;
+                    let lastRecord = data[data.length - 1];
+
+                    this.goodsId = lastRecord.goods_id;
+                    this.colorId = lastRecord.color_id;
 
                     this.collectionRecord.push(...data);
 

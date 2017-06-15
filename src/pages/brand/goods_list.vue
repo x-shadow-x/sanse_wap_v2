@@ -150,7 +150,8 @@
 				colorFilterStr: '',
                 isMore: false,
                 myScroll: null,
-                goodsList: []
+                goodsList: [],
+                pageIndex: 1
 			}
 		},
 
@@ -293,7 +294,7 @@
 				'sortField': ' ',
 				'sortBy': 'asc',
 				'cookieId': '23456006805d970d5438a354dc019fc295614979',
-				'pageIndex': '1',
+				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
 				let data = response.data;
@@ -311,6 +312,24 @@
                 tempLoad = 0;
 
             function pullUpAction () {
+            	this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
+					'userId': '304014',
+					'funcType': this.$route.query.funcType,
+					'catId': this.$route.query.catId || 0,
+					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+					'sortField': ' ',
+					'sortBy': 'asc',
+					'cookieId': '23456006805d970d5438a354dc019fc295614979',
+					'pageIndex': this.pageIndex++,
+					'pageSize': this.$interface.PAGE_SIZE
+				}, (response) => {
+					let data = response.data;
+					this.goodsList = data.dataList;
+
+					setTimeout(() => {
+						this.myScroll.refresh();
+					}, 320);
+				});
             }
 
             function loaded() {
