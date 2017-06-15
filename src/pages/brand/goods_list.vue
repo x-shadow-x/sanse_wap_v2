@@ -36,7 +36,11 @@
     					<i class="arr_icon" :class="{active: toggleMap.isShowFilterList}"></i>
     				</div>
 
-    				<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
+    				
+    			</div>
+            </div>
+		</div>
+		<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
     					<div class="filter_list_box" @click.stop="">
     						<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
     							<div class="filter_list">
@@ -64,50 +68,27 @@
     						</template>
     					</div>
     				</div>
-    			</div>
-            </div>
-		</div>
 
         <div class="goods_list_box" id="goodsListBox">
             <div class="scroller">
                 <ul class="goods_list">
-                    <li class="goods_item" v-for="">
+                    <li class="goods_item" v-for="(item, index) in goodsList">
                         <div class="img_box">
-                            <img src="../../images/test_img.jpg" alt="商品名字" class="goods_img">
+                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
                         </div>
                         <div class="goods_info_box">
-                            <h2 class="goods_name">ORIGINALS女子 短袖T恤</h2>
+                            <h2 class="goods_name">{{item.goods_name}}</h2>
                             <div class="price_box">
-                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip">
+                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
                                 <div class="current_price_box">
-                                    <span class="money_tip">¥</span><span class="price">209.30</span>
+                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
                                 </div>
                                 <div class="old_price_box">
-                                    <span class="money_tip">¥</span><span class="price">299.00</span>
+                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
                                 </div>
                             </div>
                             <div class="date_box">
-                                <i class="date_icon"></i><span class="date">2017-06-09</span>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="goods_item" v-for="">
-                        <div class="img_box">
-                            <img src="../../images/test_img.jpg" alt="商品名字" class="goods_img">
-                        </div>
-                        <div class="goods_info_box">
-                            <h2 class="goods_name">ORIGINALS女子 短袖T恤</h2>
-                            <div class="price_box">
-                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip">
-                                <div class="current_price_box">
-                                    <span class="money_tip">¥</span><span class="price">209.30</span>
-                                </div>
-                                <div class="old_price_box">
-                                    <span class="money_tip">¥</span><span class="price">299.00</span>
-                                </div>
-                            </div>
-                            <div class="date_box">
-                                <i class="date_icon"></i><span class="date">2017-06-09</span>
+                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
                             </div>
                         </div>
                     </li>
@@ -169,6 +150,7 @@
 				colorFilterStr: '',
                 isMore: false,
                 myScroll: null,
+                goodsList: []
 			}
 		},
 
@@ -303,6 +285,26 @@
 			});
 
 
+			this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
+				'userId': '304014',
+				'funcType': this.$route.query.funcType,
+				'catId': this.$route.query.catId || 0,
+				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+				'sortField': ' ',
+				'sortBy': 'asc',
+				'cookieId': '23456006805d970d5438a354dc019fc295614979',
+				'pageIndex': '1',
+				'pageSize': this.$interface.PAGE_SIZE
+			}, (response) => {
+				let data = response.data;
+				this.goodsList = data.dataList;
+
+				setTimeout(() => {
+					this.myScroll.refresh();
+				}, 320);
+			});
+
+
             var pullUpEl,
                 pullUpOffset,
                 generatedCount = 0,
@@ -346,9 +348,7 @@
                 });
             }
 
-            setTimeout(() => {
-                loaded.bind(this)();
-            }, 1000);
+            loaded.bind(this)();
 		}
 	}
 </script>
@@ -371,7 +371,7 @@
 		top: 0;
 		width: 100%;
 		border-bottom: 1px solid #efefef;
-		z-index: 3;
+		z-index: 5;
         background: #fff;
 	}
 
@@ -469,18 +469,19 @@
 
 	.filter_bar {
 		position: fixed;
-		top: calc(1.2rem + 1px);
-        padding-top: .2rem;
-		width: 96%;
-		line-height: 1rem;
-		left: 2%;
-
+		top: 1.2rem;
+        padding: .2rem 0;
+		width: 100%;
+		left: 0;
 		text-align: right;
-        z-index: 3;
+        z-index: 4;
         background: #fff;
 	}
 
     .filter_bar_box {
+    	width: 96%;
+    	line-height: 1rem;
+    	margin: 0 auto;
         border: 1px solid #efefef;
     }
     .new_good_icon {
@@ -557,12 +558,13 @@
 		position: fixed;
 		right: -100%;
 		width: 100%;
-		top: 2.6rem;
+		top: 2.4rem;
 		bottom: 0;
 		overflow: hidden;
 		background: rgba(0, 0, 0, .6);
 		opacity: 0;
 		transition: opacity .4s, right 0s .4s;
+		z-index: 3;
 	}
 
 	.filter_list_out_box.show {

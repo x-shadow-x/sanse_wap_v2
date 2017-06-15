@@ -1,5 +1,5 @@
 export default {
-    'PAGE_SIZE': '10',
+    'PAGE_SIZE': '50',
     'GET_BRAND_WITH_CATEGORYLIST': '/GetBrandWithCategory_List/', // 品牌列表页获取品牌信息
     'GET_BUY_CAR_GOOD_LIST': '/GetBuyCarGoodList/', // 点击底部导航栏进入购物袋页面获取购物袋列表数据
     'GET_USER_ACCOUNT_LIST': '/Get_User_AccountList/', // 个人中心用户余额记录列表
@@ -22,4 +22,5 @@ export default {
     'BATCH_OPTIMIZE_BUY_CAR': '/BatchOptimize_BuyCar/', // 购物袋列表页商品批量删除
     'GET_BRAND_WITH_CATEGORY_PLUS_LIST': '/GetBrandWithCategoryPlus_List/', // 获取商品列表页顶部分类类别
     'GET_APP_PROPERTY_LIST': '/Get_APP_Property_List/', // 获取商品能被用于做过滤条件的属性
+    'GET_ALL_GOODS_DETAIL_LIST': '/Get_ALL_Goods_Detail_List/', // 获取所有商品列表
 }
