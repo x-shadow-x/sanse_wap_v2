@@ -859,9 +859,9 @@
     .goods_list_box {
         position: relative;
         width: 96%;
-        height: calc(100% - 2.6rem);
+        height: 100%;
         box-sizing: border-box;
-        margin: 2.6rem auto 0 auto;
+        margin: 0 auto;
         overflow: hidden;
         box-sizing: border-box;
         background: #fff;
@@ -873,6 +873,8 @@
         width: 100%;
         min-height: 100%;
         padding: 0;
+        padding-top: 2.6rem;
+        box-sizing: border-box;
     }
 
     .goods_list {
