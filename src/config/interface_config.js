@@ -23,4 +23,5 @@ export default {
     'GET_BRAND_WITH_CATEGORY_PLUS_LIST': '/GetBrandWithCategoryPlus_List/', // 获取商品列表页顶部分类类别
     'GET_APP_PROPERTY_LIST': '/Get_APP_Property_List/', // 获取商品能被用于做过滤条件的属性
     'GET_ALL_GOODS_DETAIL_LIST': '/Get_ALL_Goods_Detail_List/', // 获取所有商品列表
+    'GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO': '/Get_APP_SearchGoodDetailList_ForPro/', // 使用过滤条件时获取商品列表
 }

@@ -42,13 +42,13 @@
 			<div class="filter_list_box" @click.stop="">
 				<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
 					<div class="filter_list">
-						<div class="prototype_box" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
+						<div class="prototype_box goods_pro" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
 							<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
 							<ul class="prototype_list">
-								<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index">{{item.attr_value}}</li>
+								<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index" :data-attr-value="item.attr_value">{{item.attr_value}}</li>
 							</ul>
 						</div>
-						<div class="prototype_box" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
+						<div class="prototype_box goods_color" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
 							<h2 class="prototype_title">颜色</h2>
 							<ul class="prototype_list">
 								<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
@@ -69,7 +69,7 @@
 
         <div class="goods_list_box" id="goodsListBox">
             <div class="scroller">
-                <ul class="goods_list">
+        		<ul class="goods_list" v-if="!isGoodsListEmpty">
                     <li class="goods_item" v-for="(item, index) in goodsList">
                         <div class="img_box">
                             <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
@@ -91,7 +91,13 @@
                         </div>
                     </li>
                 </ul>
-                <div :class="{transparent: !isMore}">
+                <div class="empty_goods_list_box" v-else>
+		        	<div class="empty_goods_list_tip">
+		        		<i class="empty_goods_list_icon"></i>
+		        		<p class="empty_goods_list_text">暂无商品</p>
+		        	</div>
+		        </div>
+                <div :class="{transparent: !isMore || isGoodsListEmpty}">
                     <div id="pullUp">
                         <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
                     </div>
@@ -114,27 +120,32 @@
 					{
 						text: '精选推荐',
 						isSelected: true,
-						sortType: 0
+						sortField: 0,
+						sortBy: 'asc'
 					},
 					{
 						text: '上架时间',
 						isSelected: false,
-						sortType: 1
+						sortField: 'on_sale_time',
+						sortBy: 'asc'
 					},
 					{
 						text: '销量',
 						isSelected: false,
-						sortType: 2
+						sortField: 'salesVolume',
+						sortBy: 'asc'
 					},
 					{
 						text: '价格升序',
 						isSelected: false,
-						sortType: 3
+						sortField: 'shop_price',
+						sortBy: 'asc'
 					},
 					{
 						text: '价格降序',
 						isSelected: false,
-						sortType: 4
+						sortField: 'shop_price',
+						sortBy: 'desc'
 					}
 				],
 				colorPropertyListArray: [],
@@ -144,11 +155,16 @@
 					isShowSortList: false,
 					isShowFilterList: false
 				},
+				sortField: ' ',
+				sortBy: 'asc',
+				propsFilterIdStr: '',
 				propsFilterStr: '',
-				colorFilterStr: '',
+				colorCatIdStr: 0,
                 isMore: true,
+                emptyGoodsList: false,
                 myScroll: null,
-                currentY: 0, // 记录开始滑动时候iscroll
+                currentY: 0, // 记录开始滑动时候iscroll~以便在有商品的时候做上拉则筛选框消失的效果
+                isGoodsListEmpty: false,
                 hideFilterBar: false,
                 goodsList: [],
                 pageIndex: 1
@@ -215,6 +231,11 @@
 				currentItem.isSelected = true;
 
 				this.toggleMap.isShowSortList = false;
+
+				this.sortField = currentItem.sortField;
+				this.sortBy = currentItem.sortBy;
+
+				this.getDefaultData();
 			},
 
 			/**
@@ -225,26 +246,39 @@
 			handleSelectProp(e, type) {
 				let target = e.target;
 				if(target.nodeName == 'LI') {
-					// 颜色过滤条件和其他过滤添加是平级独立的~其他过滤条件合并成一个过滤字符串
-					if(type == 'color') {
-						this.colorFilterStr = $(target).attr('data-colorcat-id');
-					} else {
-						this.propsFilterStr = this.propsFilterStr == '' ? $(target).attr('data-attr-id') : this.propsFilterStr + ',' + $(target).attr('data-attr-id');
-					}
-
-					$(target).addClass('active').siblings('li').removeClass('active');
-
+					$(target).toggleClass('active').siblings('li').removeClass('active');
 				}
-				console.log(this.propsFilterStr, '----------', this.colorFilterStr);
 			},
 
 			resetFilter() {
 				$('.prototype_item').removeClass('active');
-				this.propsFilterStr = '';
+				this.propsFilterIdStr = '';
 			},
 
 			confirmFilter() {
-				console.log(456);
+
+				this.propsFilterIdStr = '';				
+				this.propsFilterStr = '';				
+				this.colorCatIdStr = 0;				
+				
+				$('.goods_pro').find('.prototype_item.active').each((index, item) => {
+					this.propsFilterIdStr = this.propsFilterIdStr == '' ? $(item).attr('data-attr-id') : this.propsFilterIdStr + ',' + $(item).attr('data-attr-id');
+					this.propsFilterStr = this.propsFilterStr == '' ? $(item).html() : this.propsFilterStr + '$#_!' + $(item).html();
+				});
+
+				$('.goods_color').find('.prototype_item.active').each((index, item) => {
+					this.colorCatIdStr = $(item).attr('data-colorcat-id');
+				});
+
+				this.$store.commit('SHOW_LOAD');
+				this.toggleMap.isShowFilterList = false;
+				this.pageIndex = 1;
+				if(this.propsFilterIdStr != '') {
+					this.getFilterData();
+				} else {
+					this.getDefaultData();
+				}
+				
 			},
 
 			reset(expectKey) {
@@ -255,6 +289,96 @@
 					}
 					this.toggleMap[key] = false;
 				}
+			},
+
+			getDefaultData() {
+				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
+					'userId': '304014',
+					'funcType': this.$route.query.funcType,
+					'catId': this.$route.query.catId || 0,
+					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+					'sortField': this.sortField,
+					'sortBy': this.sortBy,
+					'cookieId': '23456006805d970d5438a354dc019fc295614979',
+					'pageIndex': this.pageIndex++,
+					'pageSize': this.$interface.PAGE_SIZE
+				}, (response) => {
+					let data = response.data;
+					if(data.dataList.length == 0 || data.dataList.length < this.$interface.PAGE_SIZE) {
+						this.isMore = false;
+					} else {
+						this.isMore = true;
+					}
+					if(this.pageIndex == 2) {
+						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
+						this.goodsList = data.dataList;
+					} else {
+						// 已经是翻页的数据了~故需追加而不是直接赋值
+						this.goodsList.push(...data.dataList);
+					}
+					
+
+					if(this.goodsList.length > 0) {
+						this.isGoodsListEmpty = false;
+					} else {
+						this.isGoodsListEmpty = true;
+					}
+
+					setTimeout(() => {
+						console.log(this);
+						this.myScroll.refresh();
+					}, 320);
+
+					this.$store.commit('HIDE_LOAD');
+				});
+			},
+
+			getFilterData() {
+				this.$request.get(this.$interface.GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO, {
+					'funcType': this.$route.query.funcType,
+					'catId': this.$route.query.catId || 0,
+					'propsFilterIdStr': this.propsFilterIdStr,
+					'propsFilterStr': encodeURI(this.propsFilterStr),
+					'colorCatId': this.colorCatIdStr,
+					'startPrice': 0, // 已经弃用的参数~故传个0~只是占位
+					'endPrice': 0, // 已经弃用的参数~故传个0~只是占位
+					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+					'userId': '304014',
+					'cookieId': '23456006805d970d5438a354dc019fc295614979',
+					'sortField': this.sortField,
+					'sortBy': this.sortBy,
+					'pageIndex': this.pageIndex++,
+					'pageSize': this.$interface.PAGE_SIZE
+				}, (response) => {
+					let data = response.data;
+
+					if(data.dataList.length == 0 || data.dataList.length < this.$interface.PAGE_SIZE) {
+						this.isMore = false;
+					} else {
+						this.isMore = true;
+					}
+
+					if(this.pageIndex == 2) {
+						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
+						this.goodsList = data.dataList;
+					} else {
+						// 已经是翻页的数据了~故需追加而不是直接赋值
+						this.goodsList.push(...data.dataList);
+					}
+
+					if(this.goodsList.length > 0) {
+						this.isGoodsListEmpty = false;
+					} else {
+						this.isGoodsListEmpty = true;
+					}
+
+					setTimeout(() => {
+						console.log(this);
+						this.myScroll.refresh();
+					}, 320);
+
+					this.$store.commit('HIDE_LOAD');
+				});
 			}
 		},
 
@@ -291,8 +415,8 @@
 				'funcType': this.$route.query.funcType,
 				'catId': this.$route.query.catId || 0,
 				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-				'sortField': ' ',
-				'sortBy': 'asc',
+				'sortField': this.sortField,
+				'sortBy': this.sortBy,
 				'cookieId': '23456006805d970d5438a354dc019fc295614979',
 				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
@@ -312,24 +436,30 @@
                 tempLoad = 0;
 
             function pullUpAction () {
-            	this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-					'userId': '304014',
-					'funcType': this.$route.query.funcType,
-					'catId': this.$route.query.catId || 0,
-					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-					'sortField': ' ',
-					'sortBy': 'asc',
-					'cookieId': '23456006805d970d5438a354dc019fc295614979',
-					'pageIndex': this.pageIndex++,
-					'pageSize': this.$interface.PAGE_SIZE
-				}, (response) => {
-					let data = response.data;
-					this.goodsList.push(...data.dataList);
+            	if(this.propsFilterIdStr != '') {
+					this.getFilterData();
+				} else {
+					this.getDefaultData();
+				}
 
-					setTimeout(() => {
-						this.myScroll.refresh();
-					}, 320);
-				});
+    //         	this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
+				// 	'userId': '304014',
+				// 	'funcType': this.$route.query.funcType,
+				// 	'catId': this.$route.query.catId || 0,
+				// 	'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+				// 	'sortField': this.sortField,
+				// 	'sortBy': this.sortBy,
+				// 	'cookieId': '23456006805d970d5438a354dc019fc295614979',
+				// 	'pageIndex': this.pageIndex++,
+				// 	'pageSize': this.$interface.PAGE_SIZE
+				// }, (response) => {
+				// 	let data = response.data;
+				// 	this.goodsList.push(...data.dataList);
+
+				// 	setTimeout(() => {
+				// 		this.myScroll.refresh();
+				// 	}, 320);
+				// });
             }
 
             function loaded() {
@@ -348,9 +478,15 @@
                     },
                     onScrollMove: function () {
                     	if(this.y < that.currentY - 30) {
-                    		that.hideFilterBar = true;
+                    		if(!that.isGoodsListEmpty) {
+                    			that.hideFilterBar = true;
+                    		} 
+                    		
                     	} else if(this.y > that.currentY + 30) {
-                    		that.hideFilterBar = false;
+                    		if(!that.isGoodsListEmpty) {
+                    			that.hideFilterBar = false;
+                    		}
+                    		
                     	}
 
                         if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
@@ -723,10 +859,10 @@
     .goods_list_box {
         position: relative;
         width: 96%;
-        height: 100%;
-        margin: 0 auto;
+        height: calc(100% - 2.6rem);
+        box-sizing: border-box;
+        margin: 2.6rem auto 0 auto;
         overflow: hidden;
-        padding-top: 2.6rem;
         box-sizing: border-box;
         background: #fff;
     }
@@ -745,12 +881,12 @@
     }
 
     .goods_item {
-        margin: 0 auto 30px auto;
+        margin: 0 auto 0 2%;
+        padding-bottom: 30px;
         display: inline-block;
         vertical-align: middle;
         font-size: 12px;
         width: 48%;
-        margin-left: 2%;
     }
 
     .transparent {
@@ -854,5 +990,35 @@
     .date {
         display: inline-block;
         vertical-align: middle;
+    }
+
+    .empty_goods_list_box {
+    	position: absolute;
+    	top: 0;
+    	bottom: 0;
+    	left: 0;
+    	right: 0;
+    }
+
+    .empty_goods_list_tip {
+    	position: absolute;
+    	left: 0;
+    	width: 100%;
+    	top: 30%;
+    	transform: translateY(-50%);
+    	text-align: center;
+    }
+
+    .empty_goods_list_icon {
+    	display: inline-block;
+    	vertical-align: middle;
+    	width: 60px;
+    	height: 60px;
+    	background: url('../../images/goods_list/goods_list_empty_icon.png') center no-repeat;
+    	background-size: 100% auto;
+    }
+
+    .empty_goods_list_text {
+    	margin-top: 10px;
     }
 </style>
