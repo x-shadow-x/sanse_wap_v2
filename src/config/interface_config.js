@@ -1,5 +1,5 @@
 export default {
-    'PAGE_SIZE': '2',
+    'PAGE_SIZE': '10',
     'GET_BRAND_WITH_CATEGORYLIST': '/GetBrandWithCategory_List/', // 品牌列表页获取品牌信息
     'GET_BUY_CAR_GOOD_LIST': '/GetBuyCarGoodList/', // 点击底部导航栏进入购物袋页面获取购物袋列表数据
     'GET_USER_ACCOUNT_LIST': '/Get_User_AccountList/', // 个人中心用户余额记录列表

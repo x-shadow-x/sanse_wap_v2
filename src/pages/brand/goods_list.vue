@@ -155,10 +155,11 @@
 					isShowSortList: false,
 					isShowFilterList: false
 				},
+                funcType: this.$route.query.funcType || 'AC',
 				sortField: ' ',
 				sortBy: 'asc',
-				propsFilterIdStr: '',
-				propsFilterStr: '',
+				propsFilterIdStr: 0,
+				propsFilterStr: ' ',
 				colorCatIdStr: 0,
                 isMore: true,
                 emptyGoodsList: false,
@@ -234,8 +235,14 @@
 
 				this.sortField = currentItem.sortField;
 				this.sortBy = currentItem.sortBy;
-
-				this.getDefaultData();
+                this.pageIndex = 1;
+                if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
+                    this.getDefaultData();
+                    console.log(123);
+                } else {
+                    this.getFilterData();
+                    console.log(456);
+                }
 			},
 
 			/**
@@ -252,18 +259,18 @@
 
 			resetFilter() {
 				$('.prototype_item').removeClass('active');
-				this.propsFilterIdStr = '';
+				this.propsFilterIdStr = 0;
 			},
 
 			confirmFilter() {
 
-				this.propsFilterIdStr = '';				
-				this.propsFilterStr = '';				
-				this.colorCatIdStr = 0;				
-				
+				this.propsFilterIdStr = 0;
+				this.propsFilterStr = ' ';
+				this.colorCatIdStr = 0;
+
 				$('.goods_pro').find('.prototype_item.active').each((index, item) => {
 					this.propsFilterIdStr = this.propsFilterIdStr == '' ? $(item).attr('data-attr-id') : this.propsFilterIdStr + ',' + $(item).attr('data-attr-id');
-					this.propsFilterStr = this.propsFilterStr == '' ? $(item).html() : this.propsFilterStr + '$#_!' + $(item).html();
+					this.propsFilterStr = this.propsFilterStr == ' ' ? $(item).html() : this.propsFilterStr + '$#_!' + $(item).html();
 				});
 
 				$('.goods_color').find('.prototype_item.active').each((index, item) => {
@@ -273,12 +280,11 @@
 				this.$store.commit('SHOW_LOAD');
 				this.toggleMap.isShowFilterList = false;
 				this.pageIndex = 1;
-				if(this.propsFilterIdStr != '') {
-					this.getFilterData();
-				} else {
-					this.getDefaultData();
-				}
-				
+				if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
+                    this.getDefaultData();
+                } else {
+                    this.getFilterData()
+                }
 			},
 
 			reset(expectKey) {
@@ -292,17 +298,19 @@
 			},
 
 			getDefaultData() {
-				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-					'userId': '304014',
-					'funcType': this.$route.query.funcType,
-					'catId': this.$route.query.catId || 0,
-					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-					'sortField': this.sortField,
-					'sortBy': this.sortBy,
-					'cookieId': '23456006805d970d5438a354dc019fc295614979',
-					'pageIndex': this.pageIndex++,
-					'pageSize': this.$interface.PAGE_SIZE
-				}, (response) => {
+                var temp = {
+                    'userId': '304014',
+                    'funcType': this.funcType,
+                    'catId': this.$route.query.catId || 0,
+                    'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+                    'sortField': this.sortField,
+                    'sortBy': this.sortBy,
+                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                    'pageIndex': this.pageIndex++,
+                    'pageSize': this.$interface.PAGE_SIZE
+                };
+                console.log(temp);
+				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, temp, (response) => {
 					let data = response.data;
 					if(data.dataList.length == 0 || data.dataList.length < this.$interface.PAGE_SIZE) {
 						this.isMore = false;
@@ -316,7 +324,7 @@
 						// 已经是翻页的数据了~故需追加而不是直接赋值
 						this.goodsList.push(...data.dataList);
 					}
-					
+
 
 					if(this.goodsList.length > 0) {
 						this.isGoodsListEmpty = false;
@@ -335,7 +343,7 @@
 
 			getFilterData() {
 				this.$request.get(this.$interface.GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO, {
-					'funcType': this.$route.query.funcType,
+					'funcType': this.funcType,
 					'catId': this.$route.query.catId || 0,
 					'propsFilterIdStr': this.propsFilterIdStr,
 					'propsFilterStr': encodeURI(this.propsFilterStr),
@@ -373,7 +381,6 @@
 					}
 
 					setTimeout(() => {
-						console.log(this);
 						this.myScroll.refresh();
 					}, 320);
 
@@ -387,7 +394,7 @@
 			this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORY_PLUS_LIST, {
 				'brandId': this.$route.query.brandId || 0,
 				'catId': this.$route.query.catId || 0,
-				'funcType': this.$route.query.funcType
+				'funcType': this.funcType
 			}, (response) => {
 				let data = response.data[0].CategoryList;
 				data.forEach((item) => {
@@ -399,7 +406,7 @@
 			});
 
 			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
-				'funcType': this.$route.query.funcType,
+				'funcType': this.funcType,
 				'catId': this.$route.query.catId || 0,
 				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
 				'currentBrandId': this.$route.query.brandId
@@ -412,7 +419,7 @@
 
 			this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
 				'userId': '304014',
-				'funcType': this.$route.query.funcType,
+				'funcType': this.funcType,
 				'catId': this.$route.query.catId || 0,
 				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
 				'sortField': this.sortField,
@@ -436,15 +443,15 @@
                 tempLoad = 0;
 
             function pullUpAction () {
-            	if(this.propsFilterIdStr != '') {
-					this.getFilterData();
-				} else {
-					this.getDefaultData();
-				}
+            	if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
+                    this.getDefaultData();
+                } else {
+                    this.getFilterData()
+                }
 
     //         	this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
 				// 	'userId': '304014',
-				// 	'funcType': this.$route.query.funcType,
+				// 	'funcType': this.funcType,
 				// 	'catId': this.$route.query.catId || 0,
 				// 	'keyWord': encodeURI(this.$route.query.keyWord || ' '),
 				// 	'sortField': this.sortField,
@@ -480,13 +487,13 @@
                     	if(this.y < that.currentY - 30) {
                     		if(!that.isGoodsListEmpty) {
                     			that.hideFilterBar = true;
-                    		} 
-                    		
+                    		}
+
                     	} else if(this.y > that.currentY + 30) {
                     		if(!that.isGoodsListEmpty) {
                     			that.hideFilterBar = false;
                     		}
-                    		
+
                     	}
 
                         if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
@@ -625,7 +632,7 @@
 		bottom: 0;
 		width: 15%;
 		height: 1.2rem;
-		background: url('../../images/goods_list/search_goods_icon.png') center no-repeat;
+		background: url('../../images/goods_list/search_goods_btn_icon.png') center no-repeat;
 		background-size: 16px auto;
 	}
 
