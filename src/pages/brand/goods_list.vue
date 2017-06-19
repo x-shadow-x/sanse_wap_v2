@@ -104,10 +104,11 @@
                 </div>
             </div>
         </div>
-        <div class="page_tip_box">
+        <div class="page_tip_box" v-if="showPageTip">
         	<span class="current_page">{{currentPage}}</span>
         	<span class="total_page">{{totalPage}}</span>
         </div>
+        <span class="scroll_to_top" v-if="showScrollToTop" @click="scrollToTop"></span>
 	</div>
 </template>
 
@@ -169,6 +170,8 @@
 				totalPage: 0,
 				currentPage: 1,
 				goodsItemStep: 0,
+				showPageTip: false,
+				showScrollToTop: false,
                 isMore: true,
                 showCategoryBar: true,
                 myScroll: null,
@@ -309,6 +312,10 @@
 				}
 			},
 
+			scrollToTop() {
+				this.myScroll.scrollTo(0, 0, 500);
+			},
+
 			getDefaultData(cb) {
 
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
@@ -331,6 +338,7 @@
 					if(this.pageIndex == 2) {
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
+						this.scrollToTop();
 					} else {
 						// 已经是翻页的数据了~故需追加而不是直接赋值
 						this.goodsList.push(...data.dataList);
@@ -342,6 +350,8 @@
 					} else {
 						this.isGoodsListEmpty = true;
 					}
+
+					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 
 					setTimeout(() => {
 						this.myScroll.refresh();
@@ -382,6 +392,7 @@
 					if(this.pageIndex == 2) {
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
+						this.scrollToTop();
 					} else {
 						// 已经是翻页的数据了~故需追加而不是直接赋值
 						this.goodsList.push(...data.dataList);
@@ -392,6 +403,8 @@
 					} else {
 						this.isGoodsListEmpty = true;
 					}
+
+					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 
 					setTimeout(() => {
 						this.myScroll.refresh();
@@ -439,8 +452,7 @@
 
 			this.getDefaultData(function(data) {
 				this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
-				this.goodsItemStep = -2/(this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
-				console.log($('.goods_item').outerHeight(true))
+				this.goodsItemStep = -2 / (this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
 			});
 
 
@@ -456,7 +468,6 @@
                 }
             }
 
-
 			function loaded () {
 				pullUpEl = document.getElementById('pullUp');
                 pullUpOffset = pullUpEl.offsetHeight;
@@ -468,7 +479,9 @@
 					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
 					// 此处计算公式是经过化简的~将能事先计算的固定值先计算出来直接用~减小性能开销
 					this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
-					
+					this.showPageTip = true;
+					this.showScrollToTop = false;
+
 	            	if(this.myScroll.y < this.currentY - 30) {
 	            		if(!this.isGoodsListEmpty) {
 	            			this.hideFilterBar = true;
@@ -491,6 +504,11 @@
 					
 				this.myScroll.on('scrollEnd', () => {
 					this.currentY = this.myScroll.y;
+					this.showPageTip = false;
+					if(this.myScroll.y < 0) {
+						this.showScrollToTop = true;
+					}
+
                     if (pullUpEl.className.match('flip')) {
                         pullUpEl.className = 'loading';
                         pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
@@ -1025,7 +1043,8 @@
     	margin-top: 10px;
     }
 
-    .page_tip_box {
+    .page_tip_box,
+    .scroll_to_top {
     	position: fixed;
     	right: 5%;
     	bottom: 10%;
@@ -1061,6 +1080,11 @@
     	width: 50%;
     	right: 0;
     	bottom: 12%;
+    }
+
+    .scroll_to_top {
+    	background: url('../../images/goods_list/scroll_back.png') center no-repeat;
+    	background-size: 100% auto;
     }
     
 </style>
