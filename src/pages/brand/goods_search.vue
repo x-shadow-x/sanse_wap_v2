@@ -2,15 +2,14 @@
 	<div class="goods_search_main">
 		<div class="search_box">
             <input type="text" v-model="keyWord" placeholder="请输入商品名/款号/品牌/品类" class="search_input" @keydown="submitKeyWord($event)">
-            <router-link :to="{ path:'/goods_list', query: {keyWord: keyWord, funcType: 'SE'} }" class="search_goods_btn"></router-link>
+            <router-link :to="{ path: '/goods_list', query: {keyWord: keyWord, funcType: 'SE'} }" class="search_goods_btn"></router-link>
         </div>
         <div class="hot_search_box">
             <h3 class="hot_title">热门搜搜</h3>
             <ul class="hot_search_list" @click="selectHotKeyWord($event)">
-                <li>跑鞋</li>
-                <li>跑鞋</li>
-                <li>跑鞋</li>
-                <li>跑鞋</li>
+                <li v-for="item in hotWordList">
+                    <router-link :to="{path: '/goods_list', query: {keyWord: item._search_key, funcType: 'SE'} }">{{item._search_key}}</router-link>
+                </li>
             </ul>
         </div>
 	</div>
@@ -20,7 +19,9 @@
 	export default {
 		data() {
 			return {
-                keyWord: ''
+                keyWord: '',
+                hotWordList: [],
+                pageIndex: 1
             }
 		},
         methods: {
@@ -35,6 +36,15 @@
                     this.keyWord = e.target.innerHTML;
                 }
             }
+        },
+        mounted() {
+            this.$request.get(this.$interface.GET_SEARCH_LOG_LIST, {
+                    'pageIndex': this.pageIndex++,
+                    'pageSize': this.$interface.PAGE_SIZE
+                }, (response) => {
+                    let data = response.data;
+                    this.hotWordList = data;
+                });
         }
 	}
 </script>
@@ -54,7 +64,7 @@
         width: 90%;
         position: relative;
         border: 4px solid #ddd;
-        margin: 0.773rem auto;
+        margin: 4% auto;
         background: #fff;
     }
 
@@ -74,7 +84,7 @@
         bottom: 0;
         width: 15%;
         background: url('../../images/goods_list/search_goods_icon.png') 80% center no-repeat;
-        background-size: auto 80%;
+        background-size: auto 60%;
     }
 
     .hot_search_box {

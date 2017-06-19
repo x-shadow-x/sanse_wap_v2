@@ -1,6 +1,6 @@
 <template>
-	<div class="goods_list_main" @click="reset">
-		<div class="category_bar">
+	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar}">
+		<div class="category_bar" v-if="showCategoryBar">
 			<div class="category_box">
 				<ul class="category_list">
 					<li v-for="(item, index) in categoryList" :key="item.cat_id" class="categoey_item" :class="{active: item.isSelected}" @click.stop="selectCategory(index)">
@@ -156,13 +156,14 @@
 					isShowFilterList: false
 				},
                 funcType: this.$route.query.funcType || 'AC',
+                catId: this.$route.query.catId || 0,
 				sortField: ' ',
 				sortBy: 'asc',
 				propsFilterIdStr: 0,
 				propsFilterStr: ' ',
 				colorCatIdStr: 0,
                 isMore: true,
-                emptyGoodsList: false,
+                showCategoryBar: true,
                 myScroll: null,
                 currentY: 0, // 记录开始滑动时候iscroll~以便在有商品的时候做上拉则筛选框消失的效果
                 isGoodsListEmpty: false,
@@ -190,6 +191,11 @@
 				});
 
 				this.categoryList[index].isSelected = true;
+				this.catId = this.categoryList[index].cat_id;
+				this.$store.commit('SHOW_LOAD');
+				this.resetFilter();
+				this.pageIndex = 1;
+				this.getDefaultData();
 			},
 
 			handleRestItem() {
@@ -238,10 +244,8 @@
                 this.pageIndex = 1;
                 if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
                     this.getDefaultData();
-                    console.log(123);
                 } else {
                     this.getFilterData();
-                    console.log(456);
                 }
 			},
 
@@ -260,6 +264,7 @@
 			resetFilter() {
 				$('.prototype_item').removeClass('active');
 				this.propsFilterIdStr = 0;
+				this.propsFilterStr = ' '
 			},
 
 			confirmFilter() {
@@ -298,19 +303,18 @@
 			},
 
 			getDefaultData() {
-                var temp = {
+
+				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
                     'userId': '304014',
                     'funcType': this.funcType,
-                    'catId': this.$route.query.catId || 0,
+                    'catId': this.catId,
                     'keyWord': encodeURI(this.$route.query.keyWord || ' '),
                     'sortField': this.sortField,
                     'sortBy': this.sortBy,
                     'cookieId': '23456006805d970d5438a354dc019fc295614979',
                     'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE
-                };
-                console.log(temp);
-				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, temp, (response) => {
+                }, (response) => {
 					let data = response.data;
 					if(data.dataList.length == 0 || data.dataList.length < this.$interface.PAGE_SIZE) {
 						this.isMore = false;
@@ -333,7 +337,6 @@
 					}
 
 					setTimeout(() => {
-						console.log(this);
 						this.myScroll.refresh();
 					}, 320);
 
@@ -344,7 +347,7 @@
 			getFilterData() {
 				this.$request.get(this.$interface.GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO, {
 					'funcType': this.funcType,
-					'catId': this.$route.query.catId || 0,
+					'catId': this.catId,
 					'propsFilterIdStr': this.propsFilterIdStr,
 					'propsFilterStr': encodeURI(this.propsFilterStr),
 					'colorCatId': this.colorCatIdStr,
@@ -390,24 +393,33 @@
 		},
 
 		mounted() {
-			// funcType: SE  CA
-			this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORY_PLUS_LIST, {
-				'brandId': this.$route.query.brandId || 0,
-				'catId': this.$route.query.catId || 0,
-				'funcType': this.funcType
-			}, (response) => {
-				let data = response.data[0].CategoryList;
-				data.forEach((item) => {
-					item.isSelected = false;
+
+			if(this.$route.query.funcType == 'SE') {
+				this.showCategoryBar = false;
+				document.title = '搜索结果' + decodeURI(this.$route.query.keyWord);
+			} else {
+				// funcType: SE  CA
+				// 获取顶部分类列表~如果当前页面是由搜索页通过搜索关键词跳转过来~则不显示顶部的分类列表~
+				// 所以上面if条件块内无需发送过去分类列表的请求
+				this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORY_PLUS_LIST, {
+					'brandId': this.$route.query.brandId || 0,
+					'catId': this.catId,
+					'funcType': this.funcType
+				}, (response) => {
+					let data = response.data[0].CategoryList;
+					data.forEach((item) => {
+						item.isSelected = false;
+					});
+					data[0].isSelected = true;
+					this.categoryList = data.slice(0, 4);
+					this.restCategoryList = data.slice(4);
 				});
-				data[0].isSelected = true;
-				this.categoryList = data.slice(0, 4);
-				this.restCategoryList = data.slice(4);
-			});
+			}
+			
 
 			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
 				'funcType': this.funcType,
-				'catId': this.$route.query.catId || 0,
+				'catId': this.catId,
 				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
 				'currentBrandId': this.$route.query.brandId
 			}, (response) => {
@@ -416,26 +428,7 @@
 				this.goodPropertyListArray = data.GoodPropertyListArray;
 			});
 
-
-			this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-				'userId': '304014',
-				'funcType': this.funcType,
-				'catId': this.$route.query.catId || 0,
-				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-				'sortField': this.sortField,
-				'sortBy': this.sortBy,
-				'cookieId': '23456006805d970d5438a354dc019fc295614979',
-				'pageIndex': this.pageIndex++,
-				'pageSize': this.$interface.PAGE_SIZE
-			}, (response) => {
-				let data = response.data;
-				this.goodsList = data.dataList;
-
-				setTimeout(() => {
-					this.myScroll.refresh();
-				}, 320);
-			});
-
+			this.getDefaultData();
 
             var pullUpEl,
                 pullUpOffset,
@@ -448,25 +441,6 @@
                 } else {
                     this.getFilterData()
                 }
-
-    //         	this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-				// 	'userId': '304014',
-				// 	'funcType': this.funcType,
-				// 	'catId': this.$route.query.catId || 0,
-				// 	'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-				// 	'sortField': this.sortField,
-				// 	'sortBy': this.sortBy,
-				// 	'cookieId': '23456006805d970d5438a354dc019fc295614979',
-				// 	'pageIndex': this.pageIndex++,
-				// 	'pageSize': this.$interface.PAGE_SIZE
-				// }, (response) => {
-				// 	let data = response.data;
-				// 	this.goodsList.push(...data.dataList);
-
-				// 	setTimeout(() => {
-				// 		this.myScroll.refresh();
-				// 	}, 320);
-				// });
             }
 
             function loaded() {
@@ -648,6 +622,10 @@
         transition: transform .32s;
 	}
 
+	.goods_list_main.top .filter_bar {
+		top: 0;
+	}
+
 	.filter_bar.hide {
 		transform: translateY(-100%);
 	}
@@ -739,6 +717,10 @@
 		opacity: 0;
 		transition: opacity .4s, right 0s .4s;
 		z-index: 3;
+	}
+
+	.goods_list_main.top .filter_list_out_box {
+		top: 1.2rem;
 	}
 
 	.filter_list_out_box.show {
@@ -882,6 +864,10 @@
         padding: 0;
         padding-top: 2.6rem;
         box-sizing: border-box;
+    }
+
+    .goods_list_main.top .scroller {
+    	padding-top: 1.4rem;
     }
 
     .goods_list {
