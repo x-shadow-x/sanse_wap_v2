@@ -104,12 +104,16 @@
                 </div>
             </div>
         </div>
+        <div class="page_tip_box">
+        	<span class="current_page">{{currentPage}}</span>
+        	<span class="total_page">{{totalPage}}</span>
+        </div>
 	</div>
 </template>
 
 <script>
 
-    import  '../../plugins/iscroll.js';
+    import  '../../plugins/iscroll-probe.js';
 
 	export default {
 		data() {
@@ -162,6 +166,9 @@
 				propsFilterIdStr: 0,
 				propsFilterStr: ' ',
 				colorCatIdStr: 0,
+				totalPage: 0,
+				currentPage: 1,
+				goodsItemStep: 0,
                 isMore: true,
                 showCategoryBar: true,
                 myScroll: null,
@@ -302,7 +309,7 @@
 				}
 			},
 
-			getDefaultData() {
+			getDefaultData(cb) {
 
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
                     'userId': '304014',
@@ -338,6 +345,9 @@
 
 					setTimeout(() => {
 						this.myScroll.refresh();
+						if(typeof cb == 'function') {
+							cb.bind(this)(data);
+						}
 					}, 320);
 
 					this.$store.commit('HIDE_LOAD');
@@ -416,7 +426,6 @@
 				});
 			}
 			
-
 			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
 				'funcType': this.funcType,
 				'catId': this.catId,
@@ -428,14 +437,18 @@
 				this.goodPropertyListArray = data.GoodPropertyListArray;
 			});
 
-			this.getDefaultData();
+			this.getDefaultData(function(data) {
+				this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
+				this.goodsItemStep = -2/(this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
+				console.log($('.goods_item').outerHeight(true))
+			});
 
-            var pullUpEl,
-                pullUpOffset,
-                generatedCount = 0,
-                tempLoad = 0;
 
-            function pullUpAction () {
+			var pullUpEl,
+                pullUpOffset;
+
+
+			function pullUpAction () {
             	if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
                     this.getDefaultData();
                 } else {
@@ -443,53 +456,48 @@
                 }
             }
 
-            function loaded() {
-                pullUpEl = document.getElementById('pullUp');
+
+			function loaded () {
+				pullUpEl = document.getElementById('pullUp');
                 pullUpOffset = pullUpEl.offsetHeight;
                 var that = this;
 
-                this.myScroll = new iScroll('goodsListBox', {
-                    useTransition: true,
-                    vScrollbar: false,
-                    onRefresh: function () {
-                        if (pullUpEl.className.match('loading')) {
-                            pullUpEl.className = '';
-                            pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
-                        }
-                    },
-                    onScrollMove: function () {
-                    	if(this.y < that.currentY - 30) {
-                    		if(!that.isGoodsListEmpty) {
-                    			that.hideFilterBar = true;
-                    		}
+				this.myScroll = new IScroll('#goodsListBox', { probeType: 3});
 
-                    	} else if(this.y > that.currentY + 30) {
-                    		if(!that.isGoodsListEmpty) {
-                    			that.hideFilterBar = false;
-                    		}
+				this.myScroll.on('scroll', () => {
+					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
+					// 此处计算公式是经过化简的~将能事先计算的固定值先计算出来直接用~减小性能开销
+					this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
+					
+	            	if(this.myScroll.y < this.currentY - 30) {
+	            		if(!this.isGoodsListEmpty) {
+	            			this.hideFilterBar = true;
+	            		}
 
-                    	}
+	            	} else if(this.myScroll.y > this.currentY + 30) {
+	            		if(!this.isGoodsListEmpty) {
+	            			this.hideFilterBar = false;
+	            		}
+	            	}
 
-                        if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
-                            pullUpEl.className = 'flip';
-                            pullUpEl.querySelector('.pullUpLabel').innerHTML = '释放加载';
-                            this.maxScrollY = this.maxScrollY;
-                        } else if (this.y > (this.maxScrollY + 5) && pullUpEl.className.match('flip')) {
-                            pullUpEl.className = '';
-                            pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
-                            this.maxScrollY = pullUpOffset;
-                        }
-                    },
-                    onScrollEnd: function () {
-                    	that.currentY = this.y;
-                        if (pullUpEl.className.match('flip')) {
-                            pullUpEl.className = 'loading';
-                            pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
-                            pullUpAction.bind(that)();  // Execute custom function (ajax call?)
-                        }
+	                if (this.myScroll.y < (this.myScroll.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
+	                    pullUpEl.className = 'flip';
+	                    pullUpEl.querySelector('.pullUpLabel').innerHTML = '释放加载';
+	                } else if (this.myScroll.y > (this.myScroll.maxScrollY + 5) && pullUpEl.className.match('flip')) {
+	                    pullUpEl.className = '';
+	                    pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
+	                }
+	            });
+					
+				this.myScroll.on('scrollEnd', () => {
+					this.currentY = this.myScroll.y;
+                    if (pullUpEl.className.match('flip')) {
+                        pullUpEl.className = 'loading';
+                        pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
+                        pullUpAction.bind(this)();
                     }
-                });
-            }
+				});
+			}
 
             loaded.bind(this)();
 		}
@@ -1016,4 +1024,43 @@
     .empty_goods_list_text {
     	margin-top: 10px;
     }
+
+    .page_tip_box {
+    	position: fixed;
+    	right: 5%;
+    	bottom: 10%;
+    	background: rgba(0, 0, 0, .6);
+    	color: #fff;
+    	z-index: 10000;
+    	width: 36px;
+    	height: 36px;
+    	border-radius: 100px;
+    }
+
+    .page_tip_box:after {
+    	content: '';
+    	position: absolute;
+    	left: 50%;
+    	top: 50%;
+    	width: 80%;
+    	height: 1px;
+    	background: #fff;
+    	transform: translate(-50%, -50%) rotate(135deg);
+    }
+
+    .current_page {
+    	position: absolute;
+    	width: 50%;
+    	left: 0;
+    	top: 12%;
+    	text-align: right;
+    }
+
+    .total_page {
+    	position: absolute;
+    	width: 50%;
+    	right: 0;
+    	bottom: 12%;
+    }
+    
 </style>

@@ -2,13 +2,14 @@
 	<div class="goods_search_main">
 		<div class="search_box">
             <input type="text" v-model="keyWord" placeholder="请输入商品名/款号/品牌/品类" class="search_input" @keydown="submitKeyWord($event)">
-            <router-link :to="{ path: '/goods_list', query: {keyWord: keyWord, funcType: 'SE'} }" class="search_goods_btn"></router-link>
+            <span class="search_goods_btn"></span>
+            <!-- <router-link :to="{ path: '/goods_list', query: {keyWord: keyWord, funcType: 'SE'} }" class="search_goods_btn"></router-link> -->
         </div>
         <div class="hot_search_box">
             <h3 class="hot_title">热门搜搜</h3>
-            <ul class="hot_search_list" @click="selectHotKeyWord($event)">
-                <li v-for="item in hotWordList">
-                    <router-link :to="{path: '/goods_list', query: {keyWord: item._search_key, funcType: 'SE'} }">{{item._search_key}}</router-link>
+            <ul class="hot_search_list">
+                <li v-for="(item, index) in hotWordList" data-key-word="item._search_key">
+                    <a @click="routerToGoodsList(index)">{{item._search_key}}</a>
                 </li>
             </ul>
         </div>
@@ -27,25 +28,34 @@
         methods: {
             submitKeyWord(e) {
                 if(e.keyCode==13) {
-                    console.log(this.keyWord);
+                    if(this.keyWord != '') {
+                        this.$store.commit('SET_KEY_WORD', {value: this.keyWord});
+                        this.$router.push(`/goods_list?keyWord=${this.keyWord}&funcType=SE`);
+                    }
                 }
             },
-            selectHotKeyWord(e) {
-                let target = e.target;
-                if(target.nodeName == 'LI') {
-                    this.keyWord = e.target.innerHTML;
-                }
+            routerToGoodsList(index) {
+                this.keyWord = this.hotWordList[index]._search_key;
+                this.$store.commit('SET_KEY_WORD', {value: this.keyWord});
+                this.$router.push(`/goods_list?keyWord=${this.keyWord}&funcType=SE`);
             }
         },
         mounted() {
+            this.keyWord = this.$store.state.keyWord;
             this.$request.get(this.$interface.GET_SEARCH_LOG_LIST, {
-                    'pageIndex': this.pageIndex++,
-                    'pageSize': this.$interface.PAGE_SIZE
-                }, (response) => {
-                    let data = response.data;
-                    this.hotWordList = data;
-                });
-        }
+                'pageIndex': this.pageIndex++,
+                'pageSize': this.$interface.PAGE_SIZE
+            }, (response) => {
+                let data = response.data;
+                this.hotWordList = data;
+            });
+        },
+        watch: {
+            '$route' (to, from) {
+
+                alert(123);
+            }
+        },
 	}
 </script>
 

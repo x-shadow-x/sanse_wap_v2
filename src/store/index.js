@@ -30,7 +30,8 @@ const state = {
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
     },
-    isShowLoad: false
+    isShowLoad: false,
+    keyWord: ''
 }
 
 export default new Vuex.Store({
