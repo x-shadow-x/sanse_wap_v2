@@ -479,7 +479,9 @@
 					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
 					// 此处计算公式是经过化简的~将能事先计算的固定值先计算出来直接用~减小性能开销
 					this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
-					this.showPageTip = true;
+					if(this.showPageTip > 1) {
+						this.showPageTip = true;
+					}
 					this.showScrollToTop = false;
 
 	            	if(this.myScroll.y < this.currentY - 30) {

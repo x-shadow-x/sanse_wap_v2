@@ -3,13 +3,13 @@
 		<div class="search_box">
             <input type="text" v-model="keyWord" placeholder="请输入商品名/款号/品牌/品类" class="search_input" 
             @keydown="submitKeyWord($event)" 
-            @focus="focusInput">
+            @focus="focusInput" @blur="showSearchHistory = false;">
             <a @click="routerToGoodsList(-1)" class="search_goods_btn"></a>
-            <div class="history_list_box" v-if="searchHistory.length > 0">
+            <div class="history_list_box" v-if="searchHistory.length > 0 && showSearchHistory">
                 <ul class="history_list">
-                    <li v-for="(item, index) in searchHistory" class="history_list_item" @click="selectHistoryItem(index)">{{item}}</li>
+                    <li v-for="(item, index) in searchHistory" class="history_list_item" @touchstart="selectHistoryItem(index)">{{item}}</li>
                 </ul>
-                <div class="clear_list_btn">
+                <div class="clear_list_btn" @touchstart="clearSearchHistory">
                     <span class="clear_text">清空</span>
                 </div>
             </div>
@@ -31,15 +31,11 @@
 			return {
                 keyWord: '',
                 hotWordList: [],
+                showSearchHistory: false,
+                searchHistory: [],
                 pageIndex: 1
             }
 		},
-
-        computed: {
-            searchHistory: function() {
-                return (window.localStorage.historyKeyWordList || '').split(',');
-            }
-        },
 
         methods: {
             recordToLocalStorage() {
@@ -54,6 +50,8 @@
                 } else {
                     tempArr.unshift(this.keyWord);
                 }
+
+                tempArr = [...new Set(tempArr)]
 
                 window.localStorage.historyKeyWordList = tempArr.join(',');
             },
@@ -80,18 +78,24 @@
 
             focusInput() {
                 if(this.keyWord == '') {
-
+                    this.showSearchHistory = true;
                 }
             },
 
             selectHistoryItem(index) {
                 this.keyWord = this.searchHistory[index];
+            },
+
+            clearSearchHistory() {
+                window.localStorage.historyKeyWordList = '';
+                this.searchHistory = [];
             }
         },
 
         mounted() {
             this.keyWord = this.$store.state.keyWord;
-            this.searchHistory = window.localStorage.historyKeyWordList || [];
+            this.searchHistory = window.localStorage.historyKeyWordList != '' ? window.localStorage.historyKeyWordList.split(',') : [];
+
             this.$request.get(this.$interface.GET_SEARCH_LOG_LIST, {
                 'pageIndex': this.pageIndex++,
                 'pageSize': this.$interface.PAGE_SIZE
@@ -99,6 +103,16 @@
                 let data = response.data;
                 this.hotWordList = data;
             });
+        },
+
+        watch: {
+            'keyWord'(to, from) {
+                if(to == '') {
+                    this.showSearchHistory = true;
+                } else {
+                    this.showSearchHistory = false;
+                }
+            }
         }
 	}
 </script>
@@ -178,7 +192,7 @@
     .history_list_item {
         padding-left: 14px;
         color: #7f7f7f;
-        line-height: 2.6;
+        line-height: 3;
     }
 
     .history_list_item + .history_list_item {
@@ -189,7 +203,7 @@
         text-align: center;
         color: #7f7f7f;
         background: #efefef;
-        line-height: 2;
+        line-height: 2.6;
     }
 
     .clear_list_btn:before {
