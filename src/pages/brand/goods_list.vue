@@ -71,24 +71,26 @@
             <div class="scroller">
         		<ul class="goods_list" v-if="!isGoodsListEmpty">
                     <li class="goods_item" v-for="(item, index) in goodsList">
-                        <div class="img_box">
-                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
-                        </div>
-                        <div class="goods_info_box">
-                            <h2 class="goods_name">{{item.goods_name}}</h2>
-                            <div class="price_box">
-                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
-                                <div class="current_price_box">
-                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
-                                </div>
-                                <div class="old_price_box">
-                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
-                                </div>
-                            </div>
-                            <div class="date_box">
-                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
-                            </div>
-                        </div>
+                        <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
+                        	<div class="img_box">
+	                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+	                        </div>
+	                        <div class="goods_info_box">
+	                            <h2 class="goods_name">{{item.goods_name}}</h2>
+	                            <div class="price_box">
+	                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
+	                                <div class="current_price_box">
+	                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+	                                </div>
+	                                <div class="old_price_box">
+	                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+	                                </div>
+	                            </div>
+	                            <div class="date_box">
+	                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
+	                            </div>
+	                        </div>
+                        </router-link>
                     </li>
                 </ul>
                 <div class="empty_goods_list_box" v-else>
@@ -339,9 +341,11 @@
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
 						this.scrollToTop();
+						this.$store.commit('SET_GOODS_LIST_RECORD', data.dataDetailList);
 					} else {
 						// 已经是翻页的数据了~故需追加而不是直接赋值
 						this.goodsList.push(...data.dataList);
+						this.$store.commit('PUSH_GOODS_LIST_RECORD', data.dataDetailList);
 					}
 
 
@@ -393,9 +397,11 @@
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
 						this.scrollToTop();
+						this.$store.commit('PUSH_GOODS_LIST_RECORD', data.dataDetailList);
 					} else {
 						// 已经是翻页的数据了~故需追加而不是直接赋值
 						this.goodsList.push(...data.dataList);
+						this.$store.commit('SET_GOODS_LIST_RECORD', data.dataDetailList);
 					}
 
 					if(this.goodsList.length > 0) {
@@ -473,7 +479,7 @@
                 pullUpOffset = pullUpEl.offsetHeight;
                 var that = this;
 
-				this.myScroll = new IScroll('#goodsListBox', { probeType: 3});
+				this.myScroll = new IScroll('#goodsListBox', { probeType: 3, preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A)$/ }});
 
 				this.myScroll.on('scroll', () => {
 					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
@@ -901,6 +907,10 @@
     .goods_list {
         margin-left: -2%;
         font-size: 0;
+    }
+
+    .goods_detail_link {
+    	display: block;
     }
 
     .goods_item {

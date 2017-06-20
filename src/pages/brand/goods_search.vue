@@ -51,7 +51,7 @@
                     tempArr.unshift(this.keyWord);
                 }
 
-                tempArr = [...new Set(tempArr)]
+                tempArr = [...new Set(tempArr)];
 
                 window.localStorage.historyKeyWordList = tempArr.join(',');
             },

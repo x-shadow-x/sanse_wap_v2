@@ -8,11 +8,15 @@ Vue.use(Vuex)
 const state = {
     routerList: {
         '/home': 0,
+
         '/brand': 1,
         '/goods_list': 5,
         '/goods_search': 6,
+        '/goods_detail': 7,
+
         '/shopping_bag': 3,
-        '/settle_accounts': 6,
+        '/settle_accounts': 8,
+
         '/user_index': 4,
         '/blance': 15,
         '/red_package': 16,
@@ -30,6 +34,7 @@ const state = {
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
     },
+    goodsListRecord: [],
     isShowLoad: false,
     keyWord: ''
 }
