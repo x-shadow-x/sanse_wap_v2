@@ -25,5 +25,5 @@ export default {
     'GET_ALL_GOODS_DETAIL_LIST': '/Get_ALL_Goods_Detail_List/', // 获取所有商品列表
     'GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO': '/Get_APP_SearchGoodDetailList_ForPro/', // 使用过滤条件时获取商品列表
     'GET_SEARCH_LOG_LIST': '/Get_SearchLog_List/', // 搜索页获取热门搜索列表
-    'GET_GOODS_DETAIL_LIST_GOODSID': '/GetGoodsDetailList_GoodsId/',
+    'GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE': '/GetGoodsDetailList_GoodsIdMessage/',
 }

@@ -290,7 +290,6 @@
 
             var pullUpEl, pullUpOffset,
                 generatedCount = 0;
-            var tempLoad = 0;
 
             function pullUpAction () {
 

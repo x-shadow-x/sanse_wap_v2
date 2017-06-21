@@ -9,6 +9,9 @@
 	            <div class="swiper-slide goods_detail_item" v-for="item in goodsImageList">
 	            	<img :src="item.img_url" :alt="selectColorGoodsDetail.goodsName" class="goods_img">
 	            </div>
+	            <div class="swiper-slide goods_detail_item">
+	            	<iframe src="http://inno.mo2o.com.cn:8092/getContent.php?act=goods&id=14196&brand_id=1" width="100%" height="80%" class="goods_code_frame"></iframe>
+	            </div>
 	        </div>
 	        <div class="swiper-pagination"></div>
 	    </div>
@@ -45,16 +48,22 @@
 
 			if(goodsDetailList.length == 0) {
 				// store中未保存相应的数据，则可能是直接通过连接跳到详情页的，此时通过另一个接口根据goodsid直接拿对应的商品数据
-				console.log(this.goodsId, '==============');
-				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID, {
+				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE, {
 					'goodsId': this.goodsId,
-                    'userId': '304014',
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979'
+                    'userId': '304014'
                 }, (response) => {
-					
-					console.log(response, '-------------');
+					let data = response.data;
+					let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
+					this.selectColorGoodsDetail = JSON.parse(data.GoodsColorMessage);
+					let tempImgList = [];
 
-					this.$store.commit('HIDE_LOAD');
+					goodsImageMessage.forEach((item, index) => {
+						if(item.img_color == this.colorId) {
+							tempImgList.push({'img_url': item.img_url});
+						}
+					});
+
+					this.goodsImageList = tempImgList;
 				});
 			} else {
 				goodsDetailList.forEach((item, index) => {
@@ -69,11 +78,13 @@
 						this.goodsImageList = item.goodsListEntity;
 					}
 				});
-
-				setTimeout(() => {
-					this.mySwiper.update();
-				}, 500);
 			}
+
+			this.$store.commit('HIDE_LOAD');
+
+			setTimeout(() => {
+				this.mySwiper.update();
+			}, 500);
 		}
 	}
 </script>
@@ -120,5 +131,12 @@
 	.swiper-container-vertical>.swiper-pagination-bullets {
 		left: 10px;
 		right: auto;
+	}
+
+	.goods_code_frame {
+		position: absolute;
+		left: 0;
+		top: 50%;
+		transform: translateY(-50%);
 	}
 </style>
