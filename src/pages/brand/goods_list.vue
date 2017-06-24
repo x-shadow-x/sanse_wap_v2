@@ -1,5 +1,5 @@
 <template>
-	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar}">
+	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar}" @scroll="scrollHandle($event)">
 		<div class="category_bar" v-if="showCategoryBar">
 			<div class="category_box">
 				<ul class="category_list">
@@ -68,41 +68,39 @@
 		</div>
 
         <div class="goods_list_box" id="goodsListBox">
-            <div class="scroller">
-        		<ul class="goods_list" v-if="!isGoodsListEmpty">
-                    <li class="goods_item" v-for="(item, index) in goodsList">
-                        <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
-                        	<div class="img_box">
-	                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
-	                        </div>
-	                        <div class="goods_info_box">
-	                            <h2 class="goods_name">{{item.goods_name}}</h2>
-	                            <div class="price_box">
-	                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
-	                                <div class="current_price_box">
-	                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
-	                                </div>
-	                                <div class="old_price_box">
-	                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
-	                                </div>
-	                            </div>
-	                            <div class="date_box">
-	                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
-	                            </div>
-	                        </div>
-                        </router-link>
-                    </li>
-                </ul>
-                <div class="empty_goods_list_box" v-else>
-		        	<div class="empty_goods_list_tip">
-		        		<i class="empty_goods_list_icon"></i>
-		        		<p class="empty_goods_list_text">暂无商品</p>
-		        	</div>
-		        </div>
-                <div :class="{transparent: !isMore || isGoodsListEmpty}">
-                    <div id="pullUp">
-                        <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
-                    </div>
+    		<ul class="goods_list" v-if="!isGoodsListEmpty">
+                <li class="goods_item" v-for="(item, index) in goodsList">
+                    <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
+                    	<div class="img_box">
+                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+                        </div>
+                        <div class="goods_info_box">
+                            <h2 class="goods_name">{{item.goods_name}}</h2>
+                            <div class="price_box">
+                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
+                                <div class="current_price_box">
+                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+                                </div>
+                                <div class="old_price_box">
+                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+                                </div>
+                            </div>
+                            <div class="date_box">
+                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
+                            </div>
+                        </div>
+                    </router-link>
+                </li>
+            </ul>
+            <div class="empty_goods_list_box" v-else>
+	        	<div class="empty_goods_list_tip">
+	        		<i class="empty_goods_list_icon"></i>
+	        		<p class="empty_goods_list_text">暂无商品</p>
+	        	</div>
+	        </div>
+            <div :class="{transparent: !isMore || isGoodsListEmpty}">
+                <div id="pullUp">
+                    <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
                 </div>
             </div>
         </div>
@@ -117,6 +115,7 @@
 <script>
 
     import  '../../plugins/iscroll-probe.js';
+    // import  '../../plugins/iscroll-5.js';
 
 	export default {
 		data() {
@@ -315,7 +314,7 @@
 			},
 
 			scrollToTop() {
-				this.myScroll.scrollTo(0, 0, 500);
+				// this.myScroll.scrollTo(0, 0, 500);
 			},
 
 			getDefaultData(cb) {
@@ -348,7 +347,6 @@
 						this.$store.commit('PUSH_GOODS_LIST_RECORD', data.dataDetailList);
 					}
 
-
 					if(this.goodsList.length > 0) {
 						this.isGoodsListEmpty = false;
 					} else {
@@ -358,13 +356,13 @@
 					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 
 					setTimeout(() => {
-						this.myScroll.refresh();
 						if(typeof cb == 'function') {
 							cb.bind(this)(data);
 						}
 					}, 320);
 
 					this.$store.commit('HIDE_LOAD');
+
 				});
 			},
 
@@ -412,12 +410,15 @@
 
 					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 
-					setTimeout(() => {
-						this.myScroll.refresh();
-					}, 320);
-
 					this.$store.commit('HIDE_LOAD');
 				});
+			},
+
+			scrollHandle(e) {
+				if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
+					console.log(123);
+				}
+				
 			}
 		},
 
@@ -461,7 +462,6 @@
 				this.goodsItemStep = -2 / (this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
 			});
 
-
 			var pullUpEl,
                 pullUpOffset;
 
@@ -470,7 +470,7 @@
             	if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
                     this.getDefaultData();
                 } else {
-                    this.getFilterData()
+                    this.getFilterData();
                 }
             }
 
@@ -479,16 +479,22 @@
                 pullUpOffset = pullUpEl.offsetHeight;
                 var that = this;
 
-				this.myScroll = new IScroll('#goodsListBox', { probeType: 3, preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A)$/ }});
+				this.myScroll = new IScroll('#goodsListBox', { 
+					probeType: 3,
+					
+					// bounce: false,
+					// scrollbars: true,
+					preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A)$/ },
+				});
 
 				this.myScroll.on('scroll', () => {
 					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
 					// 此处计算公式是经过化简的~将能事先计算的固定值先计算出来直接用~减小性能开销
-					this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
-					if(this.showPageTip > 1) {
-						this.showPageTip = true;
-					}
-					this.showScrollToTop = false;
+					// this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
+					// if(this.currentPage > 1) {
+					// 	this.showPageTip = true;
+					// }
+					// this.showScrollToTop = false;
 
 	            	if(this.myScroll.y < this.currentY - 30) {
 	            		if(!this.isGoodsListEmpty) {
@@ -525,7 +531,7 @@
 				});
 			}
 
-            loaded.bind(this)();
+            // loaded.bind(this)();
 		}
 	}
 </script>
@@ -882,21 +888,18 @@
     .goods_list_box {
         position: relative;
         width: 96%;
-        height: 100%;
+        min-height: 100%;
         box-sizing: border-box;
         margin: 0 auto;
-        overflow: hidden;
+        padding-top: 2.6rem;
         box-sizing: border-box;
         background: #fff;
     }
 
     .scroller {
-        position: absolute;
-        z-index: 1;
-        width: 100%;
         min-height: 100%;
         padding: 0;
-        padding-top: 2.6rem;
+        
         box-sizing: border-box;
     }
 

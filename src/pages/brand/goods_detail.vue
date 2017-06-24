@@ -9,9 +9,9 @@
 	            <div class="swiper-slide goods_detail_item" v-for="item in goodsImageList">
 	            	<img :src="item.img_url" :alt="selectColorGoodsDetail.goodsName" class="goods_img">
 	            </div>
-	            <div class="swiper-slide goods_detail_item">
+	            <!-- <div class="swiper-slide goods_detail_item">
 	            	<iframe src="http://inno.mo2o.com.cn:8092/getContent.php?act=goods&id=14196&brand_id=1" width="100%" height="80%" class="goods_code_frame"></iframe>
-	            </div>
+	            </div> -->
 	        </div>
 	        <div class="swiper-pagination"></div>
 	    </div>
@@ -22,11 +22,13 @@
 
 	import '../../plugins/swiper/swiper.min.js';
 	import '../../plugins/swiper/swiper.min.css';
+	import '../../../config/dev.env.js';
+
+	const goodsCodeRoot = process.env.TEMP_GOODS_CODE_ROOT;
 
 	export default {
 		data() {
 	        return {
-	        	goodsDetail: [],
 	        	mySwiper: null,
 	        	// 一个商品会对应不同的颜色，不同颜色的商品会独立出现在商品列表中，
 	        	// 所以进到详情页的时候不仅需要获取当前选中的商品~还要获取当前商品的当前的颜色对应的商品数据
@@ -55,6 +57,7 @@
 					let data = response.data;
 					let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					this.selectColorGoodsDetail = JSON.parse(data.GoodsColorMessage);
+					
 					let tempImgList = [];
 
 					goodsImageMessage.forEach((item, index) => {
@@ -66,13 +69,14 @@
 					this.goodsImageList = tempImgList;
 				});
 			} else {
+				let selectGoodsDetail = [];
 				goodsDetailList.forEach((item, index) => {
 					if(item.goodsId == this.goodsId) {
-						this.goodsDetail = item;
+						selectGoodsDetail = item;
 					}
 				});
 
-				this.goodsDetail.dataList.forEach((item, index) => {
+				selectGoodsDetail.dataList.forEach((item, index) => {
 					if(item.img_color == this.colorId) {
 						this.selectColorGoodsDetail = item;
 						this.goodsImageList = item.goodsListEntity;
@@ -82,9 +86,38 @@
 
 			this.$store.commit('HIDE_LOAD');
 
+			console.log(this.selectColorGoodsDetail);
+
 			setTimeout(() => {
 				this.mySwiper.update();
 			}, 500);
+
+
+
+			// this.$http.get('getContent.php',{
+			// 	params:{
+			// 		'act': 'goods',
+			// 		'id': '14196',
+			// 		'brand_id': '1'
+			// 	},
+			// 	baseURL: goodsCodeRoot,
+			// }).then(function(response) {
+
+			// 	var REG_BODY = /<body[^>]*>([\s\S]*)<\/body>/;
+
+		 //        function getBody(content){
+		 //            var result = REG_BODY.exec(content);
+		 //            if(result && result.length === 2)
+		 //                return result[1];
+		 //            return content;
+		 //        }
+
+			// 	let data = response.data;
+			// 	console.log(getBody(data));
+
+			// }).catch(function(err){
+			// 	console.log(err);
+			// });
 		}
 	}
 </script>

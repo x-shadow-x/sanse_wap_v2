@@ -22,7 +22,7 @@ export default {
     	state.goodsListRecord = data;
     },
 
-    [PUSH_GOODS_LIST_RECORD](state, arg) {
-    	state.goodsListRecord = state.goodsListRecord.push(...data);
+    [PUSH_GOODS_LIST_RECORD](state, data) {
+        state.goodsListRecord.push(...data);
     }
 }
