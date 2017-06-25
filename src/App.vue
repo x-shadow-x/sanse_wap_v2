@@ -56,6 +56,16 @@
         overflow: visible;
     }
 
+    .lazyload {
+        opacity: 0;
+    }
+
+    .lazyloading {
+        opacity: 1;
+        background: #f7f7f7 url('./images/common/loading.gif') no-repeat center;
+        background-size: 32px auto;
+    }
+
     .slide-right-enter-active {
         transition: all .32s;
     }

@@ -11,6 +11,8 @@ import interfaceConfig from './config/interface_config.js'
 import store from './store'
 import axios from 'axios'
 
+import './plugins/lazysizes.min.js'
+
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 Vue.prototype.HOST = '/api'

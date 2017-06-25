@@ -1,5 +1,5 @@
 <template>
-	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar}" @scroll="scrollHandle($event)">
+	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar, disable_scroll: disableScroll}" @scroll="scrollHandle($event)" @touchstart="beforeScroll($event)" @touchmove="handleMove($event)">
 		<div class="category_bar" v-if="showCategoryBar">
 			<div class="category_box">
 				<ul class="category_list">
@@ -38,7 +38,7 @@
     			</div>
             </div>
 		</div>
-		<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}">
+		<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}" @touchstart.stop="" @touchmove.stop="" @scroll.stop="">
 			<div class="filter_list_box" @click.stop="">
 				<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
 					<div class="filter_list">
@@ -72,7 +72,7 @@
                 <li class="goods_item" v-for="(item, index) in goodsList">
                     <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
                     	<div class="img_box">
-                            <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+                            <img :data-src="item.goods_img" :alt="item.goods_name" class="goods_img lazyload">
                         </div>
                         <div class="goods_info_box">
                             <h2 class="goods_name">{{item.goods_name}}</h2>
@@ -113,9 +113,6 @@
 </template>
 
 <script>
-
-    import  '../../plugins/iscroll-probe.js';
-    // import  '../../plugins/iscroll-5.js';
 
 	export default {
 		data() {
@@ -175,10 +172,10 @@
 				showScrollToTop: false,
                 isMore: true,
                 showCategoryBar: true,
-                myScroll: null,
                 currentY: 0, // 记录开始滑动时候iscroll~以便在有商品的时候做上拉则筛选框消失的效果
                 isGoodsListEmpty: false,
                 hideFilterBar: false,
+                isLoading: false, // 自己实现滚动加载，用来判断当前是都已经在加载了~避免滚动底部后多次加载数据
                 goodsList: [],
                 pageIndex: 1
 			}
@@ -189,7 +186,11 @@
 				return this.sortList.filter((item) => {
 					return item.isSelected;
 				})[0].text
-			}
+			},
+            disableScroll: function() {
+                // 展开过滤条件侧边栏的时候禁用外部商品列表的滚动
+                return this.toggleMap.isShowFilterList;
+            }
 		},
 
 		methods: {
@@ -207,6 +208,7 @@
 				this.resetFilter();
 				this.pageIndex = 1;
 				this.getDefaultData();
+                this.getAppPropertyList();
 			},
 
 			handleRestItem() {
@@ -233,7 +235,7 @@
 
 			toggleFilterList() {
 				this.reset('isShowFilterList');
-				this.toggleMap.isShowFilterList = !this.toggleMap.isShowFilterList;
+                this.toggleMap.isShowFilterList = !this.toggleMap.isShowFilterList;
 			},
 
 			selectSortItem(index) {
@@ -317,6 +319,25 @@
 				// this.myScroll.scrollTo(0, 0, 500);
 			},
 
+            getCategory() {
+                // funcType: SE  CA
+                // 获取顶部分类列表~如果当前页面是由搜索页通过搜索关键词跳转过来~则不显示顶部的分类列表~
+                // 所以上面if条件块内无需发送过去分类列表的请求
+                this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORY_PLUS_LIST, {
+                    'brandId': this.$route.query.brandId || 0,
+                    'catId': this.catId,
+                    'funcType': this.funcType
+                }, (response) => {
+                    let data = response.data[0].CategoryList;
+                    data.forEach((item) => {
+                        item.isSelected = false;
+                    });
+                    data[0].isSelected = true;
+                    this.categoryList = data.slice(0, 4);
+                    this.restCategoryList = data.slice(4);
+                });
+            },
+
 			getDefaultData(cb) {
 
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
@@ -337,6 +358,7 @@
 						this.isMore = true;
 					}
 					if(this.pageIndex == 2) {
+                        console.log(123);
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
 						this.scrollToTop();
@@ -366,7 +388,7 @@
 				});
 			},
 
-			getFilterData() {
+			getFilterData(cb) {
 				this.$request.get(this.$interface.GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO, {
 					'funcType': this.funcType,
 					'catId': this.catId,
@@ -410,16 +432,61 @@
 
 					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 
+                    setTimeout(() => {
+                        if(typeof cb == 'function') {
+                            cb.bind(this)(data);
+                        }
+                    }, 320);
+
 					this.$store.commit('HIDE_LOAD');
 				});
 			},
 
+            loadMoreData () {
+                this.isLoading = true;
+                if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
+                    this.getDefaultData(function() {
+                        this.isLoading = false;
+                    });
+                } else {
+                    this.getFilterData(function() {
+                        this.isLoading = false;
+                    });
+                }
+            },
+
+            beforeScroll(e) {
+                this.currentY = e.targetTouches[0].pageY;
+            },
+
+            handleMove(e) {
+                if(e.targetTouches[0].pageY - this.currentY > 20) {
+                    this.hideFilterBar = false;
+                } else if(e.targetTouches[0].pageY - this.currentY < 20) {
+                    this.hideFilterBar = true;
+                }
+            },
+
 			scrollHandle(e) {
 				if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
-					console.log(123);
+                    if(!this.isLoading) {
+                        this.loadMoreData();
+                    }
 				}
-				
-			}
+			},
+
+            getAppPropertyList() {
+                this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
+                    'funcType': this.funcType,
+                    'catId': this.catId,
+                    'keyWord': encodeURI(this.$route.query.keyWord || ' '),
+                    'currentBrandId': this.$route.query.brandId
+                }, (response) => {
+                    let data = response.data;
+                    this.colorPropertyListArray = data.ColorPropertyListArray;
+                    this.goodPropertyListArray = data.GoodPropertyListArray;
+                });
+            }
 		},
 
 		mounted() {
@@ -428,110 +495,16 @@
 				this.showCategoryBar = false;
 				document.title = '搜索结果' + decodeURI(this.$route.query.keyWord);
 			} else {
-				// funcType: SE  CA
-				// 获取顶部分类列表~如果当前页面是由搜索页通过搜索关键词跳转过来~则不显示顶部的分类列表~
-				// 所以上面if条件块内无需发送过去分类列表的请求
-				this.$request.get(this.$interface.GET_BRAND_WITH_CATEGORY_PLUS_LIST, {
-					'brandId': this.$route.query.brandId || 0,
-					'catId': this.catId,
-					'funcType': this.funcType
-				}, (response) => {
-					let data = response.data[0].CategoryList;
-					data.forEach((item) => {
-						item.isSelected = false;
-					});
-					data[0].isSelected = true;
-					this.categoryList = data.slice(0, 4);
-					this.restCategoryList = data.slice(4);
-				});
+                this.getCategory();
+
 			}
-			
-			this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
-				'funcType': this.funcType,
-				'catId': this.catId,
-				'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-				'currentBrandId': this.$route.query.brandId
-			}, (response) => {
-				let data = response.data;
-				this.colorPropertyListArray = data.ColorPropertyListArray;
-				this.goodPropertyListArray = data.GoodPropertyListArray;
-			});
+
+            this.getAppPropertyList();
 
 			this.getDefaultData(function(data) {
 				this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
 				this.goodsItemStep = -2 / (this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
 			});
-
-			var pullUpEl,
-                pullUpOffset;
-
-
-			function pullUpAction () {
-            	if(this.colorCatIdStr == 0 && this.propsFilterIdStr == 0) {
-                    this.getDefaultData();
-                } else {
-                    this.getFilterData();
-                }
-            }
-
-			function loaded () {
-				pullUpEl = document.getElementById('pullUp');
-                pullUpOffset = pullUpEl.offsetHeight;
-                var that = this;
-
-				this.myScroll = new IScroll('#goodsListBox', { 
-					probeType: 3,
-					
-					// bounce: false,
-					// scrollbars: true,
-					preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A)$/ },
-				});
-
-				this.myScroll.on('scroll', () => {
-					// this.currentPage = Math.ceil((2 * (this.myScroll.y * this.goodsItemStep)) / this.$interface.PAGE_SIZE);
-					// 此处计算公式是经过化简的~将能事先计算的固定值先计算出来直接用~减小性能开销
-					// this.currentPage = Math.ceil(this.myScroll.y * this.goodsItemStep);
-					// if(this.currentPage > 1) {
-					// 	this.showPageTip = true;
-					// }
-					// this.showScrollToTop = false;
-
-	            	if(this.myScroll.y < this.currentY - 30) {
-	            		if(!this.isGoodsListEmpty) {
-	            			this.hideFilterBar = true;
-	            		}
-
-	            	} else if(this.myScroll.y > this.currentY + 30) {
-	            		if(!this.isGoodsListEmpty) {
-	            			this.hideFilterBar = false;
-	            		}
-	            	}
-
-	                if (this.myScroll.y < (this.myScroll.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
-	                    pullUpEl.className = 'flip';
-	                    pullUpEl.querySelector('.pullUpLabel').innerHTML = '释放加载';
-	                } else if (this.myScroll.y > (this.myScroll.maxScrollY + 5) && pullUpEl.className.match('flip')) {
-	                    pullUpEl.className = '';
-	                    pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
-	                }
-	            });
-					
-				this.myScroll.on('scrollEnd', () => {
-					this.currentY = this.myScroll.y;
-					this.showPageTip = false;
-					if(this.myScroll.y < 0) {
-						this.showScrollToTop = true;
-					}
-
-                    if (pullUpEl.className.match('flip')) {
-                        pullUpEl.className = 'loading';
-                        pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
-                        pullUpAction.bind(this)();
-                    }
-				});
-			}
-
-            // loaded.bind(this)();
 		}
 	}
 </script>
@@ -547,6 +520,10 @@
 	    background: #fff;
 	    overflow: auto;
 	}
+
+    .goods_list_main.disable_scroll {
+        overflow: hidden;
+    }
 
 	.category_bar {
 		position: fixed;
@@ -899,7 +876,7 @@
     .scroller {
         min-height: 100%;
         padding: 0;
-        
+
         box-sizing: border-box;
     }
 
@@ -966,6 +943,12 @@
 
     .goods_info_box {
         line-height: 1.5;
+    }
+
+    .goods_name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .special_price_tip {
@@ -1101,5 +1084,5 @@
     	background: url('../../images/goods_list/scroll_back.png') center no-repeat;
     	background-size: 100% auto;
     }
-    
+
 </style>
