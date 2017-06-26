@@ -62,7 +62,7 @@
 
     .lazyloading {
         opacity: 1;
-        background: #f7f7f7 url('./images/common/loading.gif') no-repeat center;
+        background: #efefef;
         background-size: 32px auto;
     }
 

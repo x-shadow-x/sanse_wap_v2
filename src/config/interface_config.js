@@ -26,4 +26,7 @@ export default {
     'GET_APP_SEARCH_GOOD_DETAIL_LIST_FORPRO': '/Get_APP_SearchGoodDetailList_ForPro/', // 使用过滤条件时获取商品列表
     'GET_SEARCH_LOG_LIST': '/Get_SearchLog_List/', // 搜索页获取热门搜索列表
     'GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE': '/GetGoodsDetailList_GoodsIdMessage/',
+    'GET_GOODS_SIZE': '/GetGoods_Size/', // 普通商品尺码
+    'GET_SECKILL_GOODS_SIZE': '/GetSeckillGoods_Size/', // 秒杀活动的商品尺码
+    'GET_INTERNAL_GOODS_SIZE': '/Get_Internal_GoodsSize/', // 员工内购专场商品尺码
 }
