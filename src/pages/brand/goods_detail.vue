@@ -1,5 +1,5 @@
 <template>
-	<div class="goods_detail_main">
+	<div class="goods_detail_main" @touchstart="reset">
 		<div class="head_bar">
 			<img :src="selectColorGoodsDetail.goods_detail_brand_logo || selectColorGoodsDetail.brand_logo" alt="品牌logo" class="brand_logo">
             <div class="link_box">
@@ -8,9 +8,9 @@
             </div>
 		</div>
         <div class="goods_title_box">
-            <h2 class="goods_name">{{selectColorGoodsDetail.goods_name}}123123123123123123123123</h2>
+            <h2 class="goods_name">{{selectColorGoodsDetail.goods_name}}</h2>
             <div class="alias_goods_sn_box">
-            	<h3 class="alias_goods_sn">{{selectColorGoodsDetail.alias_goods_sn}}123123123123123123123123</h3>
+            	<h3 class="alias_goods_sn">{{selectColorGoodsDetail.alias_goods_sn}}</h3>
             </div>
         </div>
 		<div class="swiper-container">
@@ -38,30 +38,30 @@
 	    		</div>
 	    	</div>
 
-	    	<div class="handle_box">
-	    		<span class="add_goods_btn" @click="showGoodsList"></span>
+	    	<div class="handle_box" @touchstart.stop="">
+	    		<span class="add_goods_btn" @touchend="showGoodsList"></span>
 	    		<span class="collection_btn"></span>
 	    		<span class="store_search_btn"></span>
 	    	</div>
-
-	    	<ul class="code_list">
-    			<li class="code_item" v-for="(item, index) in sizeList">
-    				<span class="code">{{item.attr_value}}</span>
-    				<div class="add_box" v-if="item.product_number > 0">
-    					<div class="edit_num_box">
-                            <span class="subtract num_edit_btn" :class="{disable: item.number <= 1}" @click="subtractGoods(index)"></span>
-                            <span class="goods_num_result">{{item.number}}</span>
-                            <span class="add num_edit_btn" :class="{disable: item.number >= item.product_number}" @click="addGoods(index)"></span>
-                        </div>
-                        <div class="add_to_shopping_bag" @click.self="addToShoppingBag($event, index)">
-                        	<span class="add_to_shopping_bag_text">添加</span>
-                        	<i class="add_tip"></i>
-                        </div>
-    				</div>
-    				<span class="out_of_store" v-else>缺货</span>
-    			</li>
-    		</ul>
 	    </div>
+	    <span class="add_to_shopping_bag_tip" id="addToShoppingBagTip"></span>
+	    <ul class="code_list" :class="{show: toggleMap.showSizeList}" @touchstart.stop="">
+			<li class="code_item" v-for="(item, index) in sizeList">
+				<span class="code">{{item.attr_value}}</span>
+				<div class="add_box" v-if="item.product_number > 0">
+					<div class="edit_num_box">
+                        <span class="subtract num_edit_btn" :class="{disable: item.number <= 1}" @touchend="subtractGoods(index)"></span>
+                        <span class="goods_num_result">{{item.number}}</span>
+                        <span class="add num_edit_btn" :class="{disable: item.number >= item.product_number}" @touchend="addGoods(index)"></span>
+                    </div>
+                    <div class="add_to_shopping_bag" @click.self="addToShoppingBag($event, index)">
+                    	<span class="add_to_shopping_bag_text">添加</span>
+                    	<i class="add_tip"></i>
+                    </div>
+				</div>
+				<span class="out_of_store" v-else>缺货</span>
+			</li>
+		</ul>
 	</div>
 </template>
 
@@ -83,6 +83,9 @@
 	        	goodsImageList: [],
 	        	goodsId: this.$route.query.goodsId,
 	        	colorId: this.$route.query.colorId,
+	        	toggleMap: {
+	        		showSizeList: false,
+	        	},
 	        	sizeList: [],
 	        }
 	    },
@@ -115,9 +118,24 @@
 	    	},
 
 	    	showGoodsList() {
+	    		console.log(this.toggleMap.showSizeList);
 	    		this.getSize();
+	    		this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
+	    		this.reset('showSizeList');
 	    	},
 
+	    	reset(exceptKey='') {
+	    		console.log(123);
+	    		let toggleMap = this.toggleMap;
+	    		for(let key in toggleMap) {
+	    			if(key == exceptKey) {
+	    				continue;
+	    			} else {
+	    				toggleMap[key] = false;
+	    			}
+	    			
+	    		}
+	    	},
 
 	    	subtractGoods(index) {
                 let currentItem = this.sizeList[index];
@@ -130,7 +148,6 @@
 
             addGoods(index) {
                 let currentItem = this.sizeList[index];
-                console.log(index);
                 if(currentItem.product_number > currentItem.number ) {
                     // 未超过库存量~可以继续添加
                     currentItem.number = +currentItem.number + 1;
@@ -139,6 +156,18 @@
 
             addToShoppingBag(e, index) {
             	//  todo 添加商品到购物车动画
+            	let sourceElement = $(e.target).parents('.code_item').find('.code').offset();
+            	let sourceX = sourceElement.left;
+            	let sourceY = sourceElement.top;
+            	console.log(sourceX);
+            	console.log(sourceY);
+            	$('#addToShoppingBagTip').css('top', sourceY + 'px');
+            	setTimeout(() => {
+            		$('#addToShoppingBagTip').addClass('animate')
+            	}, 100);
+            	setTimeout(() => {
+            		$('#addToShoppingBagTip').removeClass('animate');
+            	}, 1300);
             }
 	    },
 
@@ -360,7 +389,8 @@
 		right: 0;
 		height: 1rem;
 		padding: 0.24rem;
-		z-index: 2;
+		z-index: 5;
+		background: #fff;
 	}
 
 	.buy_bar:before {
@@ -415,19 +445,53 @@
 		bottom: 1.48rem;
 		left: 0;
 		right: 0;
-		background: rgba(255, 255, 255, .9);
-		border-bottom: 1px solid #ddd;
-		max-height: 320px;
+		background: rgba(255, 255, 255, .95);
+		max-height: 7.4rem;
 		overflow-y: auto;
+		transform: translateY(100%);
+		transition: transform .32s;
+		z-index: 2;
+	}
+
+	.code_list.show {
+		transform: translateY(0);
 	}
 
 	.code_item {
 		position: relative;
-		padding: 0.241546rem;
+		padding: 0.24rem;
 	}
 
-	.code_item + .code_item {
-		border-top: 1px solid #ddd;
+	.code_item:before {
+		content: "";
+	    position: absolute;
+	    width: 200%;
+	    height: 200%;
+	    left: 0;
+	    top: -1px;
+	    border-bottom: 1px solid #dfdfdf;
+	    transform-origin: 0 0;
+	    transform: scale(0.5, 0.5);
+	    box-sizing: border-box;
+	}
+
+	.add_to_shopping_bag_tip {
+		position: fixed;
+		width: 16px;
+		height: 16px;
+		background: url('../../images/goods_detail/add_to_shopping_bag_tip_icon.png');
+		background-size: 100% auto;
+		left: 10px;
+		top: 0;
+		z-index: 1000;
+		opacity: 0;
+	}
+
+	.add_to_shopping_bag_tip.animate {
+		transition: opacity .5s, left .7s linear .5s, top .7s ease-out .5s;
+		opacity: 1;
+		top: 10px !important;
+		left: 90% !important;
 	}
 
 	.code_list .code {
@@ -511,9 +575,22 @@
         height: 32px;
         display: inline-block;
         vertical-align: middle;
-        border: 1px solid #ccc;
         background: url('../../images/common/add_icon.png') center no-repeat;
         background-size: 14px auto;
+        position: relative;
+    }
+
+    .num_edit_btn:before {
+    	content: "";
+	    position: absolute;
+	    left: 0;
+	    top: 0;
+	    width: 200%;
+	    height: 200%;
+	    border: 1px solid #dfdfdf;
+	    transform-origin: 0 0;
+	    transform: scale(0.5, 0.5);
+	    box-sizing: border-box;
     }
 
     .subtract {
@@ -534,9 +611,22 @@
         width: 70px;
         height: 32px;
         line-height: 32px;
-        border-top: 1px solid #ccc;
-        border-bottom: 1px solid #ccc;
         font-size: 12px;
         text-align: center;
+        position: relative;
     }
+
+    .goods_num_result:before {
+	    content: "";
+	    position: absolute;
+	    left: 0;
+	    top: 0;
+	    width: 200%;
+	    height: 200%;
+	    border-top: 1px solid #dfdfdf;
+	    border-bottom: 1px solid #dfdfdf;
+	    transform-origin: 0 0;
+	    transform: scale(0.5, 0.5);
+	    box-sizing: border-box;
+	}
 </style>
