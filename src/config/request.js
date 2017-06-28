@@ -49,7 +49,11 @@ function queryEncoded(params) {
 */
 function apiAxios (method, url, params, success, failure) {
 	method = method.toUpperCase();
-	let headerInfo = null;
+	let headerInfo = {
+        'platform_src': 'WAP',
+        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+        'systype': 'wap'
+    };
 	if(method == 'GET' && params) {
 		if(params && params.header) {
 			headerInfo = params.header;

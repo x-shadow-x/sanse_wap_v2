@@ -29,4 +29,6 @@ export default {
     'GET_GOODS_SIZE': '/GetGoods_Size/', // 普通商品尺码
     'GET_SECKILL_GOODS_SIZE': '/GetSeckillGoods_Size/', // 秒杀活动的商品尺码
     'GET_INTERNAL_GOODS_SIZE': '/Get_Internal_GoodsSize/', // 员工内购专场商品尺码
+    'CREATE_BUYCAR_INSERT': '/Create_BuyCar_Insert/', // 登录状态下添加商品到购物车
+    'CREATE_INSERT_BUYCAR_UNLOGININ': '/Create_Insert_BuyCar_UnLoginIn/', // 未登录状态下添加商品到购物车
 }

@@ -118,7 +118,6 @@
 	    	},
 
 	    	showGoodsList() {
-	    		console.log(this.toggleMap.showSizeList);
 	    		this.getSize();
 	    		this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
 	    		this.reset('showSizeList');
@@ -154,13 +153,48 @@
                 }
             },
 
+            addToShoppingBagRequestWithLogin() {
+    //         	$arr=array($user_id,$res['goods_id'],$res['product_id'],$add_num,$goods_attr,$goods_attr_id_str,$goods_type,$issue_id);
+
+    //         	this.$request.get(this.$interface.CREATE_BUYCAR_INSERT, {
+    //         		'userId': '304014',
+				// 	'goodsId': this.selectColorGoodsDetail.goods_id,
+    //                 'product_id': 
+    //             }, (response) => {
+				// 	let data = response.data;
+    //                 // console.log(data);
+    //                 let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
+				// 	let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
+				// 	this.selectColorGoodsDetail = data.GoodsColorMessage;
+
+				// 	let tempImgList = [];
+
+				// 	goodsImageMessage.forEach((item, index) => {
+				// 		if(item.img_color == this.colorId) {
+				// 			tempImgList.push({'img_url': item.img_url});
+				// 		}
+				// 	});
+
+    //                 for(let i = 0, len = goodsColorMessage.length; i < len; i++) {
+    //                     let currentItem = goodsColorMessage[i];
+    //                     if(currentItem.img_color == this.colorId) {
+    //                         this.selectColorGoodsDetail = currentItem;
+    //                         break;
+    //                     }
+    //                 }
+
+				// 	this.goodsImageList = tempImgList;
+
+    //                 console.log(this.selectColorGoodsDetail);
+				// });
+            },
+            addToShoppingBagRequestWithUnLogin() {},
+
             addToShoppingBag(e, index) {
             	//  todo 添加商品到购物车动画
             	let sourceElement = $(e.target).parents('.code_item').find('.code').offset();
             	let sourceX = sourceElement.left;
             	let sourceY = sourceElement.top;
-            	console.log(sourceX);
-            	console.log(sourceY);
             	$('#addToShoppingBagTip').css('top', sourceY + 'px');
             	setTimeout(() => {
             		$('#addToShoppingBagTip').addClass('animate')
@@ -168,6 +202,7 @@
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
             	}, 1300);
+          
             }
 	    },
 
@@ -187,7 +222,7 @@
                     'userId': '304014'
                 }, (response) => {
 					let data = response.data;
-                    // console.log(data);
+                    console.log(data);
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
 					this.selectColorGoodsDetail = data.GoodsColorMessage;
@@ -210,7 +245,7 @@
 
 					this.goodsImageList = tempImgList;
 
-                    console.log(this.selectColorGoodsDetail);
+                    // console.log(this.selectColorGoodsDetail);
 				});
 			} else {
 				let selectGoodsDetail = [];

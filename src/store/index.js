@@ -6,6 +6,8 @@ import mutations from './mutations'
 Vue.use(Vuex)
 
 const state = {
+    userId: '0', // 全局使用的userid，个人中心页几乎各项数据的获取都需要此字段~同时此字段也被用来判断用户是否已经登录~默认为0表示没有登录
+    cookieId: '0', // 一个随机id~因在多个页面获取数据时需要用到故作全局配置~默认为 0
     routerList: {
         '/home': 0,
 
@@ -34,9 +36,9 @@ const state = {
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
     },
-    goodsListRecord: [],
+    goodsListRecord: [], // 记录商品列表当前加载的商品数据的状况~以便从商品详情页返回的时候还原之前的状态
     isShowLoad: false,
-    keyWord: ''
+    keyWord: '', // 当在商品搜索页输入关键词并跳转到搜索结果页时需先记录输入的关键词~以便再再次返回搜索页的时候直接显示上次输入的关键词
 }
 
 export default new Vuex.Store({
