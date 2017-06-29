@@ -8,11 +8,11 @@ const PUSH_GOODS_LIST_RECORD = 'PUSH_GOODS_LIST_RECORD'
 
 export default {
 
-    [SET_USER_ID](data) {
+    [SET_USER_ID](state, data) {
         state.userId = data;
     },
 
-    [SET_COOKIE_ID](data) {
+    [SET_COOKIE_ID](state, data) {
         state.cookieId = data;
     },
 

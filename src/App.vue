@@ -20,6 +20,10 @@
                 isShowLoad: false
             }
         },
+        mounted() {
+            this.$store.commit('SET_USER_ID', '304014');
+            this.$store.commit('SET_COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+        },
         components: {
             footerBar,
             load

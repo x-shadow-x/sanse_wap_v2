@@ -184,7 +184,7 @@
 			});
 
 			this.$request.get(this.$interface.GET_USER_ADDRESS_LIST, {
-				'userId': '304014'
+				'userId': this.$store.state.userId
 			}, (response) => {
 				let data = response.data;
 

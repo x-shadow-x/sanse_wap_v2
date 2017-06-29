@@ -39,8 +39,8 @@
 	    	</div>
 
 	    	<div class="handle_box" @touchstart.stop="">
-	    		<span class="add_goods_btn" @touchend="showGoodsList"></span>
-	    		<span class="collection_btn"></span>
+	    		<span class="add_goods_btn" :class="{spread: toggleMap.showSizeList}" @touchend="toggleGoodsList"></span>
+	    		<span class="collection_btn" :class="{active: isCollected}" @click="toggleCategory"></span>
 	    		<span class="store_search_btn"></span>
 	    	</div>
 	    </div>
@@ -86,6 +86,7 @@
 	        	toggleMap: {
 	        		showSizeList: false,
 	        	},
+	        	isCollected: false,
 	        	sizeList: [],
 	        }
 	    },
@@ -117,14 +118,13 @@
 	    		}
 	    	},
 
-	    	showGoodsList() {
+	    	toggleGoodsList() {
 	    		this.getSize();
 	    		this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
 	    		this.reset('showSizeList');
 	    	},
 
 	    	reset(exceptKey='') {
-	    		console.log(123);
 	    		let toggleMap = this.toggleMap;
 	    		for(let key in toggleMap) {
 	    			if(key == exceptKey) {
@@ -153,42 +153,36 @@
                 }
             },
 
-            addToShoppingBagRequestWithLogin() {
-    //         	$arr=array($user_id,$res['goods_id'],$res['product_id'],$add_num,$goods_attr,$goods_attr_id_str,$goods_type,$issue_id);
+            addToShoppingBagRequest(index, interfaceName, id) {
 
-    //         	this.$request.get(this.$interface.CREATE_BUYCAR_INSERT, {
-    //         		'userId': '304014',
-				// 	'goodsId': this.selectColorGoodsDetail.goods_id,
-    //                 'product_id': 
-    //             }, (response) => {
-				// 	let data = response.data;
-    //                 // console.log(data);
-    //                 let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
-				// 	let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
-				// 	this.selectColorGoodsDetail = data.GoodsColorMessage;
+            	let currentSizeGoods = this.sizeList[index];
+            	let colorName = currentSizeGoods.color_Name;
+            	let sizeVal = currentSizeGoods.attr_value;
+            	let goodsAttr = '';
+            	let goodsAttrId = this.selectColorGoodsDetail.img_color + ',' + currentSizeGoods.goods_attr_id;
 
-				// 	let tempImgList = [];
+            	if(colorName != '') {
+            		goodsAttr = goodsAttr + '颜色:' + colorName + ' ';
+            	}
+            	if(sizeVal != '') {
+            		goodsAttr = goodsAttr + '尺码:' + sizeVal;
+            	}
+            	goodsAttr = encodeURI(goodsAttr);
 
-				// 	goodsImageMessage.forEach((item, index) => {
-				// 		if(item.img_color == this.colorId) {
-				// 			tempImgList.push({'img_url': item.img_url});
-				// 		}
-				// 	});
+            	let postData = {
+            		'userIdOrCookieId': id,
+					'goodsId': this.selectColorGoodsDetail.goods_id,
+                    'product_id': currentSizeGoods.product_id,
+                    'addNum': currentSizeGoods.number,
+                    'goodsAttr': goodsAttr,
+                    'goodsAttrId': goodsAttrId,
+                    'saleType': this.selectColorGoodsDetail.sale_type,
+                    'issueId': this.selectColorGoodsDetail.issue_id,
+                };
+            	
 
-    //                 for(let i = 0, len = goodsColorMessage.length; i < len; i++) {
-    //                     let currentItem = goodsColorMessage[i];
-    //                     if(currentItem.img_color == this.colorId) {
-    //                         this.selectColorGoodsDetail = currentItem;
-    //                         break;
-    //                     }
-    //                 }
-
-				// 	this.goodsImageList = tempImgList;
-
-    //                 console.log(this.selectColorGoodsDetail);
-				// });
+            	this.$request.post(interfaceName, postData, (response) => {});
             },
-            addToShoppingBagRequestWithUnLogin() {},
 
             addToShoppingBag(e, index) {
             	//  todo 添加商品到购物车动画
@@ -202,7 +196,36 @@
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
             	}, 1300);
-          
+
+            	if(this.$store.state.userId == 0) {
+            		// 已经登录了使用登录状态下添加到购物车的接口
+            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, this.$store.state.userId);
+            	} else {
+            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId);
+            	}
+            },
+
+            toggleCollectionRequest(interfaceName, cb) {
+            	this.$request.get(interfaceName, {
+            		'userId': this.$store.state.userId,
+					'goodsId': this.selectColorGoodsDetail.goods_id,
+					'cookieId': this.$store.state.cookieId,
+					'colorId': this.selectColorGoodsDetail.img_color
+                    
+                }, cb);
+            },
+
+            toggleCategory() {
+            	if(this.isCollected) {
+            		this.toggleCollectionRequest(this.$interface.DELETE_FAVORITEGOODS, (response) => {
+	                    this.isCollected = false;
+					});
+            	} else {
+            		this.toggleCollectionRequest(this.$interface.ADD_FAVORITEGOODS, (response) => {
+	                    this.isCollected = true;
+					});
+            	}
+            	
             }
 	    },
 
@@ -219,13 +242,12 @@
 				// store中未保存相应的数据，则可能是直接通过连接跳到详情页的，此时通过另一个接口根据goodsid直接拿对应的商品数据
 				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE, {
 					'goodsId': this.goodsId,
-                    'userId': '304014'
+                    'userId': this.$store.state.userId
                 }, (response) => {
 					let data = response.data;
-                    console.log(data);
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
-					this.selectColorGoodsDetail = data.GoodsColorMessage;
+					// this.selectColorGoodsDetail = data.GoodsColorMessage;
 
 					let tempImgList = [];
 
@@ -245,7 +267,8 @@
 
 					this.goodsImageList = tempImgList;
 
-                    // console.log(this.selectColorGoodsDetail);
+					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
+
 				});
 			} else {
 				let selectGoodsDetail = [];
@@ -261,12 +284,11 @@
 						this.goodsImageList = item.goodsListEntity;
 					}
 				});
-                console.log(this.selectColorGoodsDetail);
+
+				this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
 			}
 
 			this.$store.commit('HIDE_LOAD');
-
-
 
 			setTimeout(() => {
 				this.mySwiper.update();
@@ -579,6 +601,7 @@
 	.store_search_btn {
 		display: inline-block;
 		vertical-align: middle;
+		position: relative;
 	}
 
 	.add_goods_btn {
@@ -586,6 +609,10 @@
 		height: 1rem;
 		background: url('../../images/goods_detail/add_goods_icon.png') center no-repeat;
 		background-size: auto 100%;
+	}
+
+	.add_goods_btn.spread {
+		background-image: url('../../images/goods_detail/add_goods_hide_icon.png');
 	}
 
 	.collection_btn,
@@ -599,6 +626,26 @@
 
 	.store_search_btn {
 		background-image: url('../../images/goods_detail/store_search_icon.png');
+	}
+
+	.collection_btn.active {
+		background-image: url('../../images/goods_detail/collection_active_icon.png');
+		animation: rotate_animation 1s;
+	}
+
+	@keyframes rotate_animation {
+	    0% {
+	        top: 0px;
+	        transform: translateZ(40px) rotateX(0);
+	    }
+	    50% {
+	        top: -1rem;
+	        transform: translateZ(40px) rotateX(720deg);
+	    }
+	    100% {
+	        top: 0px;
+	        transform: translateZ(40px) rotateX(720deg);
+	    }
 	}
 
 	.edit_num_box {

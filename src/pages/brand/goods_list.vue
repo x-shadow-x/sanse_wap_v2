@@ -341,13 +341,13 @@
 			getDefaultData(cb) {
 
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'funcType': this.funcType,
                     'catId': this.catId,
                     'keyWord': encodeURI(this.$route.query.keyWord || ' '),
                     'sortField': this.sortField,
                     'sortBy': this.sortBy,
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                    'cookieId': this.$store.state.cookieId,
                     'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {
@@ -398,8 +398,8 @@
 					'startPrice': 0, // 已经弃用的参数~故传个0~只是占位
 					'endPrice': 0, // 已经弃用的参数~故传个0~只是占位
 					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-					'userId': '304014',
-					'cookieId': '23456006805d970d5438a354dc019fc295614979',
+					'userId': this.$store.state.userId,
+					'cookieId': this.$store.state.cookieId,
 					'sortField': this.sortField,
 					'sortBy': this.sortBy,
 					'pageIndex': this.pageIndex++,
@@ -904,6 +904,7 @@
 
     .transparent {
         visibility: hidden;
+        display: none;
     }
 
     #pullUp {

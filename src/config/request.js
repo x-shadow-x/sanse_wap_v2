@@ -54,7 +54,7 @@ function apiAxios (method, url, params, success, failure) {
         'cookie_id': '23456006805d970d5438a354dc019fc295614979',
         'systype': 'wap'
     };
-	if(method == 'GET' && params) {
+	if((method == 'GET' && params) || (method == 'POST' && params)) {
 		if(params && params.header) {
 			headerInfo = params.header;
 			delete params.header;
@@ -66,7 +66,8 @@ function apiAxios (method, url, params, success, failure) {
 	axios({
 		method: method,
 		url: url,
-		data: method === 'POST' || method === 'PUT' ? params : null,
+		// data: method === 'POST' || method === 'PUT' ? params : null,
+		data: method === 'PUT' ? params : null,
 		headers: headerInfo ? headerInfo : null,
 	    // params: method === 'GET' || method === 'DELETE' ? params : null,
 	    baseURL: root,

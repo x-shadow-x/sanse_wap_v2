@@ -11,7 +11,7 @@
 			this.$request.get(this.$interface.GET_ALL_ORDER_ENTITY, {
                 'header': {
                     'platform_src': 'WAP',
-                    'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+                    'cookie_id': this.$store.state.cookieId,
                     'systype': 'wap'
                 },
                 'orderId': this.$route.params.order_id

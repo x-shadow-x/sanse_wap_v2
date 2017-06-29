@@ -89,9 +89,9 @@
                 let selectedCollectionRecord = this.collectionRecord[index];
 
                 this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'goodsId': selectedCollectionRecord.goods_id,
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                    'cookieId': this.$store.state.cookieId,
                     'colorId': selectedCollectionRecord.color_id
                 }, (response) => {
                     this.collectionRecord.splice(index, 1);
@@ -103,8 +103,8 @@
         mounted() {
 
             this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                'userId': '304014',
-                'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                'userId': this.$store.state.userId,
+                'cookieId': this.$store.state.cookieId,
                 'favType': 2,
                 'pageSize': this.$interface.PAGE_SIZE,
                 'goodsId': this.goodsId,
@@ -119,8 +119,9 @@
                 this.collectionRecord = data; // 积分记录数组
 
                 if(data.length == this.$interface.PAGE_SIZE) {
-                    // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
                     this.isMore = true;
+                } else {
+                    this.isMore = false;
                 }
 
                 let lastRecord = data[data.length - 1];
@@ -139,9 +140,13 @@
 
             function pullUpAction () {
 
+                if(!this.isMore) {
+                    return;
+                }
+
                 this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                    'userId': '304014',
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                    'userId': this.$store.state.userId,
+                    'cookieId': this.$store.state.cookieId,
                     'favType': 2,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'goodsId': this.goodsId,
@@ -244,6 +249,7 @@
 
     .transparent {
         visibility: hidden;
+        display: none;
     }
 
     #pullUp {

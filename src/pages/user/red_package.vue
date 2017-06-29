@@ -114,7 +114,7 @@
 			}
 
 			this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
-				'userId': '304014',
+				'userId': this.$store.state.userId,
 				'pageIndex': '1',
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
@@ -143,7 +143,7 @@
 			function pullUpAction () {
 
                 this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'pageIndex': '2',
                     'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {

@@ -119,10 +119,10 @@
                 this.$request.get(this.dataInterface, {
                     'header': {
                         'platform_src': 'WAP',
-                        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+                        'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -164,10 +164,10 @@
                 this.$request.get(this.dataInterface, {
                     'header': {
                         'platform_src': 'WAP',
-                        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+                        'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -198,10 +198,10 @@
             this.$request.get(this.dataInterface, {
                 'header': {
                     'platform_src': 'WAP',
-                    'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+                    'cookie_id': this.$store.state.cookieId,
                     'systype': 'wap'
                 },
-                'userId': '304014',
+                'userId': this.$store.state.userId,
                 'orderStatus': this.orderStatus,
                 'pageSize': this.$interface.PAGE_SIZE,
                 'pageIndex': this.pageIndex++
@@ -229,10 +229,10 @@
                 this.$request.get(this.dataInterface, {
                     'header': {
                         'platform_src': 'WAP',
-                        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+                        'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': '304014',
+                    'userId': this.$store.state.userId,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -428,6 +428,7 @@
 
     .transparent {
         visibility: hidden;
+        display: none;
     }
 
     #pullUp {

@@ -257,8 +257,8 @@
         mounted() {
 
             this.$request.get(this.$interface.GET_BUY_CAR_GOOD_LIST, {
-                'userId': '304014',
-                'cookieId': '23456006805d970d5438a354dc019fc295614979'
+                'userId': this.$store.state.userId,
+                'cookieId': this.$store.state.cookieId
             }, (response) => {
                 let data = response.data;
 
@@ -294,8 +294,8 @@
             function pullUpAction () {
 
                 this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                    'userId': '304014',
-                    'cookieId': '23456006805d970d5438a354dc019fc295614979',
+                    'userId': this.$store.state.userId,
+                    'cookieId': this.$store.state.cookieId,
                     'favType': 2,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'goodsId': this.goodsId,
@@ -378,7 +378,7 @@
         position: absolute;
         width: 100%;
         top: 48px;
-        bottom: 2.8rem;
+        bottom: 1.4rem;
         left: 0;
         overflow: hidden;
     }
@@ -393,6 +393,7 @@
 
     .transparent {
         visibility: hidden;
+        display: none;
     }
 
     #pullUp {
