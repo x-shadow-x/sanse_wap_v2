@@ -24,7 +24,17 @@
 	        </div>
 	        <div class="swiper-pagination"></div>
 	    </div>
-
+		
+		<div class="goods_different_color_bar_box" v-if="goodsColorMessage.length > 1">
+			<ul class="goods_different_color_bar">
+				<li class="goods_color_item" v-for="(item, index) in goodsColorMessage" :key="item.goods_id">
+					<div class="img_box">
+						<img :src="item.smallpic" alt="item.goods_name" class="different_color_preview">
+					</div>
+				</li>
+			</ul>	
+		</div>
+		
 	    <div class="buy_bar">
 	    	<div class="price_box">
 	    		<div class="user_price_box">
@@ -79,7 +89,8 @@
 	        	mySwiper: null,
 	        	// 一个商品会对应不同的颜色，不同颜色的商品会独立出现在商品列表中，
 	        	// 所以进到详情页的时候不仅需要获取当前选中的商品~还要获取当前商品的当前的颜色对应的商品数据
-	        	selectColorGoodsDetail: {},
+	        	goodsColorMessage: [], // 当前商品可能存在多种颜色~此变量用以存放当前商品的所有颜色信息
+	        	selectColorGoodsDetail: {}, // 商品详情页显示的数据为当前商品的选中的颜色~通过索引找到当前颜色的数据信息存放在此变量
 	        	goodsImageList: [],
 	        	goodsId: this.$route.query.goodsId,
 	        	colorId: this.$route.query.colorId,
@@ -247,7 +258,7 @@
 					let data = response.data;
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
-					// this.selectColorGoodsDetail = data.GoodsColorMessage;
+					this.goodsColorMessage = goodsColorMessage;
 
 					let tempImgList = [];
 
@@ -268,6 +279,7 @@
 					this.goodsImageList = tempImgList;
 
 					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
+					console.log(this.goodsColorMessage, '------------');
 
 				});
 			} else {
@@ -278,6 +290,7 @@
 					}
 				});
 
+				this.goodsColorMessage = selectGoodsDetail.dataList;
 				selectGoodsDetail.dataList.forEach((item, index) => {
 					if(item.img_color == this.colorId) {
 						this.selectColorGoodsDetail = item;
@@ -286,6 +299,8 @@
 				});
 
 				this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
+
+				console.log(this.goodsColorMessage, '------------');
 			}
 
 			this.$store.commit('HIDE_LOAD');
@@ -436,6 +451,45 @@
 		position: absolute;
 		left: 0;
 		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.goods_different_color_bar_box {
+		position: fixed;
+		left: 0;
+		bottom: 1.48rem;
+		width: 100%;
+		background: rgba(255, 255, 255, .8);
+		overflow-x: auto;
+		padding: 10px 2px;
+
+	}
+
+	.goods_different_color_bar {
+		white-space: nowrap;
+	}
+
+	.goods_color_item {
+		display: inline-block;
+		width: 50px;
+		height: 50px;
+	}
+
+	.goods_color_item + .goods_color_item {
+		margin-left: 10px;
+	}
+
+	.goods_color_item .img_box {
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+
+	.different_color_preview {
+		position: absolute;
+		left: 0;
+		top: 50%;
+		width: 100%;
 		transform: translateY(-50%);
 	}
 
