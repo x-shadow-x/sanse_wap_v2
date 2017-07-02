@@ -24,7 +24,7 @@
 	        </div>
 	        <div class="swiper-pagination"></div>
 	    </div>
-		
+
 		<div class="goods_different_color_bar_box" v-if="goodsColorMessage.length > 1">
 			<ul class="goods_different_color_bar">
 				<li class="goods_color_item" v-for="(item, index) in goodsColorMessage" :key="item.goods_id">
@@ -32,9 +32,9 @@
 						<img :src="item.smallpic" alt="item.goods_name" class="different_color_preview">
 					</div>
 				</li>
-			</ul>	
+			</ul>
 		</div>
-		
+
 	    <div class="buy_bar">
 	    	<div class="price_box">
 	    		<div class="user_price_box">
@@ -72,6 +72,19 @@
 				<span class="out_of_store" v-else>缺货</span>
 			</li>
 		</ul>
+        <div class="store_search_box">
+            <h2>请问你想要的尺码是？</h2>
+            <ul class="search_code_list">
+                <li class="search_code_item">
+                    <span class="code">36</span>
+                    <span class="select_btn"></span>
+                </li>
+                <li class="search_code_item">
+                    <span class="code">36</span>
+                    <span class="select_btn active"></span>
+                </li>
+            </ul>
+        </div>
 	</div>
 </template>
 
@@ -105,7 +118,7 @@
 	    methods: {
 	    	getSize() {
 	    		if(this.selectColorGoodsDetail.sale_type == 6) {
-	    			
+
 	    		} else if(this.selectColorGoodsDetail.sale_type == 5) {
 	    			this.$request.get(this.$interface.GET_SECKILL_GOODS_SIZE, {
 						'issueId': this.selectColorGoodsDetail.issue_id,
@@ -143,7 +156,7 @@
 	    			} else {
 	    				toggleMap[key] = false;
 	    			}
-	    			
+
 	    		}
 	    	},
 
@@ -190,7 +203,7 @@
                     'saleType': this.selectColorGoodsDetail.sale_type,
                     'issueId': this.selectColorGoodsDetail.issue_id,
                 };
-            	
+
 
             	this.$request.post(interfaceName, postData, (response) => {});
             },
@@ -222,7 +235,7 @@
 					'goodsId': this.selectColorGoodsDetail.goods_id,
 					'cookieId': this.$store.state.cookieId,
 					'colorId': this.selectColorGoodsDetail.img_color
-                    
+
                 }, cb);
             },
 
@@ -236,7 +249,7 @@
 	                    this.isCollected = true;
 					});
             	}
-            	
+
             }
 	    },
 
@@ -279,7 +292,10 @@
 					this.goodsImageList = tempImgList;
 
 					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
-					console.log(this.goodsColorMessage, '------------');
+
+                    setTimeout(() => {
+                        this.mySwiper.update();
+                    }, 500);
 
 				});
 			} else {
@@ -300,16 +316,12 @@
 
 				this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
 
-				console.log(this.goodsColorMessage, '------------');
+                setTimeout(() => {
+                    this.mySwiper.update();
+                }, 500);
 			}
 
 			this.$store.commit('HIDE_LOAD');
-
-			setTimeout(() => {
-				this.mySwiper.update();
-			}, 500);
-
-
 
 			// this.$http.get('getContent.php',{
 			// 	params:{
@@ -428,6 +440,7 @@
 		margin-top: 0.241546rem;
 		width: 100%;
 		height: 100vw;
+        background: #f8f8f8;
 	}
 
 	.goods_detail_item {
@@ -457,22 +470,25 @@
 	.goods_different_color_bar_box {
 		position: fixed;
 		left: 0;
+        right: 0;
 		bottom: 1.48rem;
-		width: 100%;
 		background: rgba(255, 255, 255, .8);
-		overflow-x: auto;
-		padding: 10px 2px;
-
+		padding: 10px 5px;
+        z-index: 2;
+        overflow: hidden;
 	}
 
 	.goods_different_color_bar {
 		white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-align: center;
 	}
 
 	.goods_color_item {
 		display: inline-block;
-		width: 50px;
-		height: 50px;
+		width: 1.4rem;
+		height: 1.4rem;
 	}
 
 	.goods_color_item + .goods_color_item {
@@ -605,7 +621,7 @@
 		left: 90% !important;
 	}
 
-	.code_list .code {
+	.code {
 		line-height: 1rem;
 	}
 
@@ -765,4 +781,37 @@
 	    transform: scale(0.5, 0.5);
 	    box-sizing: border-box;
 	}
+
+    .store_search_box {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, .95);
+        z-index: 5;
+    }
+
+    .store_search_box h2 {
+        padding: .24rem .48rem;
+    }
+
+    .search_code_item {
+        padding: .24rem .48rem;
+        position: relative;
+    }
+
+    .select_btn {
+        position: absolute;
+        right: .48rem;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 100%;
+        width: 32px;
+        background: url('../../images/common/checkbox_icon.png') right center no-repeat;
+        background-size: 16px auto;
+    }
+
+    .select_btn.active {
+        background-image: url('../../images/common/checkbox_icon_active.png');
+    }
 </style>
