@@ -27,7 +27,7 @@
 
 		<div class="goods_different_color_bar_box" v-if="goodsColorList.length > 1">
 			<ul class="goods_different_color_bar">
-				<li class="goods_color_item" v-for="(item, index) in goodsColorList" :key="item.goods_id" @click="toggleColor(index)">
+				<li class="goods_color_item" :class="{active: item.isSelect}" v-for="(item, index) in goodsColorList" :key="item.goods_id" @click="toggleColor(index)">
 					<div class="img_box">
 						<img :src="item.smallpic" alt="item.goods_name" class="different_color_preview">
 					</div>
@@ -313,6 +313,14 @@
             	let colorId = tempColorMessage.img_color;
             	this.handleResultTip = tempColorMessage.colorname;
 
+            	if(!tempColorMessage.isSelect) {
+            		this.goodsColorList.forEach((item) => {
+            			item.isSelect = false;
+            		});
+
+            		this.goodsColorList[index].isSelect = true;
+            	}
+
             	this.showHandleResultTip = true;
 
             	setTimeout(() => {
@@ -328,7 +336,6 @@
             		this.mySwiper.update();
             		this.mySwiper.slideTo(0, 500, false);
             	}, 320);
-
             }
 	    },
 
@@ -350,7 +357,7 @@
 					let data = response.data;
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
-					this.goodsColorList = goodsColorMessage;
+					
 
 					this.goodsColorMessage = goodsColorMessage;
 
@@ -371,24 +378,23 @@
 					});
 
 					goodsColorMessage.forEach((item, index) => {
+
+						if(item.img_color == this.colorId) {
+							item.isSelect = true;
+						} else {
+							item.isSelect = false;
+						}
+						
 						tempAllColorGoodsMessageList[item.img_color] = item;
 					});
+
+					this.goodsColorList = goodsColorMessage;
 
 					this.allColorGoodsImageList = tempAllColorGoodsImageList;
 					this.goodsColorMessage = tempAllColorGoodsMessageList;
 
 					this.goodsImageList = this.allColorGoodsImageList[this.colorId];
 					this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
-
-					console.log(this.selectColorGoodsDetail, '----------');
-
-                    // for(let i = 0, len = goodsColorMessage.length; i < len; i++) {
-                    //     let currentItem = goodsColorMessage[i];
-                    //     if(currentItem.img_color == this.colorId) {
-                    //         this.selectColorGoodsDetail = currentItem;
-                    //         break;
-                    //     }
-                    // }
 
 					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
 
@@ -408,17 +414,20 @@
 				let tempAllColorGoodsImageList = {};
 				let tempAllColorGoodsMessageList = {};
 
-				this.goodsColorList = selectGoodsDetail.dataList;
-
 				selectGoodsDetail.dataList.forEach((item, index) => {
 					tempAllColorGoodsImageList[item.img_color] = item.goodsListEntity;
 					tempAllColorGoodsMessageList[item.img_color] = item;
 
 					if(item.img_color == this.colorId) {
 						this.selectColorGoodsDetail = item;
+						item.isSelect = true;
 						this.goodsImageList = item.goodsListEntity;
+					} else {
+						item.isSelect = false;
 					}
 				});
+
+				this.goodsColorList = selectGoodsDetail.dataList;
 
 				this.allColorGoodsImageList = tempAllColorGoodsImageList;
 				this.goodsColorMessage = tempAllColorGoodsMessageList;
@@ -595,12 +604,18 @@
         overflow-x: auto;
         overflow-y: hidden;
         text-align: center;
+        padding: 5px;
 	}
 
 	.goods_color_item {
 		display: inline-block;
 		width: 1.4rem;
 		height: 1.4rem;
+	}
+
+	.goods_color_item.active {
+		transform: scale(1.1, 1.1);
+		border: 1px solid #ef8200;
 	}
 
 	.goods_color_item + .goods_color_item {
