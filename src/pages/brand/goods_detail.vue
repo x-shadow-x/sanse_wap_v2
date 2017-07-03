@@ -25,9 +25,9 @@
 	        <div class="swiper-pagination"></div>
 	    </div>
 
-		<div class="goods_different_color_bar_box" v-if="goodsColorMessage.length > 1">
+		<div class="goods_different_color_bar_box" v-if="goodsColorList.length > 1">
 			<ul class="goods_different_color_bar">
-				<li class="goods_color_item" v-for="(item, index) in goodsColorMessage" :key="item.goods_id">
+				<li class="goods_color_item" v-for="(item, index) in goodsColorList" :key="item.goods_id" @click="toggleColor(index)">
 					<div class="img_box">
 						<img :src="item.smallpic" alt="item.goods_name" class="different_color_preview">
 					</div>
@@ -51,7 +51,7 @@
 	    	<div class="handle_box" @touchstart.stop="">
 	    		<span class="add_goods_btn" :class="{spread: toggleMap.showSizeList}" @touchend="toggleGoodsList"></span>
 	    		<span class="collection_btn" :class="{active: isCollected}" @click="toggleCategory"></span>
-	    		<span class="store_search_btn"></span>
+	    		<span class="store_search_btn" @touchend="showStoreSearchList"></span>
 	    	</div>
 	    </div>
 	    <span class="add_to_shopping_bag_tip" id="addToShoppingBagTip"></span>
@@ -72,19 +72,22 @@
 				<span class="out_of_store" v-else>缺货</span>
 			</li>
 		</ul>
-        <div class="store_search_box">
+        <div class="store_search_box" :class="{show: toggleMap.showStoreSearch}" @touchstart.stop="">
             <h2>请问你想要的尺码是？</h2>
             <ul class="search_code_list">
-                <li class="search_code_item">
-                    <span class="code">36</span>
-                    <span class="select_btn"></span>
-                </li>
-                <li class="search_code_item">
-                    <span class="code">36</span>
-                    <span class="select_btn active"></span>
+                <li class="search_code_item" v-for="(item, index) in sizeList">
+                    <span class="code">{{item.attr_value}}</span>
+                    <span class="select_btn" :class="{active: item.isSelect == true}" @click="selectSize(index)"></span>
                 </li>
             </ul>
+            <div class="store_search_btn_box">
+            	<span class="store_search" v-if="isSelectSize">马上查询</span>
+            	<span class="select_size_tip" v-else>请选择所需尺码</span>
+            	
+            </div>
         </div>
+
+        <span class="handle_result_tip" :class="{show: showHandleResultTip}">{{handleResultTip}}</span>
 	</div>
 </template>
 
@@ -94,29 +97,42 @@
 	import '../../plugins/swiper/swiper.min.css';
 	import '../../../config/dev.env.js';
 
-	// const goodsCodeRoot = process.env.TEMP_GOODS_CODE_ROOT;
-
 	export default {
 		data() {
 	        return {
 	        	mySwiper: null,
 	        	// 一个商品会对应不同的颜色，不同颜色的商品会独立出现在商品列表中，
 	        	// 所以进到详情页的时候不仅需要获取当前选中的商品~还要获取当前商品的当前的颜色对应的商品数据
-	        	goodsColorMessage: [], // 当前商品可能存在多种颜色~此变量用以存放当前商品的所有颜色信息
+	        	goodsColorMessage: {}, // 当前商品可能存在多种颜色~此变量用以存放当前商品的所有颜色信息,以img_color作为key
+	        	goodsColorList: [], // goodsColorMessage为了方便查找~将商品的颜色信息组织为key-value对~但无法在v-for中遍历~故设此变量
+
 	        	selectColorGoodsDetail: {}, // 商品详情页显示的数据为当前商品的选中的颜色~通过索引找到当前颜色的数据信息存放在此变量
-	        	goodsImageList: [],
+
+	        	allColorGoodsImageList: {}, //记录当前商品所有颜色的大图地址，以img_color作为key
+	        	goodsImageList: [], //记录当前颜色商品的大图地址
 	        	goodsId: this.$route.query.goodsId,
 	        	colorId: this.$route.query.colorId,
 	        	toggleMap: {
 	        		showSizeList: false,
+	        		showStoreSearch: false
 	        	},
 	        	isCollected: false,
-	        	sizeList: [],
+	        	showHandleResultTip: false,
+	        	sizeList: null,
+	        	handleResultTip: ''
 	        }
 	    },
 
+	    computed: {
+	    	isSelectSize: function() {
+	    		return this.sizeList && this.sizeList.some((item) => {
+		    			return item.isSelect;
+		    		});
+	    	}
+	    },
+
 	    methods: {
-	    	getSize() {
+	    	getSize(cb) {
 	    		if(this.selectColorGoodsDetail.sale_type == 6) {
 
 	    		} else if(this.selectColorGoodsDetail.sale_type == 5) {
@@ -125,7 +141,20 @@
 	                    'imgColor': this.selectColorGoodsDetail.img_color
 	                }, (response) => {
 						let data = response.data;
+	                    
+	                    data.forEach((item) => {
+	                    	if(item.product_number > 0) {
+								item.number = 1;
+							}
+
+	                    	item.isSelect = false;
+	                    });
+
 	                    this.sizeList = data;
+
+	                    if(cb) {
+	                    	cb.bind(this)();
+	                    }
 					});
 	    		} else {
 	    			this.$request.get(this.$interface.GET_GOODS_SIZE, {
@@ -133,17 +162,29 @@
 	                    'imgColor': this.selectColorGoodsDetail.img_color
 	                }, (response) => {
 						let data = response.data;
+
 						data.forEach((item, index) => {
-							if(item.product_number > 0)
-							item.number = 1;
+							if(item.product_number > 0) {
+								item.number = 1;
+							}
+							
+							item.isSelect = false;
 						});
+
 						this.sizeList = data;
+
+						if(cb) {
+	                    	cb.bind(this)();
+	                    }
 					});
 	    		}
 	    	},
 
 	    	toggleGoodsList() {
-	    		this.getSize();
+	    		if(!this.sizeList) {
+	    			this.getSize();
+	    		}
+	    		
 	    		this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
 	    		this.reset('showSizeList');
 	    	},
@@ -235,7 +276,6 @@
 					'goodsId': this.selectColorGoodsDetail.goods_id,
 					'cookieId': this.$store.state.cookieId,
 					'colorId': this.selectColorGoodsDetail.img_color
-
                 }, cb);
             },
 
@@ -249,6 +289,45 @@
 	                    this.isCollected = true;
 					});
             	}
+
+            },
+
+            showStoreSearchList() {
+            	if(!this.sizeList) {
+            		this.getSize(function() {
+            			this.reset('showStoreSearch');
+            		});
+            		
+            	}
+            	this.toggleMap.showStoreSearch = true;
+	    		this.reset('showStoreSearch');
+            },
+
+            selectSize(index) {
+            	this.sizeList[index].isSelect = !this.sizeList[index].isSelect;
+            },
+
+            toggleColor(index) {
+            	let tempColorMessage = this.goodsColorList[index];
+            	let goodsId = tempColorMessage.goods_id;
+            	let colorId = tempColorMessage.img_color;
+            	this.handleResultTip = tempColorMessage.colorname;
+
+            	this.showHandleResultTip = true;
+
+            	setTimeout(() => {
+            		this.showHandleResultTip = false;
+            	}, 800);
+
+            	this.selectColorGoodsDetail = this.goodsColorMessage[colorId];
+            	this.goodsImageList = this.allColorGoodsImageList[colorId];
+
+            	this.getSize();
+
+            	setTimeout(() => {
+            		this.mySwiper.update();
+            		this.mySwiper.slideTo(0, 500, false);
+            	}, 320);
 
             }
 	    },
@@ -271,25 +350,45 @@
 					let data = response.data;
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);
 					let goodsColorMessage = JSON.parse(data.GoodsColorMessage);
+					this.goodsColorList = goodsColorMessage;
+
 					this.goodsColorMessage = goodsColorMessage;
 
 					let tempImgList = [];
 
+					let tempAllColorGoodsImageList = {};
+					let tempAllColorGoodsMessageList = {};
+
+					// 当前页刷新请求回来的数据结构与在列表页直接记录的数据结构有所不同~此处通过注册在data上的变量对两种情况下的数据进行统一
 					goodsImageMessage.forEach((item, index) => {
-						if(item.img_color == this.colorId) {
-							tempImgList.push({'img_url': item.img_url});
+
+						if(tempAllColorGoodsImageList[item.img_color]) {
+							tempAllColorGoodsImageList[item.img_color].push({'img_url': item.img_url});
+						} else {
+							tempAllColorGoodsImageList[item.img_color] = [{'img_url': item.img_url}];
 						}
+						
 					});
 
-                    for(let i = 0, len = goodsColorMessage.length; i < len; i++) {
-                        let currentItem = goodsColorMessage[i];
-                        if(currentItem.img_color == this.colorId) {
-                            this.selectColorGoodsDetail = currentItem;
-                            break;
-                        }
-                    }
+					goodsColorMessage.forEach((item, index) => {
+						tempAllColorGoodsMessageList[item.img_color] = item;
+					});
 
-					this.goodsImageList = tempImgList;
+					this.allColorGoodsImageList = tempAllColorGoodsImageList;
+					this.goodsColorMessage = tempAllColorGoodsMessageList;
+
+					this.goodsImageList = this.allColorGoodsImageList[this.colorId];
+					this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
+
+					console.log(this.selectColorGoodsDetail, '----------');
+
+                    // for(let i = 0, len = goodsColorMessage.length; i < len; i++) {
+                    //     let currentItem = goodsColorMessage[i];
+                    //     if(currentItem.img_color == this.colorId) {
+                    //         this.selectColorGoodsDetail = currentItem;
+                    //         break;
+                    //     }
+                    // }
 
 					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
 
@@ -306,13 +405,26 @@
 					}
 				});
 
-				this.goodsColorMessage = selectGoodsDetail.dataList;
+				let tempAllColorGoodsImageList = {};
+				let tempAllColorGoodsMessageList = {};
+
+				this.goodsColorList = selectGoodsDetail.dataList;
+
 				selectGoodsDetail.dataList.forEach((item, index) => {
+					tempAllColorGoodsImageList[item.img_color] = item.goodsListEntity;
+					tempAllColorGoodsMessageList[item.img_color] = item;
+
 					if(item.img_color == this.colorId) {
 						this.selectColorGoodsDetail = item;
 						this.goodsImageList = item.goodsListEntity;
 					}
 				});
+
+				this.allColorGoodsImageList = tempAllColorGoodsImageList;
+				this.goodsColorMessage = tempAllColorGoodsMessageList;
+
+				this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
+				this.goodsImageList = this.allColorGoodsImageList[this.colorId];
 
 				this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
 
@@ -789,15 +901,28 @@
         bottom: 0;
         background: rgba(255, 255, 255, .95);
         z-index: 5;
+        transform: translateY(100%);
+		transition: transform .32s;
+    }
+
+    .store_search_box.show {
+    	transform: translateY(0);
     }
 
     .store_search_box h2 {
         padding: .24rem .48rem;
+        border-bottom: 1px solid #efefef;
+    }
+
+    .search_code_list {
+		max-height: 7.4rem;
+		overflow-y: auto;
     }
 
     .search_code_item {
         padding: .24rem .48rem;
         position: relative;
+        border-bottom: 1px solid #efefef;
     }
 
     .select_btn {
@@ -813,5 +938,44 @@
 
     .select_btn.active {
         background-image: url('../../images/common/checkbox_icon_active.png');
+    }
+
+    .store_search_btn_box {
+    	text-align: center;
+    	padding: 0.24rem 0;
+    	color: #fff;
+    }
+
+    .select_size_tip,
+    .store_search {
+    	display: inline-block;
+    	padding: 0.38rem 0.48rem;
+    }
+
+    .select_size_tip {
+    	background: #ddd;
+    }
+
+    .store_search {
+    	background: #ef8200;
+    }
+
+    .handle_result_tip {
+    	position: fixed;
+    	left: -1000px;
+    	bottom: 4rem;
+    	transform: translateX(-50%);
+    	background: rgba(0, 0, 0, .8);
+    	color: #fff;
+    	padding: 10px 20px;
+    	border-radius: 4px;
+    	transition: opacity .5s, left 0s .53s;
+    	opacity: 0;
+    }
+
+    .handle_result_tip.show {
+    	left: 50%;
+    	opacity: 1;
+    	transition: left 0s, opacity .5s .1s;
     }
 </style>
