@@ -4,7 +4,9 @@
 			<img :src="selectColorGoodsDetail.goods_detail_brand_logo || selectColorGoodsDetail.brand_logo" alt="品牌logo" class="brand_logo">
             <div class="link_box">
                 <router-link class="user_index" to="/user_index"></router-link>
-                <router-link class="shopping_bag" to="/shopping_bag"></router-link>
+                <router-link class="shopping_bag" to="/shopping_bag">
+                	<num-tip :num="shoppingBagNum"></num-tip>
+                </router-link>
             </div>
 		</div>
         <div class="goods_title_box">
@@ -39,12 +41,12 @@
 	    	<div class="price_box">
 	    		<div class="user_price_box">
 	    			<span class="money_tip">¥</span>
-	    			<span class="price user_price">{{selectColorGoodsDetail.user_price}}</span>
+	    			<span class="price user_price sansefont_bold">{{selectColorGoodsDetail.user_price}}</span>
 	    			<span>您的专属价</span>
 	    		</div>
 	    		<div class="market_price_box">
 	    			<span class="money_tip">¥</span>
-	    			<span class="price market_price">{{selectColorGoodsDetail.price}}</span>
+	    			<span class="price market_price sansefont_light">{{selectColorGoodsDetail.price}}</span>
 	    		</div>
 	    	</div>
 
@@ -97,6 +99,8 @@
 	import '../../plugins/swiper/swiper.min.css';
 	import '../../../config/dev.env.js';
 
+	import numTip from '../../components/common/num_tip.vue';
+
 	export default {
 		data() {
 	        return {
@@ -119,7 +123,8 @@
 	        	isCollected: false,
 	        	showHandleResultTip: false,
 	        	sizeList: null,
-	        	handleResultTip: ''
+	        	handleResultTip: '',
+	        	shoppingBagNum: 0
 	        }
 	    },
 
@@ -132,6 +137,17 @@
 	    },
 
 	    methods: {
+
+	    	getShoppingBagNum() {
+	    		this.$request.get(this.$interface.GETSTOREAGECOUNT, {
+					'userId': this.$store.state.userId,
+	                'cookieId': this.$store.state.cookieId
+	            }, (response) => {
+	            	let data = response.data;
+	            	this.shoppingBagNum = data;
+				});
+	    	},
+
 	    	getSize(cb) {
 	    		if(this.selectColorGoodsDetail.sale_type == 6) {
 
@@ -182,10 +198,29 @@
 
 	    	toggleGoodsList() {
 	    		if(!this.sizeList) {
-	    			this.getSize();
+	    			this.getSize(function() {
+	    				if(this.sizeList && this.sizeList.length > 0) {
+			    			this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
+			    		} else {
+			    			this.handleResultTip = '没有尺码';
+			    			this.showHandleResultTip = true;
+			    			setTimeout(() => {
+			    				this.showHandleResultTip = false;
+			    			}, 800);
+			    		}
+	    			});
+	    		} else {
+	    			if(this.sizeList && this.sizeList.length > 0) {
+		    			this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
+		    		} else {
+		    			this.handleResultTip = '没有尺码';
+		    			this.showHandleResultTip = true;
+		    			setTimeout(() => {
+		    				this.showHandleResultTip = false;
+		    			}, 800);
+		    		}
 	    		}
 	    		
-	    		this.toggleMap.showSizeList = !this.toggleMap.showSizeList;
 	    		this.reset('showSizeList');
 	    	},
 
@@ -218,7 +253,7 @@
                 }
             },
 
-            addToShoppingBagRequest(index, interfaceName, id) {
+            addToShoppingBagRequest(index, interfaceName, id, cb) {
 
             	let currentSizeGoods = this.sizeList[index];
             	let colorName = currentSizeGoods.color_Name;
@@ -246,7 +281,11 @@
                 };
 
 
-            	this.$request.post(interfaceName, postData, (response) => {});
+            	this.$request.post(interfaceName, postData, (response) => {
+            		if(cb) {
+            			cb();
+            		}
+            	});
             },
 
             addToShoppingBag(e, index) {
@@ -256,18 +295,19 @@
             	let sourceY = sourceElement.top;
             	$('#addToShoppingBagTip').css('top', sourceY + 'px');
             	setTimeout(() => {
-            		$('#addToShoppingBagTip').addClass('animate')
+            		$('#addToShoppingBagTip').addClass('animate');
             	}, 100);
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
-            	}, 1300);
 
-            	if(this.$store.state.userId == 0) {
-            		// 已经登录了使用登录状态下添加到购物车的接口
-            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, this.$store.state.userId);
-            	} else {
-            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId);
-            	}
+            		if(this.$store.state.userId != 0) {
+	            		// 已经登录了使用登录状态下添加到购物车的接口
+	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, this.$store.state.userId, () => {this.getShoppingBagNum()});
+	            	} else {
+	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId, () => {this.getShoppingBagNum()});
+	            	}
+            	
+            	}, 1300);
             },
 
             toggleCollectionRequest(interfaceName, cb) {
@@ -296,10 +336,29 @@
             	if(!this.sizeList) {
             		this.getSize(function() {
             			this.reset('showStoreSearch');
+
+            			if(this.sizeList && this.sizeList.length > 0) {
+		            		this.toggleMap.showStoreSearch = true;
+		            	} else {
+		            		this.handleResultTip = '没有尺码';
+			    			this.showHandleResultTip = true;
+			    			setTimeout(() => {
+			    				this.showHandleResultTip = false;
+			    			}, 800);
+		            	}
             		});
-            		
+            	} else {
+            		if(this.sizeList && this.sizeList.length > 0) {
+	            		this.toggleMap.showStoreSearch = true;
+	            	} else {
+	            		this.handleResultTip = '没有尺码';
+		    			this.showHandleResultTip = true;
+		    			setTimeout(() => {
+		    				this.showHandleResultTip = false;
+		    			}, 800);
+	            	}
             	}
-            	this.toggleMap.showStoreSearch = true;
+            	
 	    		this.reset('showStoreSearch');
             },
 
@@ -384,7 +443,7 @@
 						} else {
 							item.isSelect = false;
 						}
-						
+
 						tempAllColorGoodsMessageList[item.img_color] = item;
 					});
 
@@ -442,6 +501,8 @@
                 }, 500);
 			}
 
+			this.getShoppingBagNum();
+
 			this.$store.commit('HIDE_LOAD');
 
 			// this.$http.get('getContent.php',{
@@ -468,6 +529,10 @@
 			// }).catch(function(err){
 			// 	console.log(err);
 			// });
+		},
+
+		components: {
+			numTip
 		}
 	}
 </script>
@@ -667,6 +732,10 @@
         line-height: 1;
     }
 
+    .user_price_box .money_tip {
+    	font-weight: bolder;
+    }
+
     .price {
     	display: inline-block;
     	vertical-align: text-top;
@@ -675,7 +744,6 @@
 
     .user_price {
     	font-size: 16px;
-    	font-weight: bolder;
     }
 
 	.market_price_box {

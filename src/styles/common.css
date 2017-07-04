@@ -126,3 +126,36 @@ body {
 .confirm_btn {
     display: block;
 }
+
+
+@font-face {
+    font-family: 'sansefont_light';
+    src: url(../font/sanse_w3.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sansefont_bold';
+    src: url(../font/sanse_w6.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
+.sansefont_light {
+    font-family: 'sansefont_light';
+}
+
+.sansefont_bold {
+    font-family: 'sansefont_bold';
+}
+
+/* @font-face {
+    font-family: 'GothamLight';
+    src: url(../font/Gotham-Light.eot);
+    src: local('O'), 
+        url(../font/Gotham-Light.woff) format('woff'),
+        url(../font/Gotham-Light.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+} */

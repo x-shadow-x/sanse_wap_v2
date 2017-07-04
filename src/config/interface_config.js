@@ -33,4 +33,5 @@ export default {
     'CREATE_INSERT_BUYCAR_UNLOGININ': '/Create_Insert_BuyCar_UnLoginIn/', // 未登录状态下添加商品到购物车
     'ADD_FAVORITEGOODS': '/Add_FavoriteGoods/', // 添加商品到我的收藏
     'DELETE_FAVORITEGOODS': '/Delete_FavoriteGoods/', // 取消收藏当前商品
+    'GETSTOREAGECOUNT': '/GetStoreageCount/', // 获取购物车商品数量
 }
