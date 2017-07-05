@@ -83,7 +83,7 @@
                 </li>
             </ul>
             <div class="store_search_btn_box">
-            	<span class="store_search" v-if="isSelectSize">马上查询</span>
+            	<router-link to="/store_search" class="store_search" v-if="isSelectSize">马上查询</router-link>
             	<span class="select_size_tip" v-else>请选择所需尺码</span>
             	
             </div>
@@ -306,7 +306,7 @@
 	            	} else {
 	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId, () => {this.getShoppingBagNum()});
 	            	}
-            	
+
             	}, 1300);
             },
 

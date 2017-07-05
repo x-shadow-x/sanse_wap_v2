@@ -6,6 +6,7 @@ const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue'
 const goodsList = r => require.ensure([], () => r(require('../pages/brand/goods_list.vue')), 'goods')
 const goodsSearch = r => require.ensure([], () => r(require('../pages/brand/goods_search.vue')), 'goods')
 const goodsDetail = r => require.ensure([], () => r(require('../pages/brand/goods_detail.vue')), 'goods')
+const storeSearch = r => require.ensure([], () => r(require('../pages/brand/store_search.vue')), 'goods')
 
 const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
 const settleAccounts = r => require.ensure([], () => r(require('../pages/shopping_bag/settle_accounts.vue')), 'shoppingBag')
@@ -77,6 +78,12 @@ export default [{
         component: goodsDetail,
         meta: {
             title: '商品详情'
+        }
+    }, {
+        path: '/store_search',
+        component: storeSearch,
+        meta: {
+            title: '库存查询'
         }
     }, {
         path: '/shopping_bag',

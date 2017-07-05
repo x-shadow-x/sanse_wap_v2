@@ -15,6 +15,7 @@ const state = {
         '/goods_list': 5,
         '/goods_search': 6,
         '/goods_detail': 7,
+        '/store_search': 8,
 
         '/shopping_bag': 3,
         '/settle_accounts': 8,
