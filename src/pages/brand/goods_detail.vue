@@ -83,7 +83,7 @@
                 </li>
             </ul>
             <div class="store_search_btn_box">
-            	<router-link to="/store_search" class="store_search" v-if="isSelectSize">马上查询</router-link>
+            	<router-link :to="{path: '/store_search', query: {goodsId: goodsId, colorId: colorId, sizeId: sizeId}}" class="store_search" v-if="isSelectSize">马上查询</router-link>
             	<span class="select_size_tip" v-else>请选择所需尺码</span>
             	
             </div>
@@ -116,6 +116,7 @@
 	        	goodsImageList: [], //记录当前颜色商品的大图地址
 	        	goodsId: this.$route.query.goodsId,
 	        	colorId: this.$route.query.colorId,
+	        	sizeId: '',
 	        	toggleMap: {
 	        		showSizeList: false,
 	        		showStoreSearch: false
@@ -175,7 +176,8 @@
 	    		} else {
 	    			this.$request.get(this.$interface.GET_GOODS_SIZE, {
 						'goodsId': this.selectColorGoodsDetail.goods_id,
-	                    'imgColor': this.selectColorGoodsDetail.img_color
+	                    'imgColor': this.selectColorGoodsDetail.img_color,
+	                    'userId': this.$store.state.userId
 	                }, (response) => {
 						let data = response.data;
 
@@ -364,12 +366,13 @@
 
             selectSize(index) {
             	this.sizeList[index].isSelect = !this.sizeList[index].isSelect;
+            	this.sizeId = this.sizeList[index].goods_attr_id;
             },
 
             toggleColor(index) {
             	let tempColorMessage = this.goodsColorList[index];
-            	let goodsId = tempColorMessage.goods_id;
-            	let colorId = tempColorMessage.img_color;
+            	this.goodsId = tempColorMessage.goods_id;
+            	this.colorId = tempColorMessage.img_color;
             	this.handleResultTip = tempColorMessage.colorname;
 
             	if(!tempColorMessage.isSelect) {
@@ -386,8 +389,8 @@
             		this.showHandleResultTip = false;
             	}, 800);
 
-            	this.selectColorGoodsDetail = this.goodsColorMessage[colorId];
-            	this.goodsImageList = this.allColorGoodsImageList[colorId];
+            	this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
+            	this.goodsImageList = this.allColorGoodsImageList[this.colorId];
 
             	this.getSize();
 

@@ -29,7 +29,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://inno.mo2o.com.cn:8092/int_app/VER_SANSE_1_2_5/APPSERVICE.svc',
+                target: 'http://inno.mo2o.com.cn:8092/int_app/VER_SANSE_1_2_6/APPSERVICE.svc',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''

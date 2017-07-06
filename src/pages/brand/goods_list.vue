@@ -67,7 +67,7 @@
 			</div>
 		</div>
 
-        <div class="goods_list_box" id="goodsListBox">
+        <div class="goods_list_box" :class="{top: !showCategoryBar}" id="goodsListBox">
     		<ul class="goods_list" v-if="!isGoodsListEmpty">
                 <li class="goods_item" v-for="(item, index) in goodsList">
                     <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
@@ -871,6 +871,10 @@
         padding-top: 2.6rem;
         box-sizing: border-box;
         background: #fff;
+    }
+
+    .goods_list_box.top {
+    	padding-top: 1.4rem;
     }
 
     .scroller {

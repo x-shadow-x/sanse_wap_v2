@@ -34,4 +34,5 @@ export default {
     'ADD_FAVORITEGOODS': '/Add_FavoriteGoods/', // 添加商品到我的收藏
     'DELETE_FAVORITEGOODS': '/Delete_FavoriteGoods/', // 取消收藏当前商品
     'GETSTOREAGECOUNT': '/GetStoreageCount/', // 获取购物车商品数量
+    'GOODDETAIL_STORE_INVENTORY_QUERY': '/GoodDetail_StoreInventoryQuery/', // 获取库存查询结果列表
 }

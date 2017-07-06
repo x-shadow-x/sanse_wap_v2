@@ -15,38 +15,22 @@
 			</div>
 		</div>
 
-		<div class="record_list_box" id="couponNoUseListBox">
+		<div class="record_list_box" id="storeListBox">
 			<div class="scroller">
 				<ul class="record_list">
-					<!-- <li class="record_item" v-for="(item, index) in couponRecord" :key="item.bonus_id">
-						<div class="coupon_box">
-	                        <img src="../../images/temp_coupon.jpg" alt="优惠券背景图" class="coupon_bg">
-	                        <div class="coupon_value_box">
-	                            <template v-if="item.discount == '0'">
-	                                <span class="coupon_value">{{item.type_money}}</span>
-	                                <span class="quantifier">元</span>
-	                            </template>
-	                            <template v-else>
-	                                <span class="coupon_value">{{item.discount}}</span>
-	                                <span class="quantifier">折</span>
-	                            </template>
-	                        </div>
-	                    </div>
-	                    <div class="intro_box">
-	                        <div class="intro" :class="{spread: item.isSpread}">
-	                            <p class="intro_text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-	                        </div>
-	                        <div class="intro_box_tab" @click="toggleSpread(index)">
-	                            <span class="intro_box_tab_text">适用范围</span><i class="arrow_icon" :class="{spread: item.isSpread}"></i>
-	                        </div>
-	                    </div>
-					</li> -->
 					<li class="record_item">
-						<div class="coupon_box">
-	                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt voluptatum fuga amet eum neque, quos perferendis, corporis doloremque iusto sed, totam? Eos, omnis iste ea ab ad quia deleniti esse.
-	                    </div>
+						<div class="info_box">
+                        	<h2 class="store_name">望海国际广场NEO专柜</h2>
+                        	<p class="address">广东省/江门市/新会区</p>
+                        	<strong class="store_status">L,S,M,XL有货</strong>
+                        </div>
+                        <span class="distance">11566.59公里</span>
 					</li>
 				</ul>
+
+				<!-- <div class="empty_records_tip_box">
+                    <span class="empty_records_tip">商品暂无库存</span>
+                </div> -->
 				<div :class="{transparent: !isMore}">
 					<div id="pullUp">
 						<span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
@@ -62,9 +46,117 @@
 	export default {
 		data() {
 			return {
-				isMore: true
+				isMore: true,
+				goodsId: this.$route.query.goodsId,
+				colorId: this.$route.query.colorId,
+				sizeId: this.$route.query.sizeId,
+				lat: 0, // 经度
+				lng: 0, // 纬度
+				pageIndex: 1
 			}
 		},
+
+		mounted() {
+
+			var geolocation = new BMap.Geolocation(),
+				that = this;
+			    geolocation.getCurrentPosition(function(r){
+			        if(this.getStatus() == BMAP_STATUS_SUCCESS) {
+			            console.log(that);
+			            // var mk = new BMap.Marker(r.point);
+			            that.lng = r.point.lng;
+			            that.lat = r.point.lat;
+
+			            that.$request.get(that.$interface.GOODDETAIL_STORE_INVENTORY_QUERY, {
+		                    'goodsId': that.goodsId,
+		                    'colorId': that.colorId,
+		                    'sizeId': that.sizeId,
+		                    'lat': that.lat,
+		                    'lng': that.lng,
+		                    'pageIndex': that.pageIndex++,
+		                    'pageSize': that.$interface.PAGE_SIZE
+		                }, (response) => {
+		                    let data = response.data;
+		                    console.log(data);
+
+		                    // setTimeout(() => {
+		                    //     this.myScroll.refresh();
+		                    // }, 320);
+		                })
+
+			            // $goods_id,$color_id,$size_id,$lat,$lon,$pageIndex,$pageSize
+			        } else {
+			            console.log('failed:'+this.getStatus());
+			        }        
+			    },{enableHighAccuracy: true});
+
+
+			var pullUpEl,
+				pullUpOffset,
+				generatedCount = 0,
+				tempLoad = 0;
+
+			function pullUpAction () {
+                // this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
+                //     'userId': this.$store.state.userId,
+                //     'type': '1',
+                //     'pageIndex': this.pageIndex++,
+                //     'pageSize': this.$interface.PAGE_SIZE
+                // }, (response) => {
+                //     let data = response.data;
+                //     pretreatData(data);
+                //     this.couponRecord.push(...data);
+
+                //     if(data.length == this.$interface.PAGE_SIZE) {
+                //         // 因为接口返回的记录数据不是每个都有总数这一条~所以此处认为只要第一页数据的条数等于请求是声明的一页条数~就认为需要分页
+                //         this.isMore = true;
+                //     } else {
+                //         this.isMore = false;
+                //     }
+
+                //     setTimeout(() => {
+                //         this.myScroll.refresh();
+                //     }, 320);
+                // })
+			}
+
+			function loaded() {
+				pullUpEl = document.getElementById('pullUp');
+				pullUpOffset = pullUpEl.offsetHeight;
+				var that = this;
+
+				this.myScroll = new iScroll('storeListBox', {
+					useTransition: true,
+					vScrollbar: false,
+					onRefresh: function () {
+						if (pullUpEl.className.match('loading')) {
+							pullUpEl.className = '';
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
+						}
+					},
+					onScrollMove: function () {
+						if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
+							pullUpEl.className = 'flip';
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '释放加载';
+							this.maxScrollY = this.maxScrollY;
+						} else if (this.y > (this.maxScrollY + 5) && pullUpEl.className.match('flip')) {
+							pullUpEl.className = '';
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '上拉加载更多';
+							this.maxScrollY = pullUpOffset;
+						}
+					},
+					onScrollEnd: function () {
+						if (pullUpEl.className.match('flip')) {
+							pullUpEl.className = 'loading';
+							pullUpEl.querySelector('.pullUpLabel').innerHTML = '加载...';
+							pullUpAction.bind(that)();	// Execute custom function (ajax call?)
+						}
+					}
+				});
+			}
+
+            loaded.bind(this)();
+		}
 	}
 </script>
 
@@ -78,13 +170,13 @@
 		height: 100%;
 		background: #fff;
 		z-index: 3;
-		text-align: center;
 	}
 
 	.goods_info_box {
 		background: #000;
 		color: #fff;
 		padding: 0.36rem 0;
+		text-align: center;
 	}
 
 	.goods_img_box,
@@ -122,7 +214,7 @@
 
 	.record_list_box {
 		position: relative;
-		width: 96%;
+		width: 100%;
 		height: 100%;
 		margin: 0 auto;
 		overflow: hidden;
@@ -133,20 +225,8 @@
         z-index: 1;
         width: 100%;
         padding: 0;
+        min-height: 100%;
     }
-
-	.record_list {
-		padding: 0.966184rem 5% 0 5%;
-	}
-
-	.record_item {
-		margin: 0 auto 30px auto;
-	}
-
-	.transparent {
-		visibility: hidden;
-        display: none;
-	}
 
 	#pullUp {
 		line-height: 40px;
@@ -167,4 +247,63 @@
 		display: inline-block;
 		vertical-align: middle;
 	}
+
+	.record_item {
+		position: relative;
+		border-bottom: 1px solid #efefef;
+		padding: 0.32rem;
+		line-height: 1.6;
+	}
+
+	.info_box {
+		display: inline-block;
+		vertical-align: middle;
+		max-width: 70%;
+	}
+
+	.store_name,
+	.store_status {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		font-weight: bolder;
+	}
+
+	.address {
+		color: #7f7f7f;
+	}
+
+	.distance {
+		position: absolute;
+		right: .32rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: #7f7f7f;
+	}
+
+	.transparent {
+		visibility: hidden;
+        display: none;
+	}
+
+	.empty_records_tip_box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .empty_records_tip {
+        position: absolute;
+        top: 36%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: url('../../images/store_search/empty_store_icon.png') center top no-repeat;
+        background-size: 60px auto;
+        padding-top: 70px;
+        color: #939393;
+        text-align: center;
+        padding-top: 70px;
+    }
 </style>

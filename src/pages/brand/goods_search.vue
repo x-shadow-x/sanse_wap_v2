@@ -94,7 +94,7 @@
 
         mounted() {
             this.keyWord = this.$store.state.keyWord;
-            this.searchHistory = window.localStorage.historyKeyWordList != '' ? window.localStorage.historyKeyWordList.split(',') : [];
+            this.searchHistory = (window.localStorage.historyKeyWordList && window.localStorage.historyKeyWordList != '') ? window.localStorage.historyKeyWordList.split(',') : [];
 
             this.$request.get(this.$interface.GET_SEARCH_LOG_LIST, {
                 'pageIndex': this.pageIndex++,
