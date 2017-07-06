@@ -4,34 +4,31 @@
 
         <div class="info_box">
             <div class="info_item">
-                <span class="fl">姓名</span>
-                <input type="text" class="fr info_input" placeholder="请输入您的姓名" v-model="userName">
+                <span class="item_name">昵称</span>
+                <input type="text" class="info_input" placeholder="昵称不能为空" v-model="userName">
             </div>
-        </div>
-
-        <div class="info_box">
             <div class="info_item">
-                <span class="fl">性别</span>
-                <div class="sex_box fr">
-                    <div class="male_box" @click="toggleSex(0)">
-                        <i class="sex_icon male_icon"></i>
-                        <span class="check_btn" :class="{active: sexValue == 0}"></span>
-                    </div>
-                    <div class="female_box" @click="toggleSex(1)">
-                        <i class="sex_icon female_icon"></i>
-                        <span class="check_btn" :class="{active: sexValue == 1}"></span>
-                    </div>
-                </div>
+                <span class="item_name">邮箱</span>
+                <input type="email" class="info_input" v-model="email" placeholder="键入邮箱获取最新资讯">
+            </div>
+            <div class="info_item">
+                <span class="item_name">性别</span>
+                <span class="male_box" v-if="sexValue == 0">
+                    <i class="sex_icon male_icon"></i>
+                    <span>男</span>
+                </span>
+                <span class="female_box" v-if="sexValue == 1">
+                    <i class="sex_icon female_icon"></i>
+                    <span>女</span>
+                </span>
+                <span class="change_sex" @click="toggleSex($event)"></span>
             </div>
             <div class="info_item">
                 <span class="fl">生日</span>
                 <input type="text" id="birthdayInput" class="fr info_input" v-model="birthdayDate" placeholder="请选择您的生日">
                 <div id="datePlugin"></div>
             </div>
-            <div class="info_item">
-                <span class="fl">邮箱</span>
-                <input type="email" class="fr info_input" v-model="email" placeholder="键入邮箱获取最新资讯">
-            </div>
+            
         </div>
 
         <div class="info_box">
@@ -83,8 +80,17 @@
             $('#birthdayInput').date();
         },
         methods: {
-            toggleSex(value) {
-                this.sexValue = value;
+            toggleSex(e) {
+                console.log($(e.target));
+                $(e.target).addClass('rotate');
+                setTimeout(() => {
+                    $(e.target).removeClass('rotate');
+                }, 320);
+                if(this.sexValue == 0) {
+                    this.sexValue = 1;
+                } else {
+                    this.sexValue = 0;
+                }
             },
             jump(path) {
                 window.location = path;
@@ -104,7 +110,6 @@
         overflow: visible;
         background: #efefef;
         box-sizing: border-box;
-        padding-top: 0.29rem;
     }
 
     .info_box {
@@ -113,11 +118,12 @@
     }
 
     .info_box + .info_box {
-        margin-top: 0.29rem;
+        margin-top: 3px;
     }
 
     .info_item {
-        padding: 0 0.483rem 0 0.242rem;
+        position: relative;
+        padding: 0 0.48rem 0 0.24rem;
         overflow: hidden;
     }
 
@@ -125,17 +131,23 @@
         border-top: 1px solid #efefef;
     }
 
+    .item_name {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 20px;
+    }
+
     .info_input {
         height: 1.4rem;
         border: none;
         outline: none;
         width: 50%;
-        text-align: right;
         color: #7f7f7f;
+        vertical-align: middle;
     }
 
     .male_box, .female_box,
-    .sex_icon, .check_btn {
+    .sex_icon {
         display: inline-block;
         vertical-align: middle;
     }
@@ -144,15 +156,27 @@
         margin-right: 0.58rem;
     }
 
-    .sex_icon, .check_btn {
-        width: 16px;
-        height: 16px;
+    .sex_icon {
+        width: 14px;
+        height: 14px;
         background: url('../../images/user_info/sex_btn.png') center no-repeat;
         background-size: 100% auto;
     }
 
-    .check_btn.active {
-        background-image: url('../../images/user_info/sex_btn_active.png');
+    .change_sex {
+        position: absolute;
+        right: .48rem;
+        top: 50%;
+        width: 14px;
+        height: 14px;
+        margin-top: -7px;
+        background: url('../../images/user_info/toggle_icon.png') center no-repeat;
+        background-size: 14px auto;
+    }
+
+    .change_sex.rotate {
+        transition: transform .32s; 
+        transform: rotate(180deg);
     }
 
     .male_icon {

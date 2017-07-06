@@ -83,8 +83,7 @@
 		                    //     this.myScroll.refresh();
 		                    // }, 320);
 		                })
-
-			            // $goods_id,$color_id,$size_id,$lat,$lon,$pageIndex,$pageSize
+		                
 			        } else {
 			            console.log('failed:'+this.getStatus());
 			        }        
