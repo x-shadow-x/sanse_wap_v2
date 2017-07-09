@@ -929,7 +929,6 @@
             dayScroll.refresh();
 
             resetInitDete();
-            console.log(yearScroll.scrollTo);
             yearScroll.scrollTo(0, initY * 50 - 50, 100, true);
             monthScroll.scrollTo(0, initM * 50 - 50, 100, true);
             dayScroll.scrollTo(0, initD * 50 - 50, 100, true);
@@ -995,6 +994,9 @@
                 }
                 $("#datePage").hide();
                 $("#dateshadow").hide();
+                if (opts.cb && typeof opts.cb == 'function') {
+                    opts.cb();
+                }
             });
             $("#datecancle").click(function() {
                 $("#datePage").hide();
@@ -1012,12 +1014,11 @@
         function init_iScrll() {
             var strY = $("#yearwrapper ul li:eq(" + indexY + ")").html().substr(0, $("#yearwrapper ul li:eq(" + indexY + ")").html().length - 1);
             var strM = $("#monthwrapper ul li:eq(" + indexM + ")").html().substr(0, $("#monthwrapper ul li:eq(" + indexM + ")").html().length - 1);
-            console.log(indexM)
+
             yearScroll = new iScroll("yearwrapper", {
                 snap: "li",
                 vScrollbar: false,
                 onScrollEnd: function() {
-                    console.log(indexY);
                     indexY = (this.y / 50) * (-1) + 2;
                     opts.endday = checkdays(strY, strM);
                     $("#daywrapper ul").html(createDAY_UL());
@@ -1175,7 +1176,6 @@
         function createDAY_UL() {
             $("#daywrapper ul").html("");
             var str = "<li>&nbsp;</li><li>&nbsp;</li>";
-            console.log(opts.beginday, '=============', opts.endday);
             for (var i = opts.beginday; i <= opts.endday; i++) {
                 str += '<li>' + i + '日</li>';
             }

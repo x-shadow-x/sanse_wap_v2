@@ -5,11 +5,11 @@
         <div class="info_box">
             <div class="info_item">
                 <span class="item_name">昵称</span>
-                <input type="text" class="info_input" placeholder="昵称不能为空" v-model="userName">
+                <input type="text" class="info_input" placeholder="昵称不能为空" v-model="userName" @blur="saveUserName">
             </div>
             <div class="info_item">
                 <span class="item_name">邮箱</span>
-                <input type="email" class="info_input" v-model="email" placeholder="键入邮箱获取最新资讯">
+                <input type="email" class="info_input" v-model="email" placeholder="键入邮箱获取最新资讯" @blur="saveEmail">
             </div>
             <div class="info_item">
                 <span class="item_name">性别</span>
@@ -28,7 +28,7 @@
                 <input type="text" id="birthdayInput" class="info_input" v-model="birthdayDate" placeholder="请选择您的生日">
                 <div id="datePlugin"></div>
             </div>
-            
+
         </div>
 
         <div class="info_box">
@@ -52,11 +52,11 @@
             </div>
         </div>
 
-        <div class="confirm_btn_box">
+        <!-- <div class="confirm_btn_box">
             <span class="confirm_btn">完成</span>
-        </div>
+        </div> -->
         <div class="tip" :class="{show: isShowTip}">{{tip}}</div>
-        <div class="validate_hover">
+        <div class="validate_hover" v-if="inputValidateStatus">
             <div class="validate_box">
                 <h2 class="validate_box_title">发送验证码</h2>
                 <template v-if="countDown > 0">
@@ -73,11 +73,12 @@
                     <div class="input_hover" @click="focusValidateInput">
                         <span v-for="(item, index) in validateNumList" class="input_tip">{{item}}<i v-if="index == inputTipIndex && isValidateInputFocus || index == 5 && inputTipIndex == 6 && isValidateInputFocus" class="cursor" :class="{last: inputTipIndex == 6}"></i></span>
                     </div>
-                    <input type="text" class="validate_input" id="validateInput" maxlength="6" v-model="validateNum">
+                    <input type="text" class="validate_input" id="validateInput" maxlength="6" v-model="validateNum" :class="{ios: isIOS}" @blur="handleBlur">
                     <div class="validate_code_cell_box">
                         <span class="validate_code_cell_tip" v-for="item in validateNumList" :class="{transparent: item == '$'}">{{item}}</span>
                     </div>
                 </div>
+                <p class="close_validate" @click="closeValidate">关闭弹窗</p>
             </div>
         </div>
     </div>
@@ -102,6 +103,7 @@
                 tip: '错误提示',
                 isShowTip: false,
                 countDown: 100,
+                inputValidateStatus: false,
                 validateNum: '',
                 isValidateInputFocus: false
             }
@@ -119,14 +121,37 @@
 
             inputTipIndex: function() {
                 return this.validateNum.length;
+            },
+
+            isIOS: function() {
+            // 验证码输入框实际光标需要隐藏~但安卓和ios上的处理方式不同~需分开处理
+                let userAgent = navigator.userAgent;
+                // return ((userAgent.indexOf('Android') > -1) || (userAgent.indexOf('Linux')) > -1);
+                return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
             }
         },
 
         mounted() {
-            $('#birthdayInput').date();
+            $('#birthdayInput').date({
+                cb: () => {
+                    // todo----  this.birthdayDate
+                    this.birthdayDate = $('#birthdayInput').val();
+                    console.log('保存生日日期');
+                }
+            });
         },
 
         methods: {
+            saveUserName() {
+                // todo-------------- this.userName
+                // alert();
+                console.log('保存昵称');
+            },
+            saveEmail() {
+                // todo-------------- this.email
+                // alert();
+                console.log('保存邮箱');
+            },
             toggleSex(e) {
                 $(e.target).addClass('rotate');
                 setTimeout(() => {
@@ -137,6 +162,7 @@
                 } else {
                     this.sexValue = 0;
                 }
+                console.log('保存性别');
             },
 
             jump(path) {
@@ -157,14 +183,30 @@
                     }, 1000);
                     return;
                 }
+
+                this.inputValidateStatus = true;
                 console.log('发送验证码');
             },
 
             focusValidateInput() {
                 $('#validateInput').focus();
                 this.isValidateInputFocus = true;
+            },
+
+            handleBlur() {
+                this.isValidateInputFocus = false;
+            },
+
+            closeValidate() {
+                this.inputValidateStatus = false;
             }
-        }
+        },
+
+        watch: {
+            '$route' (to, from) {
+                alert(123);
+            }
+        },
 
     }
 </script>
@@ -202,7 +244,7 @@
 
     .validate_input_box {
         display: inline-block;
-        margin-top: 10px;
+        margin-top: 20px;
         position: relative;
     }
 
@@ -215,7 +257,10 @@
         z-index: 2;
         color: transparent;
         background: none;
-        visibility: hidden;
+    }
+
+    .validate_input.ios {
+        font-size: 0;
     }
 
     .input_hover {
@@ -242,6 +287,7 @@
         font-family: 'sansefont_bold';
         font-size: 14px;
         border-bottom: 1px solid #b2b2b2;
+        padding: 0 4px;
     }
 
     .validate_code_cell_tip.transparent,
@@ -254,6 +300,7 @@
         font-family: 'sansefont_bold';
         font-size: 14px;
         border-bottom: 1px solid #b2b2b2;
+        padding: 0 4px;
     }
 
     .cursor {
@@ -361,7 +408,7 @@
     }
 
     .change_sex.rotate {
-        transition: transform .32s; 
+        transition: transform .32s;
         transform: rotate(180deg);
     }
 
@@ -409,7 +456,7 @@
     }
 
     .confirm_btn_box {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -432,5 +479,10 @@
         left: 50%;
         opacity: 1;
         transition: left 0s, opacity .5s .1s;
+    }
+
+    .close_validate {
+        text-decoration: underline;
+        margin-top: 24px;
     }
 </style>
