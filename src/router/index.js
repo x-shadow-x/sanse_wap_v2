@@ -183,7 +183,7 @@ export default [{
             title: '待收货订单'
         }
     }, {
-        path: '/order_detail/:order_id',
+        path: '/order_detail',
         component: orderDetail,
         meta: {
             title: '订单详情'

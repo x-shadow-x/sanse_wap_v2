@@ -16,7 +16,7 @@
             <div class="scroller">
                 <ul class="record_list" v-if="orderRecord.length > 0">
                     <li class="record_item" v-for="item in orderRecord">
-                        <router-link :to="'/order_detail/' + item.order_id">
+                        <router-link :to="{path: '/order_detail', query: {orderId: item.order_id}}">
                             <div class="order_sum_box">
                                 <span class="money_tip">¥</span><span class="order_sum">{{item.order_amount}}</span>
                             </div>
