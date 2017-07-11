@@ -2,13 +2,13 @@
 	<div class="goods_detail_main">
 		<div class="order_info_item_box">
             <div class="num_price_box">
-                <p>¥0.00</p>
-                <p>共1款</p>
+                <p>¥{{orderEntity.order_amount}}</p>
+                <p>共{{orderEntity.totalGoodsNum}}款</p>
             </div>
             <div class="order_info">
-                <p>单号：00001170710143139710399</p>
-                <p>日期：2017-07-10 14:31</p>
-                <span class="order_status">待发货</span>
+                <p>单号：{{orderEntity.order_sn}}</p>
+                <p>日期：{{orderEntity.createTime}}</p>
+                <span class="order_status">{{orderEntity.orderStatus}}</span>
             </div>
         </div>
 
@@ -20,7 +20,7 @@
                 </div>
                 <div class="goods_info_box">
                     <h2 class="goods_name">{{item.goods_Name}}</h2>
-                    
+
                     <div class="relative_box">
                         <p>颜色：{{item.colorName}}</p>
                         <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
@@ -42,22 +42,22 @@
             <h2 class="info_item_title">资费详情</h2>
             <div class="item_box">
                 <div class="info_item">
-                    <span class="item_name">商品件数：</span><span class="item_value">1件</span>
+                    <span class="item_name">商品件数：</span><span class="item_value">{{orderEntity.totalGoodsNum}}件</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">商品总价：</span><span class="item_value">¥669.00</span>
+                    <span class="item_name">商品总价：</span><span class="item_value">¥{{orderEntity.totalMarketPrice}}</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">优惠金额：</span><span class="item_value">¥166.00</span>
+                    <span class="item_name">优惠金额：</span><span class="item_value">¥{{orderEntity.totalYouHuiPrice}}</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">余额支付：</span><span class="item_value">¥166.00</span>
+                    <span class="item_name">余额支付：</span><span class="item_value">¥{{orderEntity.surplus}}</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">运<span class="v_hidden">占位</span>费：</span><span class="item_value">¥166.00</span>
+                    <span class="item_name">运<span class="v_hidden">占位</span>费：</span><span class="item_value">¥{{orderEntity.shipping_fee}}</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">订单金额：</span><span class="item_value">¥0.00</span>
+                    <span class="item_name">订单金额：</span><span class="item_value">¥{{orderEntity.order_amount}}</span>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
             <h2 class="info_item_title">收货地址详情</h2>
             <div class="item_box">
                 <div class="info_item">
-                    <span class="item_name">收&nbsp;&nbsp;件&nbsp;&nbsp;人：</span><span class="item_value">1件</span>
+                    <span class="item_name">收&nbsp;&nbsp;件&nbsp;&nbsp;人：</span><span class="item_value">{{orderEntity.consignee}}</span>
                 </div>
                 <div class="info_item">
                     <span class="item_name">手机号码：</span><span class="item_value">{{orderEntity.mobile}}</span>
