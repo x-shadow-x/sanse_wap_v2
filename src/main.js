@@ -19,17 +19,40 @@ Vue.prototype.HOST = '/api'
 Vue.prototype.$request = request
 Vue.prototype.$interface = interfaceConfig
 
+function init() {
+    // store.commit('SET_USER_ID', '304014');
+    // store.commit('SET_COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+    let userId = localStorage.getItem('USER_ID');
+    let cookieId = localStorage.getItem('COOKIE_ID');
 
-if ('addEventListener' in document) {
-    document.addEventListener('DOMContentLoaded', function() {
-        FastClick.attach(document.body);
-    }, false);
+    if (cookieId) {
+        store.commit('SET_COOKIE_ID', cookieId);
+    } else {
+        localStorage.setItem('COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+        cookieId = '23456006805d970d5438a354dc019fc295614979';
+        store.commit('SET_COOKIE_ID', cookieId);
+    }
+
+    if (userId) {
+        store.commit('SET_USER_ID', userId);
+    } else {
+        localStorage.setItem('USER_ID', '304014');
+        userId = '304014';
+        store.commit('SET_USER_ID', userId);
+    }
+
+    if ('addEventListener' in document) {
+        document.addEventListener('DOMContentLoaded', function() {
+            FastClick.attach(document.body);
+        }, false);
+    }
 }
+
+init();
 
 Vue.use(VueRouter)
 const router = new VueRouter({
     mode: 'history',
-    base: '/vue_mobile/',
     routes
 })
 
