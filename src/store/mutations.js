@@ -5,6 +5,7 @@ const HIDE_LOAD = 'HIDE_LOAD'
 const SET_KEY_WORD = 'SET_KEY_WORD'
 const SET_GOODS_LIST_RECORD = 'SET_GOODS_LIST_RECORD'
 const PUSH_GOODS_LIST_RECORD = 'PUSH_GOODS_LIST_RECORD'
+const SET_USER_INFO = 'SET_USER_INFO'
 
 export default {
 
@@ -34,5 +35,9 @@ export default {
 
     [PUSH_GOODS_LIST_RECORD](state, data) {
         state.goodsListRecord.push(...data);
+    },
+
+    [SET_USER_INFO](state, data) {
+        state.uesrInfo = data;
     }
 }

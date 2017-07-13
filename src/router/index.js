@@ -1,6 +1,7 @@
 import App from '../App'
 
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
+const login = r => require.ensure([], () => r(require('../pages/user/login.vue')), 'login')
 
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
 const goodsList = r => require.ensure([], () => r(require('../pages/brand/goods_list.vue')), 'goods')
@@ -56,6 +57,12 @@ export default [{
             title: '首页'
         }
     }, {
+        path: '/login',
+        component: login,
+        meta: {
+            title: '登录'
+        }
+    },{
         path: '/brand',
         component: brand,
         meta: {

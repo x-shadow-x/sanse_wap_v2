@@ -3,7 +3,7 @@
 		<div class="main_content" @scroll="handleScroll($event)" @touchstart="retract">
 			<div class="info_box" id="infoBox">
 				<div class="point_value" :style="{marginBottom: marginBottom + '%'}">
-					<span class="integer" :style="{fontSize: fontSize + 'px'}">{{redPackageValueInteger}}.</span>{{redPackageValueDecimals}}元
+					<span class="integer" :style="{fontSize: fontSize + 'px'}">{{pointValue}}</span>积分
 				</div>
 			</div>
 			<div class="record_list_box" id="recordListBox" @touchstart.stop="spread">
@@ -46,7 +46,7 @@
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
 				isMore: false,
-				redPackageValue: 756.32,
+				pointValue: 0,
 				pointRecord: [],
 				fontSize: FONTSIZE,
 				marginBottom: MARGINBOTTOM, //红包数值所在盒子的底部外边距范围为(-20%~10%)
@@ -54,15 +54,6 @@
 				TOPTHRESHOLD: 0, // 红包列表所能到达的距离顶部最小的距离
 				originalOffsetTop: 0, // 页面加载后红包列表距离顶部的原始距离
 				opacity: 1 // 使用红包按钮的透明度~范围为(0~1)
-			}
-		},
-
-		computed: {
-			redPackageValueInteger() {
-				return Math.floor(this.redPackageValue)
-			},
-			redPackageValueDecimals() {
-				return this.redPackageValue.toFixed(2).split('.')[1];
 			}
 		},
 
@@ -89,11 +80,30 @@
 					$('.main_content').animate({scrollTop: 0}, 500);
 					this.isSpread = false;
 				}
-
 			}
 		},
 
 		mounted() {
+
+			if(!this.$helper.isLogin()) {
+                this.$router.push('/login');
+            }
+
+            if(this.$store.state.uesrInfo.Points) {
+            	this.pointValue = this.$store.state.uesrInfo.Points;
+            } else {
+            	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+	                'userId': localStorage.getItem('USER_ID'),
+	                'jpushId': this.$store.state.jpushId,
+	                'channelId': this.$store.state.channelId,
+	                'appId': this.$store.state.appId,
+	                
+	            }, (res) => {
+	                let data = res.data;
+	                this.pointValue = data.Points;
+	                this.$store.commit('SET_USER_INFO', data);
+	            })
+            }
 
 			function handleDate(data) {
 				data.forEach(function(item) {

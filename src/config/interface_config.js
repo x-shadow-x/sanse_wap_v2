@@ -35,4 +35,14 @@ export default {
     'DELETE_FAVORITEGOODS': '/Delete_FavoriteGoods/', // 取消收藏当前商品
     'GETSTOREAGECOUNT': '/GetStoreageCount/', // 获取购物车商品数量
     'GOODDETAIL_STORE_INVENTORY_QUERY': '/GoodDetail_StoreInventoryQuery/', // 获取库存查询结果列表
+    'SEND_SMS': '/Send_SMS/', // 获取验证码
+    'LOGIN_BY_CAPTCHA_BIND_PUSH': '/LoginInByCaptchaBindPush/', // 获取验证码
+    'GET_USERINFO_PUSH': '/GetUserInfo_Push/', // 获取用户信息
+    'GET_APP_ORDERCOUNT_BY_USERID': '/Get_APP_OrderCount_ByUserID/', // 获取个人中心订单信息
+
+    /**
+     * {userId}&{userName}&{sex}&{birthday}&{email}
+     * userName为昵称
+     */
+    'UPDATEUSERS': '/UpdateUsers/', // 获取个人更新个人信息
 }

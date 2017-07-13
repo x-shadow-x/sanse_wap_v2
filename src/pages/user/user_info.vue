@@ -5,19 +5,19 @@
         <div class="info_box">
             <div class="info_item">
                 <span class="item_name">昵称</span>
-                <input type="text" class="info_input" placeholder="昵称不能为空" v-model="userName" @blur="saveUserName">
+                <input type="text" class="info_input" placeholder="昵称不能为空" v-model="userInfo.UserName" @blur="saveUserName">
             </div>
             <div class="info_item">
                 <span class="item_name">邮箱</span>
-                <input type="email" class="info_input" v-model="email" placeholder="键入邮箱获取最新资讯" @blur="saveEmail">
+                <input type="email" class="info_input" v-model="userInfo.Email" placeholder="键入邮箱获取最新资讯" @blur="saveEmail">
             </div>
             <div class="info_item">
                 <span class="item_name">性别</span>
-                <span class="male_box" v-if="sexValue == 0">
+                <span class="male_box" v-if="userInfo.Sex == 0">
                     <i class="sex_icon male_icon"></i>
                     <span>男</span>
                 </span>
-                <span class="female_box" v-if="sexValue == 1">
+                <span class="female_box" v-if="userInfo.Sex == 1">
                     <i class="sex_icon female_icon"></i>
                     <span>女</span>
                 </span>
@@ -25,7 +25,7 @@
             </div>
             <div class="info_item">
                 <span class="item_name">生日</span>
-                <input type="text" id="birthdayInput" class="info_input" v-model="birthdayDate" placeholder="请选择您的生日">
+                <input type="text" id="birthdayInput" class="info_input" v-model="userInfo.Birthday" placeholder="请选择您的生日">
                 <div id="datePlugin"></div>
             </div>
 
@@ -34,7 +34,7 @@
         <div class="info_box">
             <div class="info_item">
                 <span class="item_name">手机</span>
-                <input type="text" :placeholder="currentPhoneNumber" v-model="newPhoneNumber" id="userPhone">
+                <input type="text" :placeholder="userInfo.MobileNo" v-model="newPhoneNumber" id="userPhone">
                 <div class="bind_phone_box">
                     <span class="bind_phone_tip" v-if="isValidateStatus" @click="validatePhoneHanlde">验证手机</span>
                     <span class="bind_phone_tip" v-else @click="bindPhoneHanlde">{{bindPhoneTip}}</span>
@@ -42,7 +42,7 @@
             </div>
             <div class="info_item">
                 <span class="item_name">微信</span>
-                <div class="binded_wechat_box" v-if="isBindWechat">
+                <div class="binded_wechat_box" v-if="userInfo.IsBindWetchat == 1">
                     <i class="wechat_icon"></i>
                     <span class="binded_wechat_tip">已绑定</span>
                 </div>
@@ -59,9 +59,9 @@
         <div class="validate_hover" v-if="inputValidateStatus">
             <div class="validate_box">
                 <h2 class="validate_box_title">发送验证码</h2>
-                <template v-if="countDown > 0">
+                <template v-if="restTime > 0">
                     <div>
-                        <span>已发送至{{newPhoneNumber}}</span><span>({{countDown}}s)</span>
+                        <span>已发送至{{newPhoneNumber}}</span><span>({{restTime}}s)</span>
                     </div>
                 </template>
                 <template v-else>
@@ -91,20 +91,19 @@
     export default {
         data() {
             return {
-                userName: '',
-                sexValue: 0,
-                birthdayDate: '',
-                email: '',
-                isBindWechat: false,
-                bindPhoneTip: '绑定手机',
-                currentPhoneNumber: '13535124518',
+                userInfo: {},
+                oldUserName: '', // 保存还未修改前的用户昵称~当用户因为误操作导致昵称为空并提交新编辑的信息的时候默认使用回最初的昵称
                 newPhoneNumber: '',
+
+
+                
                 isValidateStatus: false,
                 tip: '错误提示',
                 isShowTip: false,
-                countDown: 100,
+                isOverdue: false,
+                restTime: this.$store.state.restTime,
                 inputValidateStatus: false,
-                validateNum: '',
+                validateNum: '', // 验证码
                 isValidateInputFocus: false
             }
         },
@@ -128,28 +127,104 @@
                 let userAgent = navigator.userAgent;
                 // return ((userAgent.indexOf('Android') > -1) || (userAgent.indexOf('Linux')) > -1);
                 return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+            },
+
+            bindPhoneTip: function() {
+                return this.userInfo.IsBindMobile == 1 ? '修改绑定' : '绑定手机';
             }
         },
 
         mounted() {
+
+            if(!this.$helper.isLogin()) {
+                this.$router.push('/login');
+            }
+
+            if(this.$store.state.uesrInfo.MobileNo) {
+                // 此处MobileNo仅仅是用来判断是否已经获取过uesrInfo并存储到store了
+                this.userInfo = this.$store.state.uesrInfo;
+                this.oldUserName = this.userInfo.UserName;
+            } else {
+                this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+                    'userId': localStorage.getItem('USER_ID'),
+                    'jpushId': this.$store.state.jpushId,
+                    'channelId': this.$store.state.channelId,
+                    'appId': this.$store.state.appId,
+                    
+                }, (res) => {
+                    let data = res.data;
+                    this.userInfo = data;
+                    this.$store.commit('SET_USER_INFO', data);
+                    this.oldUserName = this.userInfo.UserName;
+                })
+            }
+
             $('#birthdayInput').date({
                 cb: () => {
-                    // todo----  this.birthdayDate
-                    this.birthdayDate = $('#birthdayInput').val();
+                    this.userInfo.Birthday = $('#birthdayInput').val();
+                    this.updateUserInfo();
                     console.log('保存生日日期');
                 }
             });
         },
 
         methods: {
+            updateUserInfo() {
+                // {userId}&{userName}&{sex}&{birthday}&{email}
+                this.$request.get(this.$interface.UPDATEUSERS, {
+                    'userId': localStorage.getItem('USER_ID'),
+                    'userName': this.userInfo.UserName || this.oldUserName,
+                    'sex': this.userInfo.Sex,
+                    'birthday': this.userInfo.Birthday,
+                    'email': this.userInfo.Email || ' ', // 若没有输入邮箱~则必须传入空格
+                }, (res) => {
+                    let data = res.data;
+                    console.log(data)
+                })
+            },
+
+            sendIdentifyingCode() {
+                
+                if(this.isOverdue) {
+                    return;
+                }
+                
+                if(!this.phoneNumber) {
+                    this.isShowAlert = true;
+                    return;
+                }
+                this.dataInterface = this.$interface.SEND_SMS;
+                this.$request.get(this.$interface.SEND_SMS, {
+                    'userName' : this.phoneNumber,
+                    'smsType' : 5,
+                    'companyId' : this.$store.state.companyId,
+                    'brandId' : this.$store.state.brandId
+                }, (res) => {
+                    this.tipTitleF = '提示';
+                    this.tipContentF = '信息已发送，请耐心等待';
+                    this.isShowAlert = true;
+                    this.isOverdue = true;
+                })
+
+                let timer = setInterval(() => {
+                    if(this.restTime > 1) {
+
+                        this.restTime--;
+                    } else {
+                        this.isOverdue = false;
+                        this.restTime = this.$store.state.restTime;
+                        this.sendCodeTip = '发送验证码';
+                        clearTimeout(timer);
+                    }
+                }, 1000);
+            },
+
             saveUserName() {
-                // todo-------------- this.userName
-                // alert();
+                this.updateUserInfo();
                 console.log('保存昵称');
             },
             saveEmail() {
-                // todo-------------- this.email
-                // alert();
+                this.updateUserInfo();
                 console.log('保存邮箱');
             },
             toggleSex(e) {
@@ -157,11 +232,12 @@
                 setTimeout(() => {
                     $(e.target).removeClass('rotate');
                 }, 320);
-                if(this.sexValue == 0) {
-                    this.sexValue = 1;
+                if(this.userInfo.Sex == 0) {
+                    this.userInfo.Sex = 1;
                 } else {
-                    this.sexValue = 0;
+                    this.userInfo.Sex = 0;
                 }
+                this.updateUserInfo();
                 console.log('保存性别');
             },
 
@@ -185,6 +261,9 @@
                 }
 
                 this.inputValidateStatus = true;
+
+                // 发送验证码
+                this.sendIdentifyingCode();
                 console.log('发送验证码');
             },
 

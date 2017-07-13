@@ -8,6 +8,7 @@ import './config/flexible_css.js'
 import './config/flexible.js'
 import request from './config/request.js'
 import interfaceConfig from './config/interface_config.js'
+import helper from './config/helper.js'
 import store from './store'
 import axios from 'axios'
 
@@ -18,6 +19,7 @@ Vue.prototype.$http = axios
 Vue.prototype.HOST = '/api'
 Vue.prototype.$request = request
 Vue.prototype.$interface = interfaceConfig
+Vue.prototype.$helper = helper
 
 function init() {
     // store.commit('SET_USER_ID', '304014');
@@ -27,19 +29,19 @@ function init() {
 
     if (cookieId) {
         store.commit('SET_COOKIE_ID', cookieId);
-    } else {
+    }/* else {
         localStorage.setItem('COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
         cookieId = '23456006805d970d5438a354dc019fc295614979';
         store.commit('SET_COOKIE_ID', cookieId);
-    }
+    }*/
 
     if (userId) {
         store.commit('SET_USER_ID', userId);
-    } else {
+    }/* else {
         localStorage.setItem('USER_ID', '304014');
         userId = '304014';
         store.commit('SET_USER_ID', userId);
-    }
+    }*/
 
     if ('addEventListener' in document) {
         document.addEventListener('DOMContentLoaded', function() {

@@ -3,7 +3,7 @@
 		<div class="main_content" @scroll="handleScroll($event)" @touchstart="retract">
 			<div class="info_box" id="infoBox">
 				<div class="point_value" :style="{marginBottom: marginBottom + '%'}">
-					<span class="integer" :style="{fontSize: fontSize + 'px'}">{{redPackageValueInteger}}.</span>{{redPackageValueDecimals}}元
+					<span class="integer" :style="{fontSize: fontSize + 'px'}">{{balanceInteger}}.</span>{{balanceDecimals}}元
 				</div>
 			</div>
 			<div class="record_list_box" id="recordListBox" @touchstart.stop="spread">
@@ -46,7 +46,7 @@
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
 				isMore: false,
-				redPackageValue: 756.32,
+				balance: '0.00',
 				blanceRecord: [],
 				fontSize: FONTSIZE,
 				marginBottom: MARGINBOTTOM, //红包数值所在盒子的底部外边距范围为(-20%~10%)
@@ -58,11 +58,12 @@
 		},
 
 		computed: {
-			redPackageValueInteger() {
-				return Math.floor(this.redPackageValue)
+
+			balanceInteger() {
+				return Math.floor(this.balance)
 			},
-			redPackageValueDecimals() {
-				return this.redPackageValue.toFixed(2).split('.')[1];
+			balanceDecimals() {
+				return this.balance.split('.')[1];
 			}
 		},
 
@@ -94,6 +95,26 @@
 		},
 
 		mounted() {
+
+			if(!this.$helper.isLogin()) {
+                this.$router.push('/login');
+            }
+
+            if(this.$store.state.uesrInfo.account_balance) {
+            	this.balance = this.$store.state.uesrInfo.account_balance;
+            } else {
+            	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+	                'userId': localStorage.getItem('USER_ID'),
+	                'jpushId': this.$store.state.jpushId,
+	                'channelId': this.$store.state.channelId,
+	                'appId': this.$store.state.appId,
+	                
+	            }, (res) => {
+	                let data = res.data;
+	                this.balance = data.account_balance;
+	                this.$store.commit('SET_USER_INFO', data);
+	            })
+            }
 
 			function handleDate(data) {
 				data.forEach(function(item) {

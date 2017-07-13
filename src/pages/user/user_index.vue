@@ -13,22 +13,41 @@
                     <img src="../../images/common/default_user_icon.png" alt="会员头像" class="user_img">
                 </div>
                 <div class="account_box">
-                    <div class="account">13535124518</div>
+                    <div class="account">{{userInfo.UserName}}</div>
                     <div class="card_type_box">
-                        <span class="card_type">普通会员</span>
-                        <span class="special_right"></span>
+                        <span class="special_right" v-if="userInfo.IsStaff == 0"></span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="box">
             <ul class="user_property_list flex_list">
-                <li class="user_property_item flex_item" v-for="item in userPropertyList">
-                    <router-link :to="item.to">
-                        <div class="user_property_value">{{item.propertyValue}}</div>
-                        <span>{{item.text}}</span>
+                <li class="user_property_item flex_item">
+                    <router-link to="/blance">
+                        <div class="user_property_value">{{userInfo.account_balance}}</div>
+                        <span>余额</span>
                     </router-link>
                 </li>
+                <li class="user_property_item flex_item">
+                    <router-link to="/red_package">
+                        <div class="user_property_value">{{userInfo.red_packet}}</div>
+                        <span>红包</span>
+                    </router-link>
+                </li>
+                <li class="user_property_item flex_item">
+                    <router-link to="/point">
+                        <div class="user_property_value">{{userInfo.Points}}</div>
+                        <span>积分</span>
+                    </router-link>
+                </li>
+                <li class="user_property_item flex_item">
+                    <router-link to="/coupon/no_use">
+                        <div class="user_property_value">{{userInfo.canUseCouponNum}}</div>
+                        <span>优惠券</span>
+                    </router-link>
+                </li>
+
+
             </ul>
         </div>
         <div class="box">
@@ -43,23 +62,39 @@
 
         <div class="box">
             <ul class="order_status_list flex_list">
-                <li class="order_status_item flex_item" v-for="item in orderStatusList">
-                    <router-link :to="item.to">
-                        <div class="order_status_icon_box">
-                            <img :src="item.iconUrl" alt="" class="order_status_icon">
-                        </div>
-                        <span>{{item.text}}</span>
+                <li class="order_status_item flex_item">
+                    <router-link to="/order_no_pay">
+                        <span class="order_status_icon no_pay">
+                            <num-tip :num="orderInfo.wait_to_pay" :style="numTipStyle"></num-tip>
+                        </span>
+                        <p>待付款</p>
+                    </router-link>
+                </li>
+                <li class="order_status_item flex_item">
+                    <router-link to="/orders_no_send">
+                        <span class="order_status_icon no_send">
+                            <num-tip :num="orderInfo.wait_to_shipping" :style="numTipStyle"></num-tip>
+                        </span>
+                        <p>待发货</p>
+                    </router-link>
+                </li>
+                <li class="order_status_item flex_item">
+                    <router-link to="/orders_no_receive">
+                        <span class="order_status_icon no_receive">
+                            <num-tip :num="orderInfo.wait_to_receiving" :style="numTipStyle"></num-tip>
+                        </span>
+                        <p>待收货</p>
                     </router-link>
                 </li>
             </ul>
         </div>
 
         <ul class="user_fn_list">
-            <li class="user_fn_item my_commission">
+            <!-- <li class="user_fn_item my_commission">
                 <router-link to="/my_commission" class="user_fn_content ofh">
                     <span class="fl title_text">我的提成</span>
                 </router-link>
-            </li>
+            </li> -->
             <li class="user_fn_item user_data">
                 <router-link to="/user_info" class="user_fn_content ofh">
                     <span class="fl title_text">个人资料</span>
@@ -93,61 +128,60 @@
 
 <script>
 
+    import numTip from '../../components/common/num_tip.vue';
+
     export default {
         data() {
             return {
                 headStyle: {
                     'background': 'rgba(0, 0, 0, 0)',
                 },
-                userPropertyList: [
-                    {
-                        'text': '余额',
-                        'propertyValue': '0.00',
-                        'to': '/blance'
-                    },
-                    {
-                        'text': '红包',
-                        'propertyValue': '0.00',
-                        'to': '/red_package'
-                    },
-                    {
-                        'text': '积分',
-                        'propertyValue': '286',
-                        'to': '/point'
-                    },
-                    {
-                        'text': '优惠券',
-                        'propertyValue': '3',
-                        'to': '/coupon/no_use'
-                    }
-                ],
-
-                orderStatusList: [
-                    {
-                        'text': '待付款',
-                        'iconUrl': require('../../images/user_index/pay_icon.png'),
-                        'to': '/order_no_pay'
-                    },
-                    {
-                        'text': '待发货',
-                        'iconUrl': require('../../images/user_index/send_goods_icon.png'),
-                        'to': '/orders_no_send'
-                    },
-                    {
-                        'text': '待收货',
-                        'iconUrl': require('../../images/user_index/receive_goods_icon.png'),
-                        'to': '/orders_no_receive'
-                    }
-                ]
+                numTipStyle: {
+                    // 数字提示泡泡默认定位为距离父盒子右上角3px的位置~若需修改~则需自定义样式并写到组件上
+                    right: '-6px', 
+                    top: '-3px'
+                },
+                userInfo: {},
+                orderInfo: {}
             }
         },
         mounted() {
+            if(!this.$helper.isLogin()) {
+                this.$router.push('/login');
+            }
+            
+
+            this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+                'userId': this.$store.state.userId,
+                'jpushId': this.$store.state.jpushId,
+                'channelId': this.$store.state.channelId,
+                'appId': this.$store.state.appId,
+                
+            }, (res) => {
+                let data = res.data;
+                this.userInfo = data;
+                console.log(data);
+                this.$store.commit('SET_USER_INFO', data);
+            })
+
+            this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
+                'userId': this.$store.state.userId
+                
+            }, (res) => {
+                let data = res.data;
+                this.orderInfo = data;
+            })
+
+
             // 头部显示阈值
             let threshold = $('#userCardBox').outerHeight() - $('#fnBox').outerHeight();
             $(window).scroll(function() {
                 var opacity = $(document).scrollTop() / threshold;
                 this.headStyle['background'] = `rgba(0, 0, 0, ${opacity})`;
             }.bind(this));
+        },
+        components: {
+            numTip
         }
     }
 </script>
@@ -240,14 +274,25 @@
         font-size: 33px;
     }
 
-    .order_status_icon_box {
-        width: 0.796296rem;
+    .order_status_icon {
+        display: inline-block;
+        width: .78rem;
+        height: .78rem;
+        background: url('../../images/user_index/pay_icon.png') center no-repeat;
+        background-size: 100% auto;
         position: relative;
-        margin: 0 auto 0.092593rem auto;
     }
 
-    .order_status_icon {
-        width: 100%;
+    .no_pay {
+        background-image: url('../../images/user_index/pay_icon.png');
+    }
+
+    .no_send {
+        background-image: url('../../images/user_index/send_goods_icon.png');
+    }
+
+    .no_receive {
+        background-image: url('../../images/user_index/receive_goods_icon.png');
     }
 
     /*----------------------------------------*/
@@ -264,8 +309,8 @@
     }
 
     .user_property_value {
-        font-size: 21px;
-        margin-bottom: 0.166667rem;
+        font-size: 16px;
+        margin-bottom: 0.16rem;
     }
 
     [data-dpr="2"] .user_property_value {
@@ -458,42 +503,17 @@
 
     .account {
         font-size: 14px;
-        line-height: 40px;
-    }
-
-    [data-dpr="2"] .account {
-        font-size: 28px;
-        line-height: 80px;
-    }
-
-    [data-dpr="3"] .account {
-        font-size: 42px;
-        line-height: 120px;
-    }
-
-    .card_type {
-        font-size: 12px;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    [data-dpr="2"] .card_type {
-        font-size: 24px;
-    }
-
-    [data-dpr="3"] .card_type {
-        font-size: 36px;
+        line-height: 0.72rem;
     }
 
     .special_right {
         display: inline-block;
         vertical-align: middle;
-        width: 2.133333rem;
-        height: 0.4rem;
+        width: 2.3rem;
+        height: 0.5rem;
         text-align: center;
         background: url('../../images/user_index/special.png') center no-repeat;
         background-size: 100% auto;
-        margin-left: 0.2rem;
     }
 
     /*-------------------------------------*/

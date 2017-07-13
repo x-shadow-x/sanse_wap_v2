@@ -53,7 +53,7 @@
 				// 交互方式为若记录盒子未展开~则用户拖动外部盒子可以逐步展开~若记录盒子因为touchstart而自动展开~则在touchstart外部盒子时收起
 				isSpread: false,
 				isMore: false,
-				redPackageValue: 756.32,
+				redPackageValue: '0.00',
 				redPackageRecord: [],
 				fontSize: FONTSIZE,
 				marginBottom: MARGINBOTTOM, //红包数值所在盒子的底部外边距范围为(-20%~10%)
@@ -69,7 +69,7 @@
 				return Math.floor(this.redPackageValue)
 			},
 			redPackageValueDecimals() {
-				return this.redPackageValue.toFixed(2).split('.')[1];
+				return this.redPackageValue.split('.')[1];
 			}
 		},
 
@@ -102,6 +102,26 @@
 
 		mounted() {
 
+			if(!this.$helper.isLogin()) {
+                this.$router.push('/login');
+            }
+
+            if(this.$store.state.uesrInfo.red_packet) {
+            	this.balance = this.$store.state.uesrInfo.red_packet;
+            } else {
+            	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+	                'userId': localStorage.getItem('USER_ID'),
+	                'jpushId': this.$store.state.jpushId,
+	                'channelId': this.$store.state.channelId,
+	                'appId': this.$store.state.appId,
+	                
+	            }, (res) => {
+	                let data = res.data;
+	                this.redPackageValue = data.red_packet;
+	                this.$store.commit('SET_USER_INFO', data);
+	            })
+            }
+            
 			function handleDate(data) {
 				data.forEach(function(item) {
 					let tempTakeTime = item.display_taketime.split(' ');
