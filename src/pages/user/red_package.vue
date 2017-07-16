@@ -106,8 +106,8 @@
                 this.$router.push('/login');
             }
 
-            if(this.$store.state.uesrInfo.red_packet) {
-            	this.balance = this.$store.state.uesrInfo.red_packet;
+            if(this.$store.state.userInfo.red_packet) {
+            	this.balance = this.$store.state.userInfo.red_packet;
             } else {
             	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
 	                'userId': localStorage.getItem('USER_ID'),

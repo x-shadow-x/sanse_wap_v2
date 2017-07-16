@@ -11,7 +11,10 @@
                 <router-link class="footer_menu_item_link footer_menu_tide" to="/home">潮文</router-link>
             </li>
             <li class="footer_menu_item">
-                <router-link class="footer_menu_item_link footer_menu_carts" to="/shopping_bag">购物袋</router-link>
+                <router-link class="footer_menu_item_link footer_menu_carts" to="/shopping_bag">
+                    购物袋
+                    <num-tip :num="shoppingBagNum" :style="numTipStyle"></num-tip>
+                </router-link>
             </li>
             <li class="footer_menu_item">
                 <router-link class="footer_menu_item_link footer_menu_user" to="/user_index">个人中心</router-link>
@@ -23,12 +26,26 @@
 
 <script>
 
+import numTip from './num_tip.vue';
+
 export default {
 	name: 'footer_bar',
 	data() {
 		return {
+            numTipStyle: {
+                right: '14px',
+                top: '3px'
+            }
 		}
-	}
+	},
+    computed: {
+        shoppingBagNum: function() {
+            return this.$store.state.shoppingBagNum;
+        }
+    },
+    components: {
+        numTip
+    }
 }
 </script>
 
@@ -65,6 +82,7 @@ export default {
 
     .footer_menu_item_link {
         display: block;
+        position: relative;
         background: url('../../images/footer_bar/home_icon.png') center 0.2rem no-repeat;
         background-size: 0.75rem;
         padding-top: 1rem;

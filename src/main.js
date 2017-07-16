@@ -8,6 +8,7 @@ import './config/flexible_css.js'
 import './config/flexible.js'
 import request from './config/request.js'
 import interfaceConfig from './config/interface_config.js'
+import md5Api from './config/md5.js'
 import helper from './config/helper.js'
 import store from './store'
 import axios from 'axios'
@@ -20,6 +21,9 @@ Vue.prototype.HOST = '/api'
 Vue.prototype.$request = request
 Vue.prototype.$interface = interfaceConfig
 Vue.prototype.$helper = helper
+Vue.prototype.$md5 = md5Api
+
+console.log(md5Api);
 
 function init() {
     // store.commit('SET_USER_ID', '304014');
@@ -29,11 +33,15 @@ function init() {
 
     if (cookieId) {
         store.commit('SET_COOKIE_ID', cookieId);
-    }/* else {
-        localStorage.setItem('COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
-        cookieId = '23456006805d970d5438a354dc019fc295614979';
+
+    } else {
+        // localStorage.setItem('COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+        // cookieId = '23456006805d970d5438a354dc019fc295614979';
+        // store.commit('SET_COOKIE_ID', cookieId);
+        let cookieId = md5Api(new Date().getTime());
+        localStorage.setItem('COOKIE_ID', cookieId);
         store.commit('SET_COOKIE_ID', cookieId);
-    }*/
+    }
 
     if (userId) {
         store.commit('SET_USER_ID', userId);

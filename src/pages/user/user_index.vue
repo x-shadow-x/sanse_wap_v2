@@ -160,7 +160,6 @@
             }, (res) => {
                 let data = res.data;
                 this.userInfo = data;
-                console.log(data);
                 this.$store.commit('SET_USER_INFO', data);
             })
 

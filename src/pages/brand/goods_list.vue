@@ -339,7 +339,8 @@
             },
 
 			getDefaultData(cb) {
-
+				console.log(this.$store.state.userId);
+				console.log(this.$store.state.cookieId);
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
                     'userId': this.$store.state.userId,
                     'funcType': this.funcType,

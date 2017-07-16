@@ -100,8 +100,8 @@
                 this.$router.push('/login');
             }
 
-            if(this.$store.state.uesrInfo.account_balance) {
-            	this.balance = this.$store.state.uesrInfo.account_balance;
+            if(this.$store.state.userInfo.account_balance) {
+            	this.balance = this.$store.state.userInfo.account_balance;
             } else {
             	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
 	                'userId': localStorage.getItem('USER_ID'),

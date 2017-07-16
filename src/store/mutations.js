@@ -6,6 +6,7 @@ const SET_KEY_WORD = 'SET_KEY_WORD'
 const SET_GOODS_LIST_RECORD = 'SET_GOODS_LIST_RECORD'
 const PUSH_GOODS_LIST_RECORD = 'PUSH_GOODS_LIST_RECORD'
 const SET_USER_INFO = 'SET_USER_INFO'
+const SET_SHOPPING_BAG_NUM = 'SET_SHOPPING_BAG_NUM'
 
 export default {
 
@@ -38,6 +39,10 @@ export default {
     },
 
     [SET_USER_INFO](state, data) {
-        state.uesrInfo = data;
+        state.userInfo = data;
+    },
+
+    [SET_SHOPPING_BAG_NUM](state, data) {
+        state.shoppingBagNum = data;
     }
 }

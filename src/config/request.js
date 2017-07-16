@@ -44,10 +44,20 @@ function queryEncoded(params) {
 	return resultStr.substr(1);
 }
 
-/*
-  接口处理函数
-*/
-function apiAxios (method, url, params, success, failure) {
+/**
+ * 接口处理函数
+ * @param  {[type]} method       [description]
+ * @param  {[type]} url          [description]
+ * @param  {[type]} params       [数据请求参数]
+ * @param  {[type]} success      [description]
+ * @param  {[type]} failure      [description]
+ * @param  {[type]} extendParams [额外参数用来做特殊处理~比如用验证码登录或是修改绑定的时候~如果验证码输入不对~接口返回的code为-1
+ *                               但是整个请求以及返回过程是正确的~故不能当做错误处理~
+ *                               此处约定如果extendParams中存在validateRequest字段并且为true~则将code为-1的情况视为正确
+ *                               不过存在的问题是必须保持此处validateRequest字段名和页面发送请求的时候的字段名一致]
+ * @return {[type]}              [description]
+ */
+function apiAxios (method, url, params, success, failure, extendParams) {
 	method = method.toUpperCase();
 	let headerInfo = {
         'platform_src': 'WAP',
@@ -74,8 +84,7 @@ function apiAxios (method, url, params, success, failure) {
 	    withCredentials: false
 	})
 	.then(function (res) {
-
-		if (res.data.code != '-1') {
+		if (res.data.code != '-1' || extendParams.validateRequest && res.data.code == '-1') {
 			if (success) {
 				success(res.data);
 			}
@@ -99,19 +108,19 @@ function apiAxios (method, url, params, success, failure) {
 
 // 返回在vue模板中的调用接口
 export default {
-	get: function (url, params, success, failure) {
-		return apiAxios('GET', url, params, success, failure)
+	get: function (url, params, success, failure, extendParams={}) {
+		return apiAxios('GET', url, params, success, failure, extendParams)
 	},
 
-	post: function (url, params, success, failure) {
-		return apiAxios('POST', url, params, success, failure)
+	post: function (url, params, success, failure, extendParams={}) {
+		return apiAxios('POST', url, params, success, failure, extendParams)
 	},
 
-	put: function (url, params, success, failure) {
-		return apiAxios('PUT', url, params, success, failure)
+	put: function (url, params, success, failure, extendParams={}) {
+		return apiAxios('PUT', url, params, success, failure, extendParams)
 	},
 
-	delete: function (url, params, success, failure) {
-		return apiAxios('DELETE', url, params, success, failure)
+	delete: function (url, params, success, failure, extendParams={}) {
+		return apiAxios('DELETE', url, params, success, failure, extendParams)
 	}
 }

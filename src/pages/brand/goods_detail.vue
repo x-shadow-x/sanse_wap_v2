@@ -146,6 +146,7 @@
 	            }, (response) => {
 	            	let data = response.data;
 	            	this.shoppingBagNum = data;
+	            	this.$store.commit('SET_SHOPPING_BAG_NUM', data);
 				});
 	    	},
 
@@ -301,11 +302,12 @@
             	}, 100);
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
-
+            		console.log(this.$store.state.userId);
             		if(this.$store.state.userId != 0) {
 	            		// 已经登录了使用登录状态下添加到购物车的接口
 	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, this.$store.state.userId, () => {this.getShoppingBagNum()});
 	            	} else {
+	            		console.log('123---------------');
 	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId, () => {this.getShoppingBagNum()});
 	            	}
 
@@ -403,6 +405,11 @@
 
 		mounted() {
 			let goodsDetailList = this.$store.state.goodsListRecord;
+			let selectGoodsDetailData = null;
+			if(goodsDetailList.length == 0) {
+				let tempDataStr = localStorage.getItem('GOODS_DETAIL_DATA');
+				selectGoodsDetailData = JSON.parse(tempDataStr);
+			}
 
 			this.mySwiper = new Swiper('.swiper-container', {
 		        pagination: '.swiper-pagination',
@@ -410,7 +417,8 @@
 		        lazyLoading : true
 		    });
 
-			if(goodsDetailList.length == 0) {
+			// if(goodsDetailList.length == 0) {
+			if(!selectGoodsDetailData && goodsDetailList == 0) {
 				// store中未保存相应的数据，则可能是直接通过连接跳到详情页的，此时通过另一个接口根据goodsid直接拿对应的商品数据
 				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE, {
 					'goodsId': this.goodsId,
@@ -458,7 +466,8 @@
 					this.goodsImageList = this.allColorGoodsImageList[this.colorId];
 					this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
 
-					this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
+					console.log(this.selectColorGoodsDetail.is_fav_goods == '1');
+					this.isCollected = this.selectColorGoodsDetail.is_fav_goods == '1';
 
                     setTimeout(() => {
                         this.mySwiper.update();
@@ -467,11 +476,18 @@
 				});
 			} else {
 				let selectGoodsDetail = [];
-				goodsDetailList.forEach((item, index) => {
-					if(item.goodsId == this.goodsId) {
-						selectGoodsDetail = item;
-					}
-				});
+				if(selectGoodsDetailData) {
+					selectGoodsDetail = selectGoodsDetailData;
+				} else {
+					goodsDetailList.forEach((item, index) => {
+						if(item.goodsId == this.goodsId) {
+							selectGoodsDetail = item;
+							// console.log(item);
+							localStorage.setItem('GOODS_DETAIL_DATA', JSON.stringify(item));
+						}
+					});
+				}
+				
 
 				let tempAllColorGoodsImageList = {};
 				let tempAllColorGoodsMessageList = {};
@@ -497,7 +513,7 @@
 				this.selectColorGoodsDetail = this.goodsColorMessage[this.colorId];
 				this.goodsImageList = this.allColorGoodsImageList[this.colorId];
 
-				this.isCollected = this.selectColorGoodsDetail.is_fav_goods;
+				this.isCollected = this.selectColorGoodsDetail.is_fav_goods == '1';
 
                 setTimeout(() => {
                     this.mySwiper.update();

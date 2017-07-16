@@ -11,7 +11,7 @@
         computed: {
         	tipNum: function() {
         		if(this.num > 99) {
-        			return this.num + '+';
+        			return '99+';
         		} else {
         			return this.num;
         		}
@@ -26,11 +26,11 @@
 		background: #ef8200;
 		color: #fff;
 		text-align: center;
-		min-width: 14px;
-		height: 18px;
+		min-width: 12px;
+		height: 16px;
 		padding: 0 2px;
 		border-radius: 100px;
-		font-size: 9px;
+		font-size: 8px;
 		line-height: 1;
 		font-weight: bolder;
 		right: 3px;
@@ -43,6 +43,7 @@
 	}
 
 	.num_tip {
+		margin-top: 1px;
 		position: absolute;
 		left: 50%;
 		top: 50%;

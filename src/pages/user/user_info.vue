@@ -66,27 +66,30 @@
                 </template>
                 <template v-else>
                     <div>
-                        <span>{{newPhoneNumber}}没收到?</span><span class="re_send">重新发送</span>
+                        <span>{{newPhoneNumber}}没收到?</span><span class="re_send" @click="sendIdentifyingCode">重新发送</span>
                     </div>
                 </template>
                 <div class="validate_input_box">
                     <div class="input_hover" @click="focusValidateInput">
-                        <span v-for="(item, index) in validateNumList" class="input_tip">{{item}}<i v-if="index == inputTipIndex && isValidateInputFocus || index == 5 && inputTipIndex == 6 && isValidateInputFocus" class="cursor" :class="{last: inputTipIndex == 6}"></i></span>
+                        <span v-for="(item, index) in captchaList" class="input_tip">{{item}}<i v-if="index == inputTipIndex && isValidateInputFocus || index == 5 && inputTipIndex == 6 && isValidateInputFocus" class="cursor" :class="{last: inputTipIndex == 6}"></i></span>
                     </div>
-                    <input type="text" class="validate_input" id="validateInput" maxlength="6" v-model="validateNum" :class="{ios: isIOS}" @blur="handleBlur">
+                    <input type="text" class="validate_input" id="validateInput" maxlength="6" v-model="captcha" :class="{ios: isIOS}" @blur="handleBlur">
                     <div class="validate_code_cell_box">
-                        <span class="validate_code_cell_tip" v-for="item in validateNumList" :class="{transparent: item == '$'}">{{item}}</span>
+                        <span class="validate_code_cell_tip" v-for="item in captchaList" :class="{transparent: item == '$'}">{{item}}</span>
                     </div>
                 </div>
                 <p class="close_validate" @click="closeValidate">关闭弹窗</p>
             </div>
         </div>
+        <alert v-on:hideAlert="hideAlert" :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" tipContentF="tipContentF"></alert>
     </div>
 </template>
 
 <script>
     import '../../plugins/date/date.css'
     import '../../plugins/date/date.js'
+
+    import alert from '../../components/common/alert.vue';
 
     export default {
         data() {
@@ -103,14 +106,18 @@
                 isOverdue: false,
                 restTime: this.$store.state.restTime,
                 inputValidateStatus: false,
-                validateNum: '', // 验证码
-                isValidateInputFocus: false
+                captcha: '', // 验证码
+                isValidateInputFocus: false,
+
+                isShowAlert : false,
+                tipTitleF : '',
+                tipContentF : '',
             }
         },
 
         computed: {
-            validateNumList: function() {
-                var tempArr = this.validateNum.split('');
+            captchaList: function() {
+                var tempArr = this.captcha.split('');
                 var result = ['$', '$', '$', '$', '$', '$'];
                 tempArr.forEach((item, index) => {
                     result[index] = item;
@@ -119,7 +126,7 @@
             },
 
             inputTipIndex: function() {
-                return this.validateNum.length;
+                return this.captcha.length;
             },
 
             isIOS: function() {
@@ -140,9 +147,9 @@
                 this.$router.push('/login');
             }
 
-            if(this.$store.state.uesrInfo.MobileNo) {
-                // 此处MobileNo仅仅是用来判断是否已经获取过uesrInfo并存储到store了
-                this.userInfo = this.$store.state.uesrInfo;
+            if(this.$store.state.userInfo.MobileNo) {
+                // 此处MobileNo仅仅是用来判断是否已经获取过userInfo并存储到store了
+                this.userInfo = this.$store.state.userInfo;
                 this.oldUserName = this.userInfo.UserName;
             } else {
                 this.$request.get(this.$interface.GET_USERINFO_PUSH, {
@@ -169,6 +176,10 @@
         },
 
         methods: {
+            hideAlert() {
+                this.isShowAlert = false;
+            },
+
             updateUserInfo() {
                 // {userId}&{userName}&{sex}&{birthday}&{email}
                 this.$request.get(this.$interface.UPDATEUSERS, {
@@ -181,42 +192,6 @@
                     let data = res.data;
                     console.log(data)
                 })
-            },
-
-            sendIdentifyingCode() {
-                
-                if(this.isOverdue) {
-                    return;
-                }
-                
-                if(!this.phoneNumber) {
-                    this.isShowAlert = true;
-                    return;
-                }
-                this.dataInterface = this.$interface.SEND_SMS;
-                this.$request.get(this.$interface.SEND_SMS, {
-                    'userName' : this.phoneNumber,
-                    'smsType' : 5,
-                    'companyId' : this.$store.state.companyId,
-                    'brandId' : this.$store.state.brandId
-                }, (res) => {
-                    this.tipTitleF = '提示';
-                    this.tipContentF = '信息已发送，请耐心等待';
-                    this.isShowAlert = true;
-                    this.isOverdue = true;
-                })
-
-                let timer = setInterval(() => {
-                    if(this.restTime > 1) {
-
-                        this.restTime--;
-                    } else {
-                        this.isOverdue = false;
-                        this.restTime = this.$store.state.restTime;
-                        this.sendCodeTip = '发送验证码';
-                        clearTimeout(timer);
-                    }
-                }, 1000);
             },
 
             saveUserName() {
@@ -250,6 +225,63 @@
                 this.isValidateStatus = true;
             },
 
+            sendIdentifyingCode() {
+                this.restTime = this.$store.state.restTime;
+                if(this.isOverdue) {
+                    return;
+                }
+                
+                this.$request.get(this.$interface.SEND_SMS, {
+                    'userName' : this.newPhoneNumber,
+                    'smsType' : 5, // 5表示绑定手机时的验证码
+                    'companyId' : this.$store.state.companyId,
+                    'brandId' : this.$store.state.brandId
+                }, (res) => {
+                    this.isOverdue = true;
+                })
+
+                let timer = setInterval(() => {
+                    if(this.restTime > 0) {
+
+                        this.restTime--;
+                    } else {
+
+                        this.isOverdue = false;
+                        clearTimeout(timer);
+                    }
+                }, 1000);
+            },
+
+            modifyBindPhoneNumberByCaptcha() {
+
+                if(!this.newPhoneNumber || !this.captcha) {
+                    this.isShowAlert = true;
+                    return;
+                }
+
+                this.$request.get(this.$interface.MODIFYUSERNAME, {
+                    'userId': this.$store.state.userId,
+                    'captcha' : this.captcha,
+                    'phoneNumber' : this.newPhoneNumber
+                }, (res) => {
+                    console.log(res);
+                    if(res.code == -1) {
+                        this.tip = res.msg;
+                        this.isShowTip = true;
+                        setTimeout(() => {
+                            this.isShowTip = false;
+                        }, 1000);
+                        return;
+                    } else if(res.code == 0){
+                        // todo---------------询问是否合并资产
+                    } else {
+                        this.closeValidate();
+                    }
+                }, null, {
+                    validateRequest: true
+                });
+            },
+
             validatePhoneHanlde() {
                 if(!(/^1[34578]\d{9}$/.test(this.newPhoneNumber))) {
                     this.tip = '手机号码不正确';
@@ -259,6 +291,7 @@
                     }, 1000);
                     return;
                 }
+                this.captcha = '';
 
                 this.inputValidateStatus = true;
 
@@ -282,10 +315,16 @@
         },
 
         watch: {
-            '$route' (to, from) {
-                alert(123);
+            'captcha' (to, from) {
+                if(to.length >= 6) {
+                    this.modifyBindPhoneNumberByCaptcha();
+                }
             }
         },
+
+        components: {
+            alert
+        }
 
     }
 </script>
@@ -319,6 +358,7 @@
     .re_send {
         color: #ef8200;
         text-decoration: underline;
+        margin-left: 10px;
     }
 
     .validate_input_box {
@@ -546,12 +586,14 @@
         left: -1000px;
         top: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, .6);
+        background: rgba(0, 0, 0, .8);
         color: #fff;
         padding: 10px 20px;
         border-radius: 4px;
         transition: opacity .5s, left 0s .53s;
         opacity: 0;
+        z-index: 10;
+        white-space: nowrap;
     }
 
     .tip.show {

@@ -87,16 +87,24 @@
             	this.$request.post(this.dataInterface,{
 					'userName' : this.phoneNumber,
 					'captcha' : this.captcha,
-					'cookieId' : this.$store.state.cookie_id,
+					'cookieId' : this.$store.state.cookieId,
 					'jpushid' : 0
             	}, (res) => {
                     console.log(res);
-                    let userId = res.data.user_id;
-            		this.$store.commit('SET_USER_ID', userId);
-                    localStorage.setItem('USER_ID', userId);
+                    if(res.code == -1) {
+                        this.tipTitleF = '提示';
+                        this.tipContentF = res.msg;
+                        this.isShowAlert = true;
+                    } else {
+                        let userId = res.data.user_id;
+                        this.$store.commit('SET_USER_ID', userId);
+                        localStorage.setItem('USER_ID', userId);
 
-            		this.$router.push('/user_index');
-            	});
+                        this.$router.push('/user_index');
+                    }
+            	}, null, {
+                    validateRequest: true
+                });
             },
             hideAlert() {
                 this.isShowAlert = false;

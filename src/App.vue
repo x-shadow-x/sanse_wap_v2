@@ -21,8 +21,15 @@
             }
         },
         mounted() {
-            this.$store.commit('SET_USER_ID', '304014');
-            this.$store.commit('SET_COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+            // this.$store.commit('SET_USER_ID', '304014');
+            // this.$store.commit('SET_COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
+            this.$request.get(this.$interface.GETSTOREAGECOUNT, {
+                'userId': this.$store.state.userId,
+                'cookieId': this.$store.state.cookieId
+            }, (response) => {
+                let data = response.data;
+                this.$store.commit('SET_SHOPPING_BAG_NUM', data);
+            });
         },
         components: {
             footerBar,

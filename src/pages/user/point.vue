@@ -89,8 +89,8 @@
                 this.$router.push('/login');
             }
 
-            if(this.$store.state.uesrInfo.Points) {
-            	this.pointValue = this.$store.state.uesrInfo.Points;
+            if(this.$store.state.userInfo.Points) {
+            	this.pointValue = this.$store.state.userInfo.Points;
             } else {
             	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
 	                'userId': localStorage.getItem('USER_ID'),
