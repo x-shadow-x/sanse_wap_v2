@@ -1,6 +1,7 @@
 <template>
 	<div class="order_detail_main">
         <div class="order_detail_content">
+            <div class="order_sys_tip">你的订单将在11分钟后</div>
     		<div class="order_info_item_box">
                 <div class="num_price_box">
                     <p>¥{{orderEntity.order_amount}}</p>
@@ -110,7 +111,7 @@
                 </div>
             </div>
 
-            <div class="order_info_item_box empty_order_info_item" :class="{blank_bottom: orderEntity.orderStatus == '待发货' || orderEntity.shipping_status == '1'}">
+            <div class="order_info_item_box empty_order_info_item" :class="{blank_bottom: orderEntity.orderStatus == '待发货' || orderEntity.shipping_status == '1' || orderEntity.orderStatus == '待付款'}">
                 <h2 class="info_item_title">备注</h2>
             </div>
         </div>
@@ -122,7 +123,23 @@
         </div>
         <div class="confirm_receive_goods" v-if="orderEntity.shipping_status == '1'" @click="confirmReceiveGoods">确认收货</div>
 
-        <confirm v-on:confirmEvent="handleConfirm" v-on:cancelEvent="handleCancel" :isShowConfirm="isShowConfirm" :tipTitleF="tipTitleF" :tipContentF="tipContentF"></confirm>
+        <div class="order_no_pay_handle_btn_box" v-if="orderEntity.orderStatus == '待付款'">
+        <!-- <div class="order_no_pay_handle_btn_box"> -->
+            <span class="cancel_order" @click="cancelOrder">取消订单</span>
+            <span class="pay_order">马上支付</span>
+        </div>
+
+        <div class="cancel_order_reason_list_box" :class="{show: isShowCancelOrderReasonListBox}">
+            <div class="cancel_order_reason_list_handle_box">
+                <span class="cancel_order_reason_list_btn" @click="hideCancelOrderReasonListBox">取消</span>
+                <h2>请选择取消订单原因</h2>
+            </div>
+            <ul class="cancel_order_reason_list">
+                <li class="cancel_order_reason" v-for="(item, index) in cancelOrderReasonList" :key="item._id" @click="selectReacon(index)">{{item._reason}}</li>
+            </ul>
+        </div>
+
+        <confirm v-on:confirmEvent="handleConfirm" v-on:cancelEvent="handleCancel" :isShowConfirm="isShowConfirm" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="confirmCbName"></confirm>
 	</div>
 </template>
 
@@ -134,27 +151,39 @@
             return {
                 orderDetailList: [], // 商品信息
                 expressList: [], // 快递物流信息
+                cancelOrderReasonList: [], // 取消订单原因列表
                 orderEntity: {},
                 isShowConfirm: false,
                 tipTitleF: '',
-                tipContentF: ''
+                tipContentF: '',
+                isShowCancelOrderReasonListBox: false,
+                confirmCbName: '',
+                cancelReasonId: '',
             }
         },
         methods: {
             confirmReceiveGoods() {
                 this.tipTitleF = ' ';
                 this.tipContentF = '确认收货吗'
+                this.confirmCbName = 'confirmReceiveGoodsCb';
                 this.isShowConfirm = true;
             },
 
-            handleConfirm() {
-                this.isShowConfirm = false;
+            confirmReceiveGoodsCb() {
                 this.$request.get(this.$interface.CONFIRMGETGOODS, {
                     'orderId': this.orderEntity.order_id,
                     'userId': localStorage.getItem('USER_ID')
                 }, (res) => {
                     this.$router.go(-1);
                 })
+            },
+
+            handleConfirm(cbName) {
+                if(cbName != '' && typeof this[cbName] == 'function') {
+                    this[cbName]();
+                }
+                this.isShowConfirm = false;
+                
             },
 
             handleCancel() {
@@ -179,9 +208,39 @@
                 localStorage.setItem('APPLY_RETURN_DATA', JSON.stringify(combinationData));
 
                 this.$router.push('/apply_return');
+            },
 
+            cancelOrder() {
+                if(this.cancelOrderReasonList.length > 0) {
+                    this.isShowCancelOrderReasonListBox = true;
+                }
+            },
+
+            hideCancelOrderReasonListBox() {
+                this.isShowCancelOrderReasonListBox = false;
+            },
+
+            selectReacon(index) {
+                this.tipTitleF = ' ';
+                this.tipContentF = '是否取消订单';
+                this.confirmCbName = 'confirmCancelOrder';
+                this.isShowConfirm = true;
+                this.isShowCancelOrderReasonListBox = false;
+                this.cancelReasonId = this.cancelOrderReasonList[index]._id
+            },
+
+            confirmCancelOrder() {
+                // {orderId}&{userId}&{cancelReasonId}
+                this.$request.get(this.$interface.CANCEL_ORDER_INFO, {
+                    'orderId': this.$route.query.orderId,
+                    'userId': localStorage.getItem('USER_ID'),
+                    'cancelReasonId': this.cancelReasonId
+                }, (response) => {
+                    this.$router.go(0);
+                });
             }
         },
+
 		mounted() {
 
 			this.$request.get(this.$interface.GET_ALL_ORDER_ENTITY, {
@@ -192,8 +251,12 @@
                 this.orderDetailList = data.orderDetailList;
                 this.orderEntity = data.orderEntity;
                 this.expressList = data.expressList;
+            });
 
-                // shipping_status == 1 ||
+
+            this.$request.get(this.$interface.GET_MOTO_ORDER_CANCEL_REASON_LIST, {}, (response) => {
+                let data = response.data;
+                this.cancelOrderReasonList = data;
             });
 		},
         components: {
@@ -219,6 +282,14 @@
         max-height: 100%;
         padding: 0 2%;
         overflow: auto;
+    }
+
+    .order_sys_tip {
+        text-align: center;
+        background: #b2b2b2;
+        line-height: 0.7rem;
+        margin-left: -2%;
+        margin-right: -2%;
     }
 
     .order_info_item_box {
@@ -440,7 +511,8 @@
     }
 
     .order_process_tip,
-    .confirm_receive_goods {
+    .confirm_receive_goods,
+    .order_no_pay_handle_btn_box {
         position: fixed;
         left: 0;
         right: 0;
@@ -467,5 +539,70 @@
     .confirm_receive_goods {
         background: #ef8200;
         color: #fff;
+    }
+
+    .order_no_pay_handle_btn_box {
+        font-size: 0;
+        color: #fff;
+    }
+
+    .cancel_order, 
+    .pay_order {
+        font-size: 14px;
+        display: inline-block;
+        vertical-align: middle;
+        width: 50%;
+    }
+
+    .cancel_order {
+        background: #b2b2b2;
+    }
+
+    .pay_order {
+        background: #ef8200;
+    }
+
+
+
+    .cancel_order_reason_list_box {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: -100%;
+        z-index: 10;
+        background: #fff;
+        text-align: center;
+        transition: bottom .32s;
+    }
+
+    .cancel_order_reason_list_box.show {
+        bottom: 0;
+    }
+
+    .cancel_order_reason_list_handle_box {
+        position: relative;
+        background: #b2b2b2;
+        color: #fff;
+        line-height: 1rem;
+    }
+
+    .cancel_order_reason_list_btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 4%;
+    }
+
+    .cancel_order_reason_list {
+        max-height: 4.8rem;
+        overflow: auto;
+    }
+
+    .cancel_order_reason {
+        line-height: 0.96rem;
+    }
+
+    .cancel_order_reason + .cancel_order_reason {
+        border-top: 1px solid #efefef;
     }
 </style>

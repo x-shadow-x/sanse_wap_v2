@@ -2,6 +2,7 @@ import App from '../App'
 
 const home = r => require.ensure([], () => r(require('../pages/home/home.vue')), 'home')
 const login = r => require.ensure([], () => r(require('../pages/user/login.vue')), 'login')
+const wxLogin = r => require.ensure([], () => r(require('../pages/user/wx_login.vue')), 'wxLogin')
 
 const brand = r => require.ensure([], () => r(require('../pages/brand/brand.vue')), 'brand')
 const goodsList = r => require.ensure([], () => r(require('../pages/brand/goods_list.vue')), 'goods')
@@ -62,6 +63,12 @@ export default [{
         component: login,
         meta: {
             title: '登录'
+        }
+    },{
+        path: '/wx_login',
+        component: wxLogin,
+        meta: {
+            title: '微信登录'
         }
     },{
         path: '/brand',

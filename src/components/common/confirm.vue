@@ -17,7 +17,7 @@
 
 <script>
     export default {
-        props: ['isShowConfirm', 'tipTitleF', 'tipContentF'],
+        props: ['isShowConfirm', 'tipTitleF', 'tipContentF', 'cbName'],
         
 
         computed: {
@@ -30,7 +30,7 @@
         },
         methods: {
             handleConfirm() {
-                this.$emit('confirmEvent');
+                this.$emit('confirmEvent', this.cbName);
             },
 
             handleCancel() {

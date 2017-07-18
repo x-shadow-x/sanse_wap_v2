@@ -74,4 +74,10 @@ export default {
      * {goods_type}
      */
     'CREATE_RESHIPORDER': '/Create_ReshipOrder/', // 申请退换货
+    'GET_MOTO_ORDER_CANCEL_REASON_LIST': '/Get_moto_order_cancel_reasonList', // 取消订单原因列表
+
+    /**
+     * {orderId}&{userId}&{cancelReasonId}
+     */
+    'CANCEL_ORDER_INFO': '/Cancel_OrderInfo/', // 取消订单
 }

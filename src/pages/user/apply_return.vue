@@ -215,7 +215,7 @@
 
 	.return_reason_list_handle_box {
 		position: relative;
-		background: #7f7f7f;
+		background: #b2b2b2;
 		color: #fff;
 		line-height: 1rem;
 	}
