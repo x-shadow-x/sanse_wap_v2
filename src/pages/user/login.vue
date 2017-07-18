@@ -90,7 +90,6 @@
 					'cookieId' : this.$store.state.cookieId,
 					'jpushid' : 0
             	}, (res) => {
-                    console.log(res);
                     if(res.code == -1) {
                         this.tipTitleF = '提示';
                         this.tipContentF = res.msg;

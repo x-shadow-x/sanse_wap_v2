@@ -1,13 +1,15 @@
 <template>
     <transition name="scale-in">
-        <div class="alert_box" v-if="isShowAlert">
-            <i class="alert_icon"></i>
-            <div class="alert_main">
-                <h2 class="tip_title">{{tipTitle}}</h2>
-                <p>{{tipContent}}</p>
-            </div>
-            <div class="confirm_btn_box">
-                <span class="confirm_btn" @click="handleConfirm">知道了</span>
+        <div class="alert_hover" v-if="isShowAlert" :class="{black: isBlack}">
+            <div class="alert_box">
+                <i class="alert_icon"></i>
+                <div class="alert_main">
+                    <h2 class="tip_title">{{tipTitle}}</h2>
+                    <p>{{tipContent}}</p>
+                </div>
+                <div class="confirm_btn_box">
+                    <span class="confirm_btn" @click="handleConfirm">知道了</span>
+                </div>
             </div>
         </div>
     </transition>
@@ -15,7 +17,7 @@
 
 <script>
     export default {
-        props: ['isShowAlert', 'tipTitleF', 'tipContentF'],
+        props: ['isShowAlert', 'tipTitleF', 'tipContentF', 'isBlackF'],
         data() {
             return {}
         },
@@ -25,6 +27,9 @@
             },
             tipContent: function() {
                 return this.tipContentF || '系统未指定提示内容';
+            },
+            isBlack: function() {
+                return this.isBlackF;
             }
         },
         methods: {
@@ -36,8 +41,22 @@
 </script>
 
 <style scoped>
-    .alert_box {
+
+    .alert_hover {
         position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        z-index: 10000;
+    }
+
+    .alert_hover.black {
+        background: rgba(0, 0, 0, .6);
+    }
+
+    .alert_box {
+        position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -80%);
@@ -81,6 +100,7 @@
         transition: all .32s;
     }
     .scale-in-enter, .scale-in-leave-to {
-        transform: scale(0, 0);
+        /*transform: scale(0, 0);*/
+        opacity: 0;
     }
 </style>

@@ -56,4 +56,22 @@ export default {
      */
     'CONFIRMGETGOODS': '/ConfirmGetGoods/', // 确认收货
     'GET_REASON_LIST': '/GetReason_List', // 获取退货原因列表
+
+
+    /**
+     * {related_order_id}
+     * {memberId}
+     * {return_type} 目前只有退货，值为 1
+     * {return_reason_Id}
+     * {return_remark}
+     * {consignee}
+     * {telephone}
+     * {districtId}
+     * {addr}
+     * {return_goodsnum}
+     * {goods_id}
+     * {product_id}
+     * {goods_type}
+     */
+    'CREATE_RESHIPORDER': '/Create_ReshipOrder/', // 申请退换货
 }

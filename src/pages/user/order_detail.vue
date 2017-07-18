@@ -1,116 +1,122 @@
 <template>
 	<div class="order_detail_main">
-		<div class="order_info_item_box">
-            <div class="num_price_box">
-                <p>¥{{orderEntity.order_amount}}</p>
-                <p>共{{orderEntity.totalGoodsNum}}款</p>
-            </div>
-            <div class="order_info">
-                <p>单号：{{orderEntity.order_sn}}</p>
-                <p>日期：{{orderEntity.createTime}}</p>
-                <span class="order_status">{{orderEntity.orderStatus}}</span>
-            </div>
-        </div>
-
-        <div class="order_info_item_box">
-            <h2 class="info_item_title">商品详情</h2>
-            <div class="goods_item_box" v-for="item in orderDetailList" :key="item.goodsId">
-                <div class="goods_img_box">
-                    <img :src="item.img_url" :alt="item.goods_Name" class="goods_img">
+        <div class="order_detail_content">
+    		<div class="order_info_item_box">
+                <div class="num_price_box">
+                    <p>¥{{orderEntity.order_amount}}</p>
+                    <p>共{{orderEntity.totalGoodsNum}}款</p>
                 </div>
-                <div class="goods_info_box">
-                    <h2 class="goods_name">{{item.goods_Name}}</h2>
+                <div class="order_info">
+                    <p>单号：{{orderEntity.order_sn}}</p>
+                    <p>日期：{{orderEntity.createTime}}</p>
+                    <span class="order_status">{{orderEntity.orderStatus}}</span>
+                </div>
+            </div>
 
-                    <div class="relative_box">
-                        <p>颜色：{{item.colorName}}</p>
-                        <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
+            <div class="order_info_item_box">
+                <h2 class="info_item_title">商品详情</h2>
+                <div class="goods_item_box" v-for="(item, index) in orderDetailList" :key="item.goodsId">
+                    <div class="goods_img_box">
+                        <img :src="item.img_url" :alt="item.goods_Name" class="goods_img">
                     </div>
-                    <p>尺码：{{item.sizeName}}</p>
-                    <div class="old_price_box">
-                        <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+                    <div class="goods_info_box">
+                        <h2 class="goods_name">{{item.goods_Name}}</h2>
+
+                        <div class="relative_box">
+                            <p>颜色：{{item.colorName}}</p>
+                            <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
+                        </div>
+                        <p>尺码：{{item.sizeName}}</p>
+                        <div class="old_price_box">
+                            <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+                        </div>
+                        <div class="current_price_box">
+                            <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span>
+                            <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+                        </div>
+                        <div class="goods_num_box">
+                            <span class="goods_num">数量：{{item.goods_num}}</span>
+                            <!-- <router-link :to="{ path: '/apply_return', query: {orderId: orderEntity.order_id, productId: item.productId, goodsId: item.goodsId}}" class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'">申请退货</router-link> -->
+                            <span class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'" @click="applyReturn(index)">申请退货</span>
+                        </div>
                     </div>
-                    <div class="current_price_box">
-                        <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span>
-                        <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+                </div>
+            </div>
+
+            <div class="order_info_item_box">
+                <h2 class="info_item_title">资费详情</h2>
+                <div class="item_box">
+                    <div class="info_item">
+                        <span class="item_name">商品件数：</span><span class="item_value">{{orderEntity.totalGoodsNum}}件</span>
                     </div>
-                    <div class="goods_num_box">
-                        <span class="goods_num">数量：{{item.goods_num}}</span>
-                        <router-link :to="{ path: '/apply_return', query: {orderId: orderEntity.order_id, productId: item.productId, goodsId: item.goodsId}}" class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'">申请退货</router-link>
+                    <div class="info_item">
+                        <span class="item_name">商品总价：</span><span class="item_value">¥{{orderEntity.totalMarketPrice}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">优惠金额：</span><span class="item_value">¥{{orderEntity.totalYouHuiPrice}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">余额支付：</span><span class="item_value">¥{{orderEntity.surplus}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">运<span class="v_hidden">占位</span>费：</span><span class="item_value">¥{{orderEntity.shipping_fee}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">订单金额：</span><span class="item_value">¥{{orderEntity.order_amount}}</span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="order_info_item_box">
-            <h2 class="info_item_title">资费详情</h2>
-            <div class="item_box">
-                <div class="info_item">
-                    <span class="item_name">商品件数：</span><span class="item_value">{{orderEntity.totalGoodsNum}}件</span>
+            <div class="order_info_item_box">
+                <h2 class="info_item_title">收货地址详情</h2>
+                <div class="item_box">
+                    <div class="info_item">
+                        <span class="item_name">收&nbsp;&nbsp;件&nbsp;&nbsp;人：</span><span class="item_value">{{orderEntity.consignee}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">手机号码：</span><span class="item_value">{{orderEntity.mobile}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">详细地址：</span><span class="item_value">{{orderEntity.Address}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">收件时间：</span><span class="item_value">{{orderEntity.rectime}}</span>
+                    </div>
                 </div>
-                <div class="info_item">
-                    <span class="item_name">商品总价：</span><span class="item_value">¥{{orderEntity.totalMarketPrice}}</span>
+            </div>
+
+            <div class="order_info_item_box" v-if="expressList.length > 0">
+                <h2 class="info_item_title">快递信息</h2>
+                <div class="shipping_info_box" v-for="item in expressList">
+                    <div class="info_item">
+                        <span class="item_name">快递公司：</span><span class="item_value">{{item.shipping_name}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">快递单号：</span><span class="item_value">{{item.invoice_no}}</span>
+                        <a :href="item.search_express_url" class="check_logistical">查看物流</a>
+                    </div>
                 </div>
-                <div class="info_item">
-                    <span class="item_name">优惠金额：</span><span class="item_value">¥{{orderEntity.totalYouHuiPrice}}</span>
+            </div>
+
+            <div class="order_info_item_box">
+                <h2 class="info_item_title">支付</h2>
+                <div class="item_box">
+                    <div class="info_item">
+                        <span class="item_name">支付方式：</span><span class="item_value">{{orderEntity.pay_name}}</span>
+                    </div>
+                    <div class="info_item">
+                        <span class="item_name">支付状态：</span><span class="item_value">{{orderEntity.orderStatus}}</span>
+                    </div>
                 </div>
-                <div class="info_item">
-                    <span class="item_name">余额支付：</span><span class="item_value">¥{{orderEntity.surplus}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">运<span class="v_hidden">占位</span>费：</span><span class="item_value">¥{{orderEntity.shipping_fee}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">订单金额：</span><span class="item_value">¥{{orderEntity.order_amount}}</span>
-                </div>
+            </div>
+
+            <div class="order_info_item_box empty_order_info_item" :class="{blank_bottom: orderEntity.orderStatus == '待发货' || orderEntity.shipping_status == '1'}">
+                <h2 class="info_item_title">备注</h2>
             </div>
         </div>
 
-        <div class="order_info_item_box">
-            <h2 class="info_item_title">收货地址详情</h2>
-            <div class="item_box">
-                <div class="info_item">
-                    <span class="item_name">收&nbsp;&nbsp;件&nbsp;&nbsp;人：</span><span class="item_value">{{orderEntity.consignee}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">手机号码：</span><span class="item_value">{{orderEntity.mobile}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">详细地址：</span><span class="item_value">{{orderEntity.Address}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">收件时间：</span><span class="item_value">{{orderEntity.rectime}}</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="order_info_item_box" v-if="expressList.length > 0">
-            <h2 class="info_item_title">快递信息</h2>
-            <div class="shipping_info_box" v-for="item in expressList">
-                <div class="info_item">
-                    <span class="item_name">快递公司：</span><span class="item_value">{{item.shipping_name}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">快递单号：</span><span class="item_value">{{item.invoice_no}}</span>
-                    <a :href="item.search_express_url" class="check_logistical">查看物流</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="order_info_item_box">
-            <h2 class="info_item_title">支付</h2>
-            <div class="item_box">
-                <div class="info_item">
-                    <span class="item_name">支付方式：</span><span class="item_value">{{orderEntity.pay_name}}</span>
-                </div>
-                <div class="info_item">
-                    <span class="item_name">支付状态：</span><span class="item_value">{{orderEntity.orderStatus}}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="order_info_item_box empty_order_info_item" :class="{blank_bottom: orderEntity.orderStatus == '待发货' || orderEntity.shipping_status == '1'}">
-            <h2 class="info_item_title">备注</h2>
-        </div>
         <div class="order_process_tip" v-if="orderEntity.orderStatus == '待发货'">
             <span>工作人员正在配送</span>
         </div>
@@ -153,6 +159,27 @@
 
             handleCancel() {
                 this.isShowConfirm = false;
+            },
+
+            applyReturn(index) {
+                let goodsInfo = this.orderDetailList[index];
+                let orderInfo = this.orderEntity;
+                let combinationData = {};
+                
+                combinationData.telephone = orderInfo.mobile;
+                combinationData.districtId = orderInfo.district;
+                combinationData.addr = orderInfo.Address;
+                combinationData.consignee = orderInfo.consignee;
+
+                combinationData.relatedOrderId = goodsInfo.order_Id;
+                combinationData.goodsId = goodsInfo.goodsId;
+                combinationData.productId = goodsInfo.productId;
+                combinationData.goodsType = goodsInfo.goodsType;
+
+                localStorage.setItem('APPLY_RETURN_DATA', JSON.stringify(combinationData));
+
+                this.$router.push('/apply_return');
+
             }
         },
 		mounted() {
@@ -185,6 +212,11 @@
         bottom: 0;
         background: #fff;
         box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .order_detail_content {
+        max-height: 100%;
         padding: 0 2%;
         overflow: auto;
     }
@@ -351,8 +383,8 @@
         transform: translateY(-50%);
         color: #ef8200;
         border: 1px solid #ef8200;
-        border-radius: .48rem;
-        line-height: .48rem;
+        border-radius: 24px;
+        line-height: 20px;
         padding: 0 10px;
     }
 
