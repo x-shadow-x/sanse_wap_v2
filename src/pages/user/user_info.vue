@@ -278,7 +278,12 @@
                         this.closeValidate();
                     }
                 }, null, {
-                    validateRequest: true
+                    cb: (res) => {
+                        let code = res.data.code;
+                        if(code == '0' || code == '-1' || code == '1' || code == '-9999') {
+                            return true;
+                        }
+                    }
                 });
             },
 

@@ -41,6 +41,8 @@ const state = {
         '/orders_no_pay': 20,
         '/orders_no_send': 21,
         '/orders_no_receive': 22,
+        '/order_detail': 40,
+        'apply_return': 41,
         '/user_info': 23,
         '/address_manager': 24,
         '/my_collection': 25,

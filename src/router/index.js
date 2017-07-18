@@ -30,6 +30,7 @@ const ordersNoPay = r => require.ensure([], () => r(require('../pages/user/order
 const ordersNoSend = r => require.ensure([], () => r(require('../pages/user/orders_no_send.vue')), 'orders')
 const ordersNoReceive = r => require.ensure([], () => r(require('../pages/user/orders_no_receive.vue')), 'orders')
 const orderDetail = r => require.ensure([], () => r(require('../pages/user/order_detail.vue')), 'orders')
+const applyReturn = r => require.ensure([], () => r(require('../pages/user/apply_return.vue')), 'orders')
 
 const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'address')
 const addressAdd = r => require.ensure([], () => r(require('../pages/user/address_add.vue')), 'address')
@@ -194,6 +195,12 @@ export default [{
         component: orderDetail,
         meta: {
             title: '订单详情'
+        }
+    }, {
+        path: '/apply_return',
+        component: applyReturn,
+        meta: {
+            title: '退货申请'
         }
     }, {
         path: '/address_manager',

@@ -14,7 +14,7 @@
             <span class="confirm_btn" @click="loginByCaptcha">提交</span>
         </div>
 
-        <alert v-on:hideAlert="hideAlert" :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" tipContentF="tipContentF"></alert>
+        <alert v-on:hideAlert="hideAlert" :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF"></alert>
     </div>
 </template>
 <script>
@@ -103,7 +103,12 @@
                         this.$router.push('/user_index');
                     }
             	}, null, {
-                    validateRequest: true
+                    cb: (res) => {
+                        let code = res.data.code;
+                        if(code == '0' || code == '-1' || code == '1' || code == '-9999') {
+                            return true;
+                        }
+                    }
                 });
             },
             hideAlert() {

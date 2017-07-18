@@ -15,16 +15,17 @@
 
 <script>
     export default {
-        data() {
-            return {
-                tipTitle: '提示',
-                tipContent: '123123123'
-            }
-        },
         props: ['isShowAlert', 'tipTitleF', 'tipContentF'],
-        mounted() {
-            this.tipTitle = this.tipTitleF || '提示';
-            this.tipContent = this.tipContentF || '系统未指定提示内容';
+        data() {
+            return {}
+        },
+        computed: {
+            tipTitle: function() {
+                return this.tipTitleF || '提示';
+            },
+            tipContent: function() {
+                return this.tipContentF || '系统未指定提示内容';
+            }
         },
         methods: {
             handleConfirm() {

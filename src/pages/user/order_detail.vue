@@ -1,5 +1,5 @@
 <template>
-	<div class="goods_detail_main">
+	<div class="order_detail_main">
 		<div class="order_info_item_box">
             <div class="num_price_box">
                 <p>¥{{orderEntity.order_amount}}</p>
@@ -33,7 +33,10 @@
                         <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span>
                         <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
                     </div>
-                    <p>数量：{{item.goods_num}}</p>
+                    <div class="goods_num_box">
+                        <span class="goods_num">数量：{{item.goods_num}}</span>
+                        <router-link :to="{ path: '/apply_return', query: {orderId: orderEntity.order_id, productId: item.productId, goodsId: item.goodsId}}" class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'">申请退货</router-link>
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,14 +83,15 @@
             </div>
         </div>
 
-        <div class="order_info_item_box">
+        <div class="order_info_item_box" v-if="expressList.length > 0">
             <h2 class="info_item_title">快递信息</h2>
-            <div class="item_box">
+            <div class="shipping_info_box" v-for="item in expressList">
                 <div class="info_item">
-                    <span class="item_name">快递公司：</span><span class="item_value">{{orderEntity.shipping_name}}</span>
+                    <span class="item_name">快递公司：</span><span class="item_value">{{item.shipping_name}}</span>
                 </div>
                 <div class="info_item">
-                    <span class="item_name">快递单号：</span><span class="item_value">{{orderEntity.invoice_no}}</span><span class="check_logistical">查看物流</span>
+                    <span class="item_name">快递单号：</span><span class="item_value">{{item.invoice_no}}</span>
+                    <a :href="item.search_express_url" class="check_logistical">查看物流</a>
                 </div>
             </div>
         </div>
@@ -104,18 +108,51 @@
             </div>
         </div>
 
-        <div class="order_info_item_box empty_order_info_item">
+        <div class="order_info_item_box empty_order_info_item" :class="{blank_bottom: orderEntity.orderStatus == '待发货' || orderEntity.shipping_status == '1'}">
             <h2 class="info_item_title">备注</h2>
         </div>
+        <div class="order_process_tip" v-if="orderEntity.orderStatus == '待发货'">
+            <span>工作人员正在配送</span>
+        </div>
+        <div class="confirm_receive_goods" v-if="orderEntity.shipping_status == '1'" @click="confirmReceiveGoods">确认收货</div>
+
+        <confirm v-on:confirmEvent="handleConfirm" v-on:cancelEvent="handleCancel" :isShowConfirm="isShowConfirm" :tipTitleF="tipTitleF" :tipContentF="tipContentF"></confirm>
 	</div>
 </template>
 
 <script>
+    import confirm from '../../components/common/confirm.vue';
+
 	export default {
         data() {
             return {
-                orderDetailList: [],
-                orderEntity: []
+                orderDetailList: [], // 商品信息
+                expressList: [], // 快递物流信息
+                orderEntity: {},
+                isShowConfirm: false,
+                tipTitleF: '',
+                tipContentF: ''
+            }
+        },
+        methods: {
+            confirmReceiveGoods() {
+                this.tipTitleF = ' ';
+                this.tipContentF = '确认收货吗'
+                this.isShowConfirm = true;
+            },
+
+            handleConfirm() {
+                this.isShowConfirm = false;
+                this.$request.get(this.$interface.CONFIRMGETGOODS, {
+                    'orderId': this.orderEntity.order_id,
+                    'userId': localStorage.getItem('USER_ID')
+                }, (res) => {
+                    this.$router.go(-1);
+                })
+            },
+
+            handleCancel() {
+                this.isShowConfirm = false;
             }
         },
 		mounted() {
@@ -127,22 +164,25 @@
 
                 this.orderDetailList = data.orderDetailList;
                 this.orderEntity = data.orderEntity;
+                this.expressList = data.expressList;
 
-
+                // shipping_status == 1 ||
             });
-		}
+		},
+        components: {
+            confirm
+        }
 	}
 </script>
 
 <style scoped>
-    .goods_detail_main {
+    .order_detail_main {
         position: fixed;
         left: 0;
         top: 0;
         right: 0;
         z-index: 2;
         bottom: 0;
-        overflow: visible;
         background: #fff;
         box-sizing: border-box;
         padding: 0 2%;
@@ -157,6 +197,10 @@
         margin: 2% auto;
     }
 
+    .order_info_item_box.blank_bottom {
+        margin-bottom: 1.4rem;
+    }
+
     .num_price_box {
         position: absolute;
         left: 0;
@@ -168,7 +212,7 @@
     }
 
     .empty_order_info_item {
-        height: 2.8rem;
+        min-height: 2.8rem;
     }
 
     .order_info {
@@ -291,6 +335,27 @@
         font-size: 14px;
     }
 
+    .goods_num_box {
+        position: relative;
+    }
+
+    .goods_num {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .apply_return {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ef8200;
+        border: 1px solid #ef8200;
+        border-radius: .48rem;
+        line-height: .48rem;
+        padding: 0 10px;
+    }
+
     .item_box {
         padding: 0 .28rem .28rem .28rem;
         line-height: 2;
@@ -320,6 +385,15 @@
         width: calc(100% - 5.5em);
     }
 
+    .shipping_info_box {
+        padding: 0 .28rem .28rem .28rem;
+    }
+
+    .shipping_info_box + .shipping_info_box {
+        border-top: 1px solid #efefef;
+        padding: .28rem;
+    }
+
     .check_logistical {
         position: absolute;
         right: 0;
@@ -331,5 +405,35 @@
         border-radius: 24px;
         font-size: 12px;
         color: #ef8200;
+    }
+
+    .order_process_tip,
+    .confirm_receive_goods {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        text-align: center;
+        background: #fff;
+        line-height: 1.2rem;
+    }
+
+    .order_process_tip span {
+        display: inline-block;
+    }
+
+    .order_process_tip:after {
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        width: 14px;
+        height: 14px;
+        background: url('../../images/order_detail/sending_status_icon.png') center no-repeat;
+        background-size: 100% auto;
+    }
+
+    .confirm_receive_goods {
+        background: #ef8200;
+        color: #fff;
     }
 </style>

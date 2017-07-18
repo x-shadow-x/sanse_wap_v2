@@ -84,12 +84,18 @@ function apiAxios (method, url, params, success, failure, extendParams) {
 	    withCredentials: false
 	})
 	.then(function (res) {
-		if (res.data.code != '-1' || extendParams.validateRequest && res.data.code == '-1') {
-			if (success) {
+		if(typeof extendParams.cb == 'function' && extendParams.cb(res)) {
+			// 一些请求整个流程是正确成功的~但是返回的code不一定是1~
+			// 此时在发送请求的时候传递一个回调函数做处理~以便此处可以正确执行到成功的回调
+			if (typeof success == 'function') {
+				success(res.data);
+			}
+		} else if(res.data.code != '-1') {
+			if (typeof success == 'function') {
 				success(res.data);
 			}
 		} else {
-			if (failure) {
+			if (typeof failure == 'function') {
 				failure(res.data)
 			} else {
 				window.alert('error: ' + JSON.stringify(res.data))

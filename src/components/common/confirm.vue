@@ -1,18 +1,16 @@
 <template>
-    <transition name="scale-in">
-        <div class="confirm_hover" v-if="isShowConfirm">
-            <div class="confirm_box">
-                <div class="confirm_main">
-                    <h2 class="tip_title">{{tipTitle}}</h2>
-                    <p>{{tipContent}}</p>
-                </div>
-                <div class="confirm_btn_box">
-                    <span class="confirm_btn" @click="handleConfirm">确认</span>
-                    <span class="cancel_btn" @click="handleCancel">取消</span>
-                </div>
+    <div class="confirm_hover" v-if="isShowConfirm">
+        <div class="confirm_box">
+            <div class="confirm_main">
+                <h2 class="tip_title">{{tipTitle}}</h2>
+                <p>{{tipContent}}</p>
+            </div>
+            <div class="confirm_btn_box">
+                <span class="confirm_btn" @click="handleConfirm">确认</span>
+                <span class="cancel_btn" @click="handleCancel">取消</span>
             </div>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script>
@@ -51,6 +49,7 @@
         background: rgba(0, 0, 0, .7);
         z-index: 10000;
     }
+
     .confirm_box {
         position: absolute;
         left: 50%;
@@ -88,16 +87,17 @@
 
     .cancel_btn {
         color: #333;
+        position: relative;
     }
 
-
-    .scale-in-enter-active {
-        transition: all .32s;
-    }
-    .scale-in-leave-active {
-        transition: all .32s;
-    }
-    .scale-in-enter, .scale-in-leave-to {
-        opacity: 0;
+    .cancel_btn:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 1px;
+        background: #efefef;
+        height: 40%;
+        transform: translateY(-50%);
     }
 </style>

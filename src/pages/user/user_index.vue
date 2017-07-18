@@ -117,9 +117,9 @@
                 </router-link>
             </li>
             <li class="user_fn_item exit">
-                <router-link to="/home" class="user_fn_content ofh">
+                <div class="user_fn_content ofh" @click="logout">
                     <span class="fl title_text">退出登录</span>
-                </router-link>
+                </div>
             </li>
         </ul>
     </div>
@@ -143,6 +143,17 @@
                 },
                 userInfo: {},
                 orderInfo: {}
+            }
+        },
+        methods: {
+            /**
+             * 退出登录仅需清楚相关的localStorage
+             */
+            logout() {
+                localStorage.removeItem('USER_ID'); 
+                localStorage.removeItem('COOKIE_ID'); 
+                localStorage.removeItem('GOODS_DETAIL_DATA');
+                this.$router.push('/login');
             }
         },
         mounted() {
@@ -256,7 +267,6 @@
         color: #ef8200;
     }
 
-    /*------------------------------------------*/
     .order_status_list {
         text-align: center;
     }
@@ -267,10 +277,6 @@
 
     [data-dpr="2"] .order_status_item {
         font-size: 22px;
-    }
-
-    [data-dpr="3"] .order_status_item {
-        font-size: 33px;
     }
 
     .order_status_icon {
@@ -294,30 +300,13 @@
         background-image: url('../../images/user_index/receive_goods_icon.png');
     }
 
-    /*----------------------------------------*/
     .user_property_list {
         font-size: 11px;
-    }
-
-    [data-dpr="2"] .user_property_list {
-        font-size: 22px;
-    }
-
-    [data-dpr="3"] .user_property_list {
-        font-size: 33px;
     }
 
     .user_property_value {
         font-size: 16px;
         margin-bottom: 0.16rem;
-    }
-
-    [data-dpr="2"] .user_property_value {
-        font-size: 42px;
-    }
-
-    [data-dpr="3"] .user_property_value {
-        font-size: 63px;
     }
 
     .user_property_item {
@@ -358,8 +347,6 @@
         padding-right: 0.2rem;
     }
 
-    /*-----------------------*/
-
     .title_text {
         font-size: 13px;
     }
@@ -370,14 +357,6 @@
 
     .flex_item {
         flex: 1;
-    }
-
-    [data-dpr="2"] .title_text {
-        font-size: 26px;
-    }
-
-    [data-dpr="3"] .title_text {
-        font-size: 39px;
     }
 
     .box {
@@ -417,14 +396,6 @@
         white-space: nowrap;
     }
 
-    [data-dpr="2"] .invite_friend_box {
-        font-size: 18px;
-    }
-
-    [data-dpr="3"] .invite_friend_box {
-        font-size: 27px;
-    }
-
     .invite_friend_text {
         display: inline-block;
         vertical-align: middle;
@@ -436,18 +407,6 @@
         width: 20px;
         height: 20px;
         vertical-align: middle;
-    }
-
-    [data-dpr="2"] .invite_friend_qr_code,
-    [data-dpr="2"] .message {
-        width: 40px;
-        height: 40px;
-    }
-
-    [data-dpr="3"] .invite_friend_qr_code,
-    [data-dpr="3"] .message {
-        width: 60px;
-        height: 60px;
     }
 
     .message {
@@ -514,6 +473,4 @@
         background: url('../../images/user_index/special.png') center no-repeat;
         background-size: 100% auto;
     }
-
-    /*-------------------------------------*/
 </style>

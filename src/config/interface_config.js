@@ -50,4 +50,10 @@ export default {
      * {user_id}&{captcha}&{mobile_num}
      */
     'MODIFYUSERNAME': '/ModifyUserName/', // 修改绑定手机
+
+    /**
+     * {orderId}&{userId}
+     */
+    'CONFIRMGETGOODS': '/ConfirmGetGoods/', // 确认收货
+    'GET_REASON_LIST': '/GetReason_List', // 获取退货原因列表
 }
