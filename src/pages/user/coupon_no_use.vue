@@ -61,7 +61,7 @@
 		mounted() {
 
 			this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
-				'userId': this.$store.state.userId,
+				'userId': localStorage.getItem('USER_ID'),
 				'type': '1',
 				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
@@ -108,7 +108,7 @@
 
 			function pullUpAction () {
                 this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'type': '1',
                     'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE

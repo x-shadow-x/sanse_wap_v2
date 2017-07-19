@@ -163,7 +163,7 @@
             
 
             this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-                'userId': this.$store.state.userId,
+                'userId': localStorage.getItem('USER_ID'),
                 'jpushId': this.$store.state.jpushId,
                 'channelId': this.$store.state.channelId,
                 'appId': this.$store.state.appId,
@@ -175,7 +175,7 @@
             })
 
             this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
-                'userId': this.$store.state.userId
+                'userId': localStorage.getItem('USER_ID')
                 
             }, (res) => {
                 let data = res.data;

@@ -110,7 +110,7 @@
 
 		mounted() {
 			this.$request.get(this.$interface.GET_USER_ADDRESS_LIST, {
-				'userId': this.$store.state.userId
+				'userId': localStorage.getItem('USER_ID')
 			}, (response) => {
 				let data = response.data;
 

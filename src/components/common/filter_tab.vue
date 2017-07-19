@@ -24,7 +24,7 @@
         },
         // mounted() {
         //     this.$request.get('/Get_APP_VariousType_OrderList/', {
-        //         'userId': this.$store.state.userId,
+        //         'userId': localStorage.getItem('USER_ID'),
         //         'orderType': '1',
         //         'pageIndex': '1',
         //         'pageSize': '10'

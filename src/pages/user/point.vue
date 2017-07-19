@@ -113,7 +113,7 @@
 			}
 
 			this.$request.get(this.$interface.GET_POINT_LIST, {
-				'userId': this.$store.state.userId,
+				'userId': localStorage.getItem('USER_ID'),
 				'pageIndex': '1',
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {

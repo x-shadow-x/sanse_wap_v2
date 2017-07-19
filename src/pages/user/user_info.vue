@@ -260,7 +260,7 @@
                 }
 
                 this.$request.get(this.$interface.MODIFYUSERNAME, {
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'captcha' : this.captcha,
                     'phoneNumber' : this.newPhoneNumber
                 }, (res) => {

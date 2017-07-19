@@ -60,7 +60,7 @@ export default {
 
     /**
      * {related_order_id}
-     * {memberId}
+     * {userId}
      * {return_type} 目前只有退货，值为 1
      * {return_reason_Id}
      * {return_remark}
@@ -80,4 +80,25 @@ export default {
      * {orderId}&{userId}&{cancelReasonId}
      */
     'CANCEL_ORDER_INFO': '/Cancel_OrderInfo/', // 取消订单
+
+    /**
+     * {orderId}
+     */
+    'GET_AUTO_CANCEL_TIME_BY_ORDER_ID': '/Get_AutoCancelTime_ByOrderID/', // 取消订单剩余时间
+
+
+
+
+    /**
+     * {userId}
+     * {rec_ids}
+     * {bonusId}
+     * {IsUsePoint}
+     * {IsUseBalance}
+     * {IsStore} 传0
+     * {addressId}
+     * {isUsePromote}
+     * {isUseRedPacket}
+     */
+    'GET_JIESUAN_LIST': '/Get_JieSuanList/', // 获取结算信息
 }

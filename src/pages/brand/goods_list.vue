@@ -339,10 +339,10 @@
             },
 
 			getDefaultData(cb) {
-				console.log(this.$store.state.userId);
+				console.log(localStorage.getItem('USER_ID'));
 				console.log(this.$store.state.cookieId);
 				this.$request.get(this.$interface.GET_ALL_GOODS_DETAIL_LIST, {
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'funcType': this.funcType,
                     'catId': this.catId,
                     'keyWord': encodeURI(this.$route.query.keyWord || ' '),
@@ -399,7 +399,7 @@
 					'startPrice': 0, // 已经弃用的参数~故传个0~只是占位
 					'endPrice': 0, // 已经弃用的参数~故传个0~只是占位
 					'keyWord': encodeURI(this.$route.query.keyWord || ' '),
-					'userId': this.$store.state.userId,
+					'userId': localStorage.getItem('USER_ID'),
 					'cookieId': this.$store.state.cookieId,
 					'sortField': this.sortField,
 					'sortBy': this.sortBy,

@@ -141,7 +141,7 @@
 
 	    	getShoppingBagNum() {
 	    		this.$request.get(this.$interface.GETSTOREAGECOUNT, {
-					'userId': this.$store.state.userId,
+					'userId': localStorage.getItem('USER_ID'),
 	                'cookieId': this.$store.state.cookieId
 	            }, (response) => {
 	            	let data = response.data;
@@ -178,7 +178,7 @@
 	    			this.$request.get(this.$interface.GET_GOODS_SIZE, {
 						'goodsId': this.selectColorGoodsDetail.goods_id,
 	                    'imgColor': this.selectColorGoodsDetail.img_color,
-	                    'userId': this.$store.state.userId
+	                    'userId': localStorage.getItem('USER_ID')
 	                }, (response) => {
 						let data = response.data;
 
@@ -302,10 +302,10 @@
             	}, 100);
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
-            		console.log(this.$store.state.userId);
-            		if(this.$store.state.userId != 0) {
+            		console.log(localStorage.getItem('USER_ID'));
+            		if(localStorage.getItem('USER_ID') != 0) {
 	            		// 已经登录了使用登录状态下添加到购物车的接口
-	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, this.$store.state.userId, () => {this.getShoppingBagNum()});
+	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, localStorage.getItem('USER_ID'), () => {this.getShoppingBagNum()});
 	            	} else {
 	            		console.log('123---------------');
 	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_INSERT_BUYCAR_UNLOGININ, this.$store.state.cookieId, () => {this.getShoppingBagNum()});
@@ -316,7 +316,7 @@
 
             toggleCollectionRequest(interfaceName, cb) {
             	this.$request.get(interfaceName, {
-            		'userId': this.$store.state.userId,
+            		'userId': localStorage.getItem('USER_ID'),
 					'goodsId': this.selectColorGoodsDetail.goods_id,
 					'cookieId': this.$store.state.cookieId,
 					'colorId': this.selectColorGoodsDetail.img_color
@@ -422,7 +422,7 @@
 				// store中未保存相应的数据，则可能是直接通过连接跳到详情页的，此时通过另一个接口根据goodsid直接拿对应的商品数据
 				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE, {
 					'goodsId': this.goodsId,
-                    'userId': this.$store.state.userId
+                    'userId': localStorage.getItem('USER_ID')
                 }, (response) => {
 					let data = response.data;
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);

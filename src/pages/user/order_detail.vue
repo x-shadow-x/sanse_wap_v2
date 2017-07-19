@@ -1,7 +1,7 @@
 <template>
 	<div class="order_detail_main">
         <div class="order_detail_content">
-            <div class="order_sys_tip">你的订单将在11分钟后</div>
+            <div class="order_sys_tip" v-if="restTime > 0">您的订单将在{{restTime}}分钟后自动取消</div>
     		<div class="order_info_item_box">
                 <div class="num_price_box">
                     <p>¥{{orderEntity.order_amount}}</p>
@@ -24,10 +24,10 @@
                         <h2 class="goods_name">{{item.goods_Name}}</h2>
 
                         <div class="relative_box">
-                            <p>颜色：{{item.colorName}}</p>
+                            <p class="goods_attr">颜色：{{item.colorName}}</p>
                             <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
                         </div>
-                        <p>尺码：{{item.sizeName}}</p>
+                        <p class="goods_attr">尺码：{{item.sizeName}}</p>
                         <div class="old_price_box">
                             <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
                         </div>
@@ -159,6 +159,7 @@
                 isShowCancelOrderReasonListBox: false,
                 confirmCbName: '',
                 cancelReasonId: '',
+                restTime: 0
             }
         },
         methods: {
@@ -251,6 +252,15 @@
                 this.orderDetailList = data.orderDetailList;
                 this.orderEntity = data.orderEntity;
                 this.expressList = data.expressList;
+
+                if(this.orderEntity.orderStatus == '待付款') {
+                    this.$request.get(this.$interface.GET_AUTO_CANCEL_TIME_BY_ORDER_ID, {
+                        'orderId': this.$route.query.orderId
+                    }, (response) => {
+                        let data = response.data;
+                        this.restTime = Math.ceil(data/60);
+                    });
+                }
             });
 
 
@@ -355,8 +365,8 @@
 
     .goods_img_box {
         position: relative;
-        width: 30%;
-        padding-top: 30%;
+        width: 32%;
+        padding-top: 32%;
         overflow: hidden;
     }
 
@@ -370,7 +380,7 @@
 
     .goods_info_box {
         font-size: 12px;
-        width: 70%;
+        width: 68%;
         box-sizing: border-box;
         padding-left: 0.28rem;
     }
@@ -411,9 +421,14 @@
         font-size: 14px;
     }
 
+    .goods_attr {
+        line-height: 1.2;
+    }
+
     .old_price_box {
         color: #7f7f7f;
         font-weight: normal;
+        margin-top: 5px;
     }
 
     .money_tip {

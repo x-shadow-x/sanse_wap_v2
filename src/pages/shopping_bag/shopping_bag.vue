@@ -26,7 +26,10 @@
                             <div class="info_swiper" :class="{edit_status: item.isEdit}">
                                 <div class="goods_info">
                                     <h2 class="goods_name">{{item.goods_name}}</h2>
-                                        <div class="goods_color">颜色: {{item.goods_color}}</div>
+                                        <div class="goods_color">
+                                            颜色: {{item.goods_color}}
+                                            <span class="limited_tip" v-if="item.is_limited == '1'">限量/特别版</span>
+                                        </div>
                                         <div class="goods_size">尺码: {{item.goods_size}}</div>
                                         <div class="price_box">
                                             <div class="old_price_box">
@@ -72,8 +75,8 @@
             <div class="balance_box" v-if="!isEditAllStatus">
                 <div class="subtotal_box">
                     <span>小计：</span><span class="money_tip">¥</span><span class="price">{{totalPrice}}</span>
-                </div>
-                <router-link to="settle_accounts" class="balance_btn_box">
+                </div>settle_accounts
+                <router-link :to="{path: '/settle_accounts', query: {recId: recId}}" class="balance_btn_box">
                     结算<span>({{totalNum}})</span>
                 </router-link>
             </div>
@@ -115,6 +118,20 @@
             }
         },
 
+        computed: {
+            recId: function() {
+                let recIdArr = [];
+                for(let i = 0, len = this.shoppingbagRecord.length; i < len; i++) {
+                    let item = this.shoppingbagRecord[i];
+                    if(item.selected) {
+                        recIdArr.push(item.rec_id);
+                    }
+                    
+                }
+                return recIdArr.join(',');
+            }
+        },
+
         methods: {
             handleData(data) {
                 data.forEach(function(item) {
@@ -130,8 +147,11 @@
                 this.totalPrice = 0;
                 this.totalNum = 0;
                 data.forEach((item) => {
-                    this.totalPrice = this.totalPrice + item.price * item.number;
-                    this.totalNum = +item.number + this.totalNum;
+                    if(item.selected) {
+                        this.totalPrice = this.totalPrice + item.price * item.number;
+                        this.totalNum = +item.number + this.totalNum;
+                    }
+                    
                 });
 
                 this.totalPrice = this.totalPrice.toFixed(2);
@@ -167,6 +187,7 @@
                 let currentItem = this.shoppingbagRecord[index];
                 currentItem.selected = !currentItem.selected;
                 this.checkIsAllSelected();
+                this.culateTotal(this.shoppingbagRecord);
             },
 
             checkIsAllSelected() {
@@ -257,7 +278,7 @@
         mounted() {
 
             this.$request.get(this.$interface.GET_BUY_CAR_GOOD_LIST, {
-                'userId': this.$store.state.userId,
+                'userId': localStorage.getItem('USER_ID'),
                 'cookieId': this.$store.state.cookieId
             }, (response) => {
                 let data = response.data;
@@ -294,7 +315,7 @@
             function pullUpAction () {
 
                 this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'cookieId': this.$store.state.cookieId,
                     'favType': 2,
                     'pageSize': this.$interface.PAGE_SIZE,
@@ -618,6 +639,17 @@
     .goods_color,
     .goods_size {
         line-height: 0.435rem;
+        position: relative;
+    }
+
+    .limited_tip {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 2px;
+        border: 1px solid red;
+        color: red;
     }
 
     .price_box {

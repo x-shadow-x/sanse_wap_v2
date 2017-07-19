@@ -116,7 +116,7 @@
             	if(this.validate()) {
             		this.$store.commit('SHOW_LOAD');
             		this.$request.get(this.$interface.ADD_ADDRESS, {
-            			'userId':this.$store.state.userId,
+            			'userId':localStorage.getItem('USER_ID'),
             			'consignee': this.consignee,
             			'district': this.distinctAddressId,
             			'address': this.address,

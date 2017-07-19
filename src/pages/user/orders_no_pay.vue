@@ -99,7 +99,7 @@
                         'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -132,7 +132,7 @@
                     'cookie_id': this.$store.state.cookieId,
                     'systype': 'wap'
                 },
-                'userId': this.$store.state.userId,
+                'userId': localStorage.getItem('USER_ID'),
                 'orderStatus': this.orderStatus,
                 'pageSize': this.$interface.PAGE_SIZE,
                 'pageIndex': this.pageIndex++
@@ -163,7 +163,7 @@
                         'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': this.$store.state.userId,
+                    'userId': localStorage.getItem('USER_ID'),
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
