@@ -1,11 +1,16 @@
 <template>
-	<div class="record_list_box" id="couponNoUseListBox">
+	<div class="record_list_box" id="couponListBox">
 		<div class="scroller">
 			<ul class="record_list">
+                <li class="record_item">
+                    <span class="check_btn" :class="{active: isOutOfCoupon}" @click="outOfCoupon"></span>
+                    <p>不使用优惠券</p>
+                </li>
 				<li class="record_item" v-for="(item, index) in couponRecord" :key="item.bonus_id">
-                    <!-- <img :src="item.bg_image_path" alt="优惠券背景图" class="coupon_bg"> -->
+                    <span class="check_btn" :class="{active: item.isSelect}" @click="selectCoupon(index)"></span>
 					<div class="coupon_box">
-                        <img src="../../images/temp_coupon.jpg" alt="优惠券背景图" class="coupon_bg">
+                        <!-- <img :src="item.isEnabled == '0' ? item.expired_bg_image_path : item.bg_image_path" alt="优惠券背景图" class="coupon_bg"> -->
+                        <img src="../../images/temp_coupon.jpg" alt="优惠券" class="coupon_bg">
                         <div class="coupon_value_box">
                             <template v-if="item.discount == '0'">
                                 <span class="coupon_value">{{item.type_money}}</span>
@@ -17,7 +22,7 @@
                             </template>
                         </div>
                     </div>
-                    <div class="intro_box">
+                    <div class="intro_box" v-if="item.isEnabled != '0'">
                         <div class="intro" :class="{spread: item.isSpread}">
                             <p class="intro_text">{{item.use_end_date}}后到期</p>
                         </div>
@@ -47,6 +52,9 @@
 				myScroll: null,
 				isMore: false,
                 pageIndex: 1,
+                isOutOfCoupon: this.$route.query.bonusId == 0,
+                recId: this.$route.query.recId,
+                bonusId: this.$route.query.bonusId || 0,
 				couponRecord: []
 			}
 		},
@@ -55,19 +63,56 @@
             toggleSpread(index) {
                 let tempValue = this.couponRecord[index].isSpread;
                 this.couponRecord[index].isSpread = !tempValue;
+            },
+
+            selectCoupon(index) {
+                let currentCoupon = this.couponRecord[index];
+
+                if(!currentCoupon.isSelect) {
+                    this.couponRecord.forEach((item) => {
+                        item.isSelect = false;
+                    });
+                    this.isOutOfCoupon = false;
+                }
+
+                currentCoupon.isSelect = true;
+                let bonusData = JSON.stringify({couponId: currentCoupon.bonus_id, couponText: currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'});
+                localStorage.setItem('SHOPPING_BAG_BONUS', JSON.stringify(bonusData));
+                // 
+                // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: currentCoupon.bonus_id, couponText: currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'});
+                setTimeout(() => {
+                    this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                }, 320);
+            },
+
+            outOfCoupon() {
+                if(!this.isOutOfCoupon) {
+                    this.couponRecord.forEach((item) => {
+                        item.isSelect = false;
+                    });
+                }
+
+                this.isOutOfCoupon = true;
+                let bonusData = JSON.stringify({couponId: 0, couponText: ''});
+                localStorage.setItem('SHOPPING_BAG_BONUS', JSON.stringify(bonusData));
+                // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: 0, couponText: ''});
+                setTimeout(() => {
+                    this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                }, 320);
             }
 		},
 
 		mounted() {
 
-			this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
+            // {user_id}&{bonus_ids}&{pageIndex}&{pageSize}
+			this.$request.get(this.$interface.GET_BONUS_LIST, {
 				'userId': localStorage.getItem('USER_ID'),
-				'type': '1',
+				'bonusIds': this.$route.query.bonusIds || 0,
 				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
 				let data = response.data;
-                pretreatData(data);
+                pretreatData(data, this.bonusId);
 				this.couponRecord = data;
 
 				if(data.length == this.$interface.PAGE_SIZE) {
@@ -82,9 +127,17 @@
                 }, 320);
 			});
 
-            function pretreatData(data) {
+            function pretreatData(data, bonusId) {
                 data.forEach(function(item) {
                     item.isSpread = false;
+                    item.isSelect = false;
+                    if(item.bonus_id == bonusId) {
+                        item.isSelect = true;
+                    } else {
+                        item.isSelect = false;
+                    }
+                    
+
                     var tempDiscountArr = item.discount.split('.');
                     if(tempDiscountArr[1] == '00') {
                         item.discount = tempDiscountArr[0];
@@ -135,7 +188,7 @@
 				pullUpOffset = pullUpEl.offsetHeight;
 				var that = this;
 
-				this.myScroll = new iScroll('couponNoUseListBox', {
+				this.myScroll = new iScroll('couponListBox', {
 					useTransition: true,
 					vScrollbar: false,
 					onRefresh: function () {
@@ -173,11 +226,13 @@
 <style scoped>
 
 	.record_list_box {
-		position: relative;
-		width: 96%;
+		position: fixed;
+		width: 100%;
 		height: 100%;
 		margin: 0 auto;
+        background: #efefef;
 		overflow: hidden;
+        z-index: 12;
 	}
 
 	.scroller {
@@ -188,11 +243,13 @@
     }
 
 	.record_list {
-		padding: 0.966184rem 5% 0 5%;
+		padding-top: 5%;
 	}
 
 	.record_item {
+        position: relative;
 		margin: 0 auto 30px auto;
+        padding: 0 5% 0 10%;
 	}
 
     .coupon_box {
@@ -296,4 +353,20 @@
 		display: inline-block;
 		vertical-align: middle;
 	}
+
+    .check_btn {
+        position: absolute;
+        left: 5%;
+        top: 50%;
+        margin-left: -7px;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        background: url('../../images/common/checkbox_icon.png') center no-repeat;
+        background-size: 100% auto;
+    }
+
+    .check_btn.active {
+        background-image: url('../../images/common/checkbox_icon_active.png');
+    }
 </style>

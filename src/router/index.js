@@ -33,6 +33,10 @@ const ordersNoReceive = r => require.ensure([], () => r(require('../pages/user/o
 const orderDetail = r => require.ensure([], () => r(require('../pages/user/order_detail.vue')), 'orders')
 const applyReturn = r => require.ensure([], () => r(require('../pages/user/apply_return.vue')), 'orders')
 
+const delievryTime = r => require.ensure([], () => r(require('../pages/shopping_bag/delievry_time.vue')), 'ordersAccount')
+const paymentList = r => require.ensure([], () => r(require('../pages/shopping_bag/payment_list.vue')), 'ordersAccount')
+const selectCoupon = r => require.ensure([], () => r(require('../pages/shopping_bag/select_coupon.vue')), 'ordersAccount')
+
 const addressManager = r => require.ensure([], () => r(require('../pages/user/address_manager.vue')), 'address')
 const addressAdd = r => require.ensure([], () => r(require('../pages/user/address_add.vue')), 'address')
 const addressEdit = r => require.ensure([], () => r(require('../pages/user/address_edit.vue')), 'address')
@@ -111,6 +115,24 @@ export default [{
         component: settleAccounts,
         meta: {
             title: '结算'
+        }
+    }, {
+        path: '/delievry_time',
+        component: delievryTime,
+        meta: {
+            title: '收货时间'
+        }
+    }, {
+        path: '/payment_list',
+        component: paymentList,
+        meta: {
+            title: '支付方式'
+        }
+    }, {
+        path: '/select_coupon',
+        component: selectCoupon,
+        meta: {
+            title: '优惠券'
         }
     }, {
         path: '/user_index',

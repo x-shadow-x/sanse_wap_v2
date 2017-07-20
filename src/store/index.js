@@ -19,6 +19,10 @@ const state = {
     keyWord: '', // 当在商品搜索页输入关键词并跳转到搜索结果页时需先记录输入的关键词~以便再再次返回搜索页的时候直接显示上次输入的关键词
     userInfo: {},
     shoppingBagNum: 0,
+    // shoppingBagBonus: {
+    //     'couponId': 0,
+    //     'couponText': ''
+    // },
     routerList: {
         '/home': 0,
 
@@ -31,6 +35,9 @@ const state = {
 
         '/shopping_bag': 3,
         '/settle_accounts': 8,
+        '/delievry_time': 9,
+        '/payment_list': 10,
+        '/select_coupon': 11,
 
         '/user_index': 4,
         '/blance': 15,

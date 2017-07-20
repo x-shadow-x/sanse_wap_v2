@@ -101,4 +101,23 @@ export default {
      * {isUseRedPacket}
      */
     'GET_JIESUAN_LIST': '/Get_JieSuanList/', // 获取结算信息
+    'GET_PAYMENT_LIST': '/GetPaymentList', // 获取支付方式
+    'GET_RECETIME_LIST': '/GetReceTimeList', // 获取收货时间
+
+    /**
+     * {user_id}
+     * {bonus_ids} 默认为0~如有需要可在跳转到优惠券选择列表时在url后带上请求参数
+     * {pageIndex}
+     * {pageSize}
+     */
+    'GET_BONUS_LIST': '/Get_BonusList/', // 结算页跳转到使用优惠券列表
+
+    /**
+     * {userId}&{addressId}&{paymentId}
+     * {besttimeId} 收货时间id
+     * {changeType} 目前为 1
+     * {changeValue} 积分变动
+     * {rec_ids}&{isStore}&{bonusId}&{surplus}&{postscript}&{condition_ids}&{redPacket}
+     */
+    'ADD_ORDERINFO_FOR_CHANGE_BY_PRODUCTIDS': '/Add_OrderInfo_ForChangeByProductIds/', // 提交订单
 }

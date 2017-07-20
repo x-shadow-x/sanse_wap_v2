@@ -25,6 +25,9 @@
 				</div>
 			</li>
 		</ul>
+		<div class="confirm_address_box" v-if="isSettleAccountsStatus">
+			<span class="confirm_address_btn" @click="confirmAddress">确认收货地址</span>
+		</div>
 		<confirm 
 		:isShowConfirm="isShowConfirm" 
 		:tipTitleF="tipTitleF" 
@@ -46,6 +49,8 @@
 				tipTitleF: '',
 				tipContentF: '',
 				confirmCbName: '',
+				selectedAddressId: '',
+				isSettleAccountsStatus: this.$route.query.act == 'settle_accounts',
 				confirmCbParams: {}
 			}
 		},
@@ -91,8 +96,11 @@
 				let selectedAddress = this.addressList[index];
 
 				if(selectedAddress.IsDefault == 1) {
+					this.selectedAddressId = selectedAddress.address_id;
 					return;
 				}
+
+				this.selectedAddressId = selectedAddress.address_id;
 
 				this.$store.commit('SHOW_LOAD');
 				this.$request.get(this.$interface.UPDATE_ADDRESS_IS_DEFAULT, {
@@ -105,6 +113,11 @@
 					selectedAddress.IsDefault = 1;
 					this.$store.commit('HIDE_LOAD');
 				});
+			},
+
+			confirmAddress() {
+				localStorage.setItem('DEFAULT_CONSIGNEE_ADDRESS', this.selectedAddressId);
+				this.$router.go(-1);
 			}
 		},
 
@@ -115,6 +128,7 @@
 				let data = response.data;
 
 				this.addressList = data;
+				this.selectedAddressId = data[0].address_id
 			});
 		},
 
@@ -230,5 +244,21 @@
 		background: #ef8200;
 		color: #fff;
 		border-radius: 4px;
+	}
+
+	.confirm_address_box {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		background: #ef8200;
+		color: #fff;
+		line-height: 14px;
+	}
+
+	.confirm_address_btn {
+		display: block;
+		padding: 0.386473rem 0;
 	}
 </style>

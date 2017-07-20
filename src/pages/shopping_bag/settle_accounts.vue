@@ -2,32 +2,32 @@
 	<div class="settle_accounts_main">
 		<div class="order_info_box">
 			<div class="order_info_item">
-				<router-link to="/settle_accounts" class="link_box">
+				<router-link :to="{path: '/address_manager', query: {act: 'settle_accounts'}}" class="link_box">
 					<h2 class="order_info_item_title">收货地址</h2>
 					<div class="order_info_item_content">
 						<div class="consignee_info">
-							<span class="consignee">收件人</span>
-							<span class="mobile">13535124518</span>
+							<span class="consignee">{{payEntity.consignee}}</span>
+							<span class="mobile">{{payEntity.mobile}}</span>
 						</div>
-						<p class="consignee_address">收货人地址收货人地址收货人地址收货人地址收货人地址收货人地址收货人地址</p>
+						<p class="consignee_address">{{payEntity.districtAddress}}</p>
 					</div>
 				</router-link>
 			</div>
 
 			<div class="order_info_item">
-				<router-link to="/settle_accounts" class="link_box">
+				<router-link to="/delievry_time" class="link_box">
 					<h2 class="order_info_item_title">收货时间</h2>
-					<div class="order_info_item_content">
-						<p>只工作日（双休日、节假日不送）</p>
+					<div class="order_info_item_content" v-if="delievryTime.rectime">
+						<p>{{delievryTime.rectime}}</p>
 					</div>
 				</router-link>
 			</div>
 
 			<div class="order_info_item">
-				<router-link to="/settle_accounts" class="link_box">
+				<router-link to="/payment_list" class="link_box">
 					<h2 class="order_info_item_title">支付方式</h2>
-					<div class="order_info_item_content">
-						<p>微信支付</p>
+					<div class="order_info_item_content" v-if="payment.pay_name">
+						<p>{{payment.pay_name}}</p>
 					</div>
 				</router-link>
 			</div>
@@ -59,6 +59,7 @@
 	                        <span class="goods_num">数量：{{item.number}}</span>
 	                    </div>
 	                </div>
+	                <div class="limited_rule_tip" v-if="item.is_limited == 1">本商品为限量/特别款商品，不与其他促销及优惠同享</div>
 	            </div>
             </div>
         </div>
@@ -78,10 +79,11 @@
 
         <div class="order_info_box">
         	<div class="order_info_item">
-        		<router-link to="/settle_accounts" class="link_box">
+        		<router-link :to="{path: '/select_coupon', query: {recId: recId, bonusId: bonusId, bonusIds: couponEntity.bonus_ids}}" class="link_box">
 					<h2 class="order_info_item_title">
 						优惠券
-						<span class="usable_coupon_tip">({{couponEntity.canUseCouponNum}}张可用)</span>
+						<span class="usable_coupon_tip" v-if="bonusId == 0">({{couponEntity.canUseCouponNum}}张可用)</span>
+						<span class="current_coupon_info">{{bonusText}}</span>
 					</h2>
 				</router-link>
         	</div>
@@ -180,8 +182,11 @@
         	<div class="total_fee_box">
         		实收款：
         		<span class="current_price_box">
-        			<span class="money_tip">¥</span><span class="price">120.00</span>
+        			<span class="money_tip">¥</span><span class="price">{{payEntity.totalprice}}</span>
         		</span>
+        	</div>
+        	<div class="submit_order_box">
+        		<span class="submit_order_btn">提交订单</span>
         	</div>
         </div>
 	</div>
@@ -194,13 +199,17 @@
 			return {
 				remark: '',
 				bonusId: 0,
+				bonusText: '',
 				isUsePoint: 0,
 				isUseRedPacket: 0,
 				isUseBalance: 0,
-				addressId: 0,
+				addressId: localStorage.getItem('DEFAULT_CONSIGNEE_ADDRESS') || 0,
 				isUsePromote: 0,
 
 				isShowTextCount: false,
+
+				delievryTime: JSON.parse(localStorage.getItem('DELIEVRY_TIME')) || {},
+				payment: JSON.parse(localStorage.getItem('PAYMENT')) || {},
 
 				goodsList: [],
 				couponEntity: {},
@@ -208,6 +217,7 @@
 				payEntity: {},
 				pointEntity: {},
 				redpacketEntity: {},
+				recId: this.$route.query.recId,
 			}
 		},
 
@@ -220,7 +230,7 @@
 				this.$store.commit('SHOW_LOAD');
 				this.$request.get(this.$interface.GET_JIESUAN_LIST, {
 	                'userId': localStorage.getItem('USER_ID'),
-	                'recId': this.$route.query.recId,
+	                'recId': this.recId,
 	                'bonusId': this.bonusId,
 	                'isUsePoint': this.isUsePoint,
 	                'isUseBalance': this.isUseBalance,
@@ -290,6 +300,14 @@
 		},
 
 		mounted() {
+			
+			if(this.$route.query.bonusData) {
+				let bonusData = JSON.parse(this.$route.query.bonusData);
+				this.bonusId = bonusData.couponId;
+				this.bonusText = bonusData.couponText;
+				console.log(this.bonusText, '=============', bonusData);
+			}
+
 			this.updateData();
 		}
 	}
@@ -342,6 +360,16 @@
 		padding: .28rem;
 		position: relative;
 		line-height: 1;
+	}
+
+	.current_coupon_info {
+		display: inline-block;
+		vertical-align: middle;
+		line-height: 18px;
+		border-radius: 4px;
+		padding: 0 5px;
+		color: #fff;
+		background: #ef8200;
 	}
 
 	.usable_coupon_tip {
@@ -426,6 +454,13 @@
         line-height: 1.4;
         padding: 0 2px;
         border: 1px solid #f20925;
+    }
+
+    .limited_rule_tip {
+    	font-size: 12px;
+    	border-top: 1px solid #efefef;
+    	margin-right: -.28rem;
+    	color: #7f7f7f;
     }
 
     .point {
@@ -559,13 +594,30 @@
     	line-height: 1.2rem;
     	height: 1.2rem;
     	background: #fff;
-    	border-top: 1px solid #efefef;
+    	font-size: 0;
     }
 
     .total_fee_box {
     	display: inline-block;
     	vertical-align: middle;
+    	padding-left: .28rem;
+    	width: 60%;
+    	font-size: 12px;
+    	box-sizing: border-box;
+    	height: 100%;
+    	border-top: 1px solid #ddd;
     }
 
-    /*.total_handle_box*/
+    .submit_order_box {
+    	display: inline-block;
+    	vertical-align: middle;
+    	width: 40%;
+    	text-align: center;
+    	background: #ef8200;
+    	font-size: 12px;
+    	box-sizing: border-box;
+    	color: #fff;
+    	height: 100%;
+    	border-top: 1px solid #ef8200;
+    }
 </style>
