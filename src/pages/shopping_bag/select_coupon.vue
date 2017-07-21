@@ -7,7 +7,7 @@
                     <p>不使用优惠券</p>
                 </li>
 				<li class="record_item" v-for="(item, index) in couponRecord" :key="item.bonus_id">
-                    <span class="check_btn" :class="{active: item.isSelect}" @click="selectCoupon(index)"></span>
+                    <span class="check_btn" :class="{active: item.isSelect}" @click="selectCoupon(index)" v-if="item.isEnabled != '0'"></span>
 					<div class="coupon_box">
                         <!-- <img :src="item.isEnabled == '0' ? item.expired_bg_image_path : item.bg_image_path" alt="优惠券背景图" class="coupon_bg"> -->
                         <img src="../../images/temp_coupon.jpg" alt="优惠券" class="coupon_bg">

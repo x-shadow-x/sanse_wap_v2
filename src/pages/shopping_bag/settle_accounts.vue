@@ -95,9 +95,9 @@
         		<div class="order_info_item_content">
         			<div class="benefit_info">
         				<span class="benefit_name">剩余积分：</span>
-        				<span class="benefit_value">{{pointEntity.allowPoint}}</span>
+        				<span class="benefit_value">{{pointEntity.totalPoints}}</span>
         			</div>
-        			<div class="benefit_info">
+        			<div class="benefit_info" v-if="pointEntity.allowPoint > 0">
         				<span class="benefit_name">可用{{pointEntity.allowPoint}}积分再抵用{{pointEntity.equalMoney}}</span>
         				<span class="check_btn" :class="{active: isUsePoint == 1}"></span>
         			</div>
@@ -186,9 +186,10 @@
         		</span>
         	</div>
         	<div class="submit_order_box">
-        		<span class="submit_order_btn">提交订单</span>
+        		<span class="submit_order_btn" @click="submitOrder">提交订单</span>
         	</div>
         </div>
+        <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
 	</div>
 </template>
 
@@ -203,11 +204,14 @@
 				isUsePoint: 0,
 				isUseRedPacket: 0,
 				isUseBalance: 0,
-				addressId: localStorage.getItem('DEFAULT_CONSIGNEE_ADDRESS') || 0,
 				isUsePromote: 0,
-
 				isShowTextCount: false,
 
+				isShowAlert: false,
+				tipTitleF: '提示',
+				tipContentF: '',
+
+				addressId: localStorage.getItem('DEFAULT_CONSIGNEE_ADDRESS') || 0,
 				delievryTime: JSON.parse(localStorage.getItem('DELIEVRY_TIME')) || {},
 				payment: JSON.parse(localStorage.getItem('PAYMENT')) || {},
 
@@ -218,6 +222,7 @@
 				pointEntity: {},
 				redpacketEntity: {},
 				recId: this.$route.query.recId,
+				conditionIds: ' '
 			}
 		},
 
@@ -226,7 +231,11 @@
 				cb(data);
 			},
 
-			updateData: function() {
+			hideAlert: function() {
+				this.isShowAlert = false;
+			},
+
+			updateData: function(cb) {
 				this.$store.commit('SHOW_LOAD');
 				this.$request.get(this.$interface.GET_JIESUAN_LIST, {
 	                'userId': localStorage.getItem('USER_ID'),
@@ -258,16 +267,30 @@
 
 	                this.pointEntity = data.pointEntity;
 	                this.redpacketEntity = data.redpacketEntity;
+	                if(typeof cb == 'function') {
+	                	cb(data);
+	                }
 	                this.$store.commit('HIDE_LOAD');
 	            });
 			},
 
 			toggleUsePromote: function() {
+				let conditionIds = [];
 				if(this.isUsePromote == 1) {
 					this.isUsePromote = 0;
+					conditionIds = ' ';
 				} else {
 					this.isUsePromote = 1;
+
+					this.listgiftEntity.forEach((item) => {
+						conditionIds.push(item.condition_id);
+					});
+
+					conditionIds = conditionIds.join(',');
 				}
+
+				this.conditionIds = conditionIds;
+
 				this.updateData();
 			},
 
@@ -296,6 +319,73 @@
 					this.isUseBalance = 1;
 				}
 				this.updateData();
+			},
+
+			validate: function(data) {
+				if(this.addressId == 0) {
+					this.tipContentF = '请选择收货地址';
+					this.isShowAlert = true;
+					return false;
+				} else if(!this.delievryTime.id) {
+					this.tipContentF = '请选择收货时间';
+					this.isShowAlert = true;
+					return false;
+				} else if(!this.payment.pay_id) {
+					this.tipContentF = '请选择支付方式';
+					this.isShowAlert = true;
+					return false;
+				}
+
+				return true;
+			},
+
+			base64Encode: function(str) {
+				var result;
+			    result = encodeURIComponent(str);
+			    result = unescape(result);
+			    result = window.btoa(result);
+			    return result;
+			},
+
+			pay: function(data) {
+				let domain = '//' + document.domain + '/';
+				let payId = this.payment.pay_id;
+				let orderSn = data.OrderSn;
+				let orderAmount = data.OrderAmount;
+				let time = parseInt(new Date().getTime() / 1000);
+				let sign = this.$md5(payId + orderSn + orderAmount + time + 'inno');
+
+				let encodeStr = payId + '||' + orderSn + '||' + orderAmount + '||' + time + '||' + sign;
+				let payCode = this.base64Encode(encodeStr);
+				let url = domain + "api/pay/wap_pay.php?pay_code=" + payCode;
+				window.location = url;
+
+			},
+
+			submitOrder: function() {
+
+				if(!this.validate()) {
+					return;
+				}
+
+				this.$request.post(this.$interface.ADD_ORDERINFO_FOR_CHANGE_BY_PRODUCTIDS, {
+		                'userId': localStorage.getItem('USER_ID'),
+		                'addressId': this.addressId,
+		                'paymentId': this.payment.pay_id,
+		                'besttimeId': this.delievryTime.id,
+		                'changeType': 1,
+		                'changeValue': this.isUsePoint == 0 ? 0 : this.pointEntity.allowPoint,
+		                'recId': this.recId,
+		                'isStore': 0,
+		                'bonusId': this.bonusId,
+		                'surplus': this.isUseBalance == 0 ? 0 : this.payEntity.canUsebalance,
+		                'postscript': this.remark || ' ',
+		                'conditionIds': this.conditionIds,
+		                'redPacket': this.isUseRedPacket == 0 ? 0 : this.redpacketEntity.canUseRedPacket
+		            }, (response) => {
+		                let data = response.data;
+		                this.pay(data);
+	            });
 			}
 		},
 
@@ -305,10 +395,16 @@
 				let bonusData = JSON.parse(this.$route.query.bonusData);
 				this.bonusId = bonusData.couponId;
 				this.bonusText = bonusData.couponText;
-				console.log(this.bonusText, '=============', bonusData);
 			}
 
-			this.updateData();
+			this.updateData((data) => {
+				// console.log(data);
+				this.addressId = data.payEntity.address_id || 0;
+			});
+		},
+
+		components: {
+			alert
 		}
 	}
 </script>
