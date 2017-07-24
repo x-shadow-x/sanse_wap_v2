@@ -52,7 +52,7 @@
                                         <span class="add num_edit_btn" :class="{disable: item.product_number <= 0}" @click="addGoods(index)"></span>
                                     </div>
                                     <div class="product_number">库存: {{item.product_number}}</div>
-                                    <span class="complete_btn" @click="item.isEdit = false;" v-if="!isEditAllStatus">完成</span>
+                                    <span class="complete_btn" @click="completeEditItem(index)" v-if="!isEditAllStatus">完成</span>
                                 </div>
                             </div>
                         </div>
@@ -227,6 +227,7 @@
                 this.$request.get(this.$interface.DEL_BUY_GOODS, {
                     'recId': selectedCollectionRecord.rec_id
                 }, (response) => {
+                    this.updateShoppingBagNum();
                     this.shoppingbagRecord.splice(index, 1);
                     this.culateTotal(this.shoppingbagRecord);
                     this.$store.commit('HIDE_LOAD');
@@ -247,39 +248,87 @@
                 this.$request.get(this.$interface.BATCH_OPTIMIZE_BUY_CAR, {
                     'postStr': postStr
                 }, (response) => {
+                    this.updateShoppingBagNum();
                     this.shoppingbagRecord = [];
                     this.$store.commit('HIDE_LOAD');
                 });
             },
 
-            subtractGoods(index) {
+            // 更新商品数量
+            updateGoodsNum(index, goodsNum, cb) {
+
+                this.$store.commit('SHOW_LOAD');
+
+                let postStr = '';
                 let currentItem = this.shoppingbagRecord[index];
+
+                postStr = '[' + JSON.stringify({'RecID': currentItem.rec_id, 'Number': goodsNum, 'IsDel': 0}) + ']';
+
+                this.$request.get(this.$interface.BATCH_OPTIMIZE_BUY_CAR, {
+                    'postStr': postStr
+                }, (response) => {
+                    this.$store.commit('HIDE_LOAD');
+                    this.updateShoppingBagNum();
+                    if(typeof cb == 'function') {
+                        cb(index);
+                    }
+                });
+            },
+
+            updateShoppingBagNum() {
+                this.$request.get(this.$interface.GETSTOREAGECOUNT, {
+                    'userId': localStorage.getItem('USER_ID'),
+                    'cookieId': this.$store.state.cookieId
+                }, (response) => {
+                    let data = response.data;
+                    this.$store.commit('SET_SHOPPING_BAG_NUM', data);
+                });
+            },
+
+            subtractGoods(index) {
+
+                let currentItem = this.shoppingbagRecord[index];
+
                 if(currentItem.number > 1) {
                     // 未到最小值~可以减少
-                    currentItem.number = +currentItem.number - 1;
-                    currentItem.product_number = +currentItem.product_number + 1;
+                    this.updateGoodsNum(index, +currentItem.number - 1, (index) => {
+                        let currentItem = this.shoppingbagRecord[index];
+                        currentItem.number = +currentItem.number - 1;
+                        currentItem.product_number = +currentItem.product_number + 1;
+                        this.culateTotal(this.shoppingbagRecord);
+                    });
                 }
-
-                this.culateTotal(this.shoppingbagRecord);
+                
             },
 
             addGoods(index) {
+
                 let currentItem = this.shoppingbagRecord[index];
+
                 if(currentItem.product_number > 0 ) {
                     // 未超过库存量~可以继续添加
-                    currentItem.number = +currentItem.number + 1;
-                    currentItem.product_number = +currentItem.product_number - 1;
-                }
+                    this.updateGoodsNum(index, +currentItem.number + 1, (index) => {
 
-                this.culateTotal(this.shoppingbagRecord);
+                        let currentItem = this.shoppingbagRecord[index];
+                        currentItem.number = +currentItem.number + 1;
+                        currentItem.product_number = +currentItem.product_number - 1;
+
+                        this.culateTotal(this.shoppingbagRecord);
+
+                    });
+                }
+                
+            },
+
+            completeEditItem(index) {
+                this.shoppingbagRecord[index].isEdit = false;
             }
         },
 
         mounted() {
-
             this.$request.get(this.$interface.GET_BUY_CAR_GOOD_LIST, {
                 'userId': localStorage.getItem('USER_ID'),
-                'cookieId': this.$store.state.cookieId
+                'cookieId': localStorage.getItem('COOKIE_ID')
             }, (response) => {
                 let data = response.data;
 
@@ -766,6 +815,7 @@
         height: 32px;
         background: url('../../images/shopping_bag/del_goods_item_icon.png') right top no-repeat;
         background-size: 16px auto;
+        z-index: 2;
     }
 
     .balance_btn_box {
