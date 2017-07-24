@@ -1,5 +1,10 @@
 // 配置API接口地址
+// 开发环境接口
 var root = process.env.API_ROOT
+
+
+// 生产环境接口
+// var root = 'http://inno.mo2o.com.cn:8092/int_app/VER_SANSE_1_2_6/APPSERVICE.svc'
 
 // 引用axios
 var axios = require('axios')

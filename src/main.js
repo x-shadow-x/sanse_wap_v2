@@ -63,6 +63,7 @@ init();
 Vue.use(VueRouter)
 const router = new VueRouter({
     mode: 'history',
+    // base: '/vue_mobile/',
     routes
 })
 

@@ -195,6 +195,7 @@
 
 <script>
 	import alert from '../../components/common/alert.vue';
+	import payHelper from '../../config/wx_pay_helper.js';
 	export default {
 		data() {
 			return {
@@ -359,6 +360,7 @@
 				let payCode = this.base64Encode(encodeStr);
 				let url = domain + "api/pay/wap_pay.php?pay_code=" + payCode;
 				window.location = url;
+				// console.log(payHelper.callpay);
 
 			},
 
