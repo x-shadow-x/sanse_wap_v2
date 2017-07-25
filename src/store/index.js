@@ -33,13 +33,13 @@ const state = {
         '/goods_detail': 7,
         '/store_search': 8,
 
-        '/shopping_bag': 3,
+        '/shopping_bag': 2,
         '/settle_accounts': 8,
         '/delievry_time': 9,
         '/payment_list': 10,
         '/select_coupon': 11,
 
-        '/user_index': 4,
+        '/user_index': 3,
         '/blance': 15,
         '/red_package': 16,
         '/point': 17,
@@ -57,6 +57,10 @@ const state = {
         '/bind_phone_number': 30,
         '/coupon/no_use': 31,
         '/coupon/overdue': 32,
+
+        '/store_pay': 4,
+        '/history_pay': 50,
+        '/pay_info': 51,
     },
     
 }

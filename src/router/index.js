@@ -13,6 +13,11 @@ const storeSearch = r => require.ensure([], () => r(require('../pages/brand/stor
 const shoppingBag = r => require.ensure([], () => r(require('../pages/shopping_bag/shopping_bag.vue')), 'shoppingBag')
 const settleAccounts = r => require.ensure([], () => r(require('../pages/shopping_bag/settle_accounts.vue')), 'shoppingBag')
 
+
+const storePay = r => require.ensure([], () => r(require('../pages/store_pay/store_pay.vue')), 'storePay')
+const historyPay = r => require.ensure([], () => r(require('../pages/store_pay/history_pay.vue')), 'storePay')
+const payInfo = r => require.ensure([], () => r(require('../pages/store_pay/pay_info.vue')), 'storePay')
+
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
 const redPackage = r => require.ensure([], () => r(require('../pages/user/red_package.vue')), 'user')
@@ -298,5 +303,23 @@ export default [{
                 title: '线上购物新手指南-售后须知'
             }
         }]
+    }, {
+        path: '/store_pay',
+        component: storePay,
+        meta: {
+            title: '店铺支付'
+        }
+    }, {
+        path: '/history_pay',
+        component: historyPay,
+        meta: {
+            title: '历史支付'
+        }
+    }, {
+        path: '/pay_info',
+        component: payInfo,
+        meta: {
+            title: '支付信息'
+        }
     }]
 }]

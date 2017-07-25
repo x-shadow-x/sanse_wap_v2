@@ -120,4 +120,21 @@ export default {
      * {rec_ids}&{isStore}&{bonusId}&{surplus}&{postscript}&{condition_ids}&{redPacket}
      */
     'ADD_ORDERINFO_FOR_CHANGE_BY_PRODUCTIDS': '/Add_OrderInfo_ForChangeByProductIds/', // 提交订单
+
+    /**
+     * userId, pageIndex, pageSize
+     */
+    'GET_OFFLINE_ORDERINFORECORD_LIST': '/Get_offline_OrderInfoRecord_List/', // 获取店铺支付历史列表
+
+
+    /**
+     * userId, qr_pay_code
+     */
+    'GET_OFFLINE_ORDERINFO': '/Get_offline_OrderInfo/', // 判断该二维码是否已经被扫过
+    /**
+     * paymentid
+     * bonusId 默认为 0
+     * IsUsePoint 默认为 0
+     */
+    'GET_OFFLINE_JIESUANLIST': '/Get_offline_JieSuanList/', // 店铺支付支付信息
 }
