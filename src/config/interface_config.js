@@ -137,4 +137,13 @@ export default {
      * IsUsePoint 默认为 0
      */
     'GET_OFFLINE_JIESUANLIST': '/Get_offline_JieSuanList/', // 店铺支付支付信息
+
+
+    /**
+     * userId, 
+     * bonusIds 默认为0~如有需要可在跳转到优惠券选择列表时在url后带上请求参数
+     * pageIndex, 
+     * pageCount
+     */
+    'GET_OFFLINE_COUPONUS_LIST': '/Get_offlineCouponusList/', // 获取店铺支付优惠券
 }

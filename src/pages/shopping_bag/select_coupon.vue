@@ -8,7 +8,7 @@
                 </li>
 				<li class="record_item" v-for="(item, index) in couponRecord" :key="item.bonus_id">
                     <span class="check_btn" :class="{active: item.isSelect}" @click="selectCoupon(index)" v-if="item.isEnabled != '0'"></span>
-					<div class="coupon_box">
+					<div class="coupon_box" :class="{over_due: item.isEnabled == '0'}">
                         <!-- <img :src="item.isEnabled == '0' ? item.expired_bg_image_path : item.bg_image_path" alt="优惠券背景图" class="coupon_bg"> -->
                         <img src="../../images/temp_coupon.jpg" alt="优惠券" class="coupon_bg">
                         <div class="coupon_value_box">
@@ -54,10 +54,18 @@
                 pageIndex: 1,
                 isOutOfCoupon: this.$route.query.bonusId == 0,
                 recId: this.$route.query.recId,
+                preRouter: this.$route.query.preRouter,
                 bonusId: this.$route.query.bonusId || 0,
+                
 				couponRecord: []
 			}
 		},
+
+        computed: {
+            interface: function() {
+                return this.$interface[this.$route.query.queryName] || this.$interface.GET_BONUS_LIST;
+            }
+        },
 
 		methods: {
             toggleSpread(index) {
@@ -81,7 +89,12 @@
                 // 
                 // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: currentCoupon.bonus_id, couponText: currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'});
                 setTimeout(() => {
-                    this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                    if(this.preRouter) {
+                        this.$router.push(this.preRouter + '&bonusData=' + bonusData);
+                    } else {
+                        this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                    }
+                    
                 }, 320);
             },
 
@@ -97,15 +110,19 @@
                 localStorage.setItem('SHOPPING_BAG_BONUS', JSON.stringify(bonusData));
                 // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: 0, couponText: ''});
                 setTimeout(() => {
-                    this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                    if(this.preRouter) {
+                        this.$router.push(this.preRouter + '&bonusData=' + bonusData);
+                    } else {
+                        this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
+                    }
                 }, 320);
             }
 		},
 
 		mounted() {
-
+        
             // {user_id}&{bonus_ids}&{pageIndex}&{pageSize}
-			this.$request.get(this.$interface.GET_BONUS_LIST, {
+			this.$request.get(this.interface, {
 				'userId': localStorage.getItem('USER_ID'),
 				'bonusIds': this.$route.query.bonusIds || 0,
 				'pageIndex': this.pageIndex++,
@@ -151,6 +168,10 @@
                     } else if(/[1-9]0/.test(tempTypeMoneyArr[1])) {
                         item.type_money = (+item.type_money).toFixed(1);
                     }
+
+                    if(!item.expired_bg_image_path) {
+                        item.expired_bg_image_path = require('../../images/coupon/coupon_out_of_date.jpg');
+                    }
                 });
             }
 
@@ -160,9 +181,9 @@
 				tempLoad = 0;
 
 			function pullUpAction () {
-                this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
+                this.$request.get(this.interface, {
                     'userId': localStorage.getItem('USER_ID'),
-                    'type': '1',
+                    'bonusIds': this.$route.query.bonusIds || 0,
                     'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {
@@ -257,8 +278,15 @@
         font-size: 0;
     }
 
+    .coupon_box.over_due {
+        background: url('../../images/coupon/overdue_icon.png') center no-repeat;
+        background-size: 100% auto;
+    }
+
 	.coupon_bg {
 		width: 100%;
+        position: relative;
+        z-index: -1;
 	}
 
     .coupon_value_box {
