@@ -13,6 +13,7 @@
 	export default {
 		data() {
 			return {
+				paymentId: this.$route.query.payId,
 				paymentList: [],
 			}
 		},
@@ -28,12 +29,16 @@
 				}
 
 				data.forEach((item) => {
-					item.isSelect = false;
+					if(item.pay_id == this.paymentId) {
+						item.isSelect = true;
+					} else {
+						item.isSelect = false;
+					}
+					
 				});
 			},
 
 			selectedPayment: function(index) {
-				console.log(index);
 				let list =this.paymentList;
 				if(!list[index].isSelect) {
 					list.forEach((item) => {
@@ -47,6 +52,7 @@
 				
 				localStorage.setItem('PAYMENT', JSON.stringify(list[index]));
 				setTimeout(() => {
+					this.$emit('childEmitUpdate', {'propName': this.$route.query.propName, 'updatePropName': list[index]});
 					this.$router.go(-1);
 				}, 320);
 			}

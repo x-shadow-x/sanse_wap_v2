@@ -3,5 +3,6 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_ROOT: '"/api"'
+  API_ROOT: '"/api"',
+  API_WX_PAY_DEV: '"/wx_pay_dev"'
 })

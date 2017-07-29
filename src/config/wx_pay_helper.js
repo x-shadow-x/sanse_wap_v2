@@ -1,4 +1,47 @@
+var root = process.env.API_WX_PAY_DEV;
+
+// 生产环境接口
+// http://fortest.innourl.com/sanse_wap_v2/dist/home
+// var root = 'http://fortest.innourl.com/sanse_wap_v2/api'
+
+// 引用axios
+var axios = require('axios')
+
+
+function apiAxios (method, url, params, success) {
+	let headerInfo = {
+        'platform_src': 'WAP',
+        'cookie_id': '23456006805d970d5438a354dc019fc295614979',
+        'systype': 'wap'
+    };
+
+	axios({
+		method: method,
+		url: url,
+		headers: headerInfo ? headerInfo : null,
+	    baseURL: root,
+	    withCredentials: false
+	})
+	.then(function (res) {
+		if(res.error != '1') {
+			if (typeof success == 'function') {
+				success(res);
+			}
+		}
+	})
+	.catch(function (err) {
+		let res = err.response;
+		if (err) {
+			window.alert('api error, HTTP CODE: ' + err)
+			return
+		}
+	})
+}
+
+
+
 function jsApiCall (data) {
+	console.log(data, '=============');
 	if(!WeixinJSBridge) {
 		alert('请用微信浏览器打开');
 		return;
@@ -36,5 +79,10 @@ export default {
 		}else{
 		    jsApiCall(data);
 		}
+	},
+
+	wxPayGetRequest: function (url, params, success) {
+		// console.log(url, params, success);
+		return apiAxios('GET', url, params, success);
 	}
 }

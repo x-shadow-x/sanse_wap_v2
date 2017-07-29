@@ -34,7 +34,7 @@
 
         methods: {
             wxLogin() {
-            	window.location.href = "http://www.sanse.com/sanse_wap_v2/api/wx_login.php";
+            	window.location.href = "http://www.sanse.com/sanse_wap_v2/api/wx_login.php?act=weixin_authorize";
             }
             
         },

@@ -2,7 +2,7 @@
 	<div class="settle_accounts_main">
 		<div class="order_info_box">
 			<div class="order_info_item">
-				<router-link :to="{path: '/address_manager', query: {act: 'settle_accounts'}}" class="link_box">
+				<router-link :to="{ path: '/settle_accounts/address_manager', query: {act: 'settle_accounts', propName: 'addressId'} }" class="link_box">
 					<h2 class="order_info_item_title">收货地址</h2>
 					<div class="order_info_item_content">
 						<div class="consignee_info">
@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="order_info_item">
-				<router-link to="/delievry_time" class="link_box">
+				<router-link :to="{ path: '/settle_accounts/delievry_time', query: {delievryTimeId: delievryTime.id, propName: 'delievryTime'} }" class="link_box">
 					<h2 class="order_info_item_title">收货时间</h2>
 					<div class="order_info_item_content" v-if="delievryTime.rectime">
 						<p>{{delievryTime.rectime}}</p>
@@ -24,7 +24,7 @@
 			</div>
 
 			<div class="order_info_item">
-				<router-link to="/payment_list" class="link_box">
+				<router-link :to="{ path: '/settle_accounts/payment_list', query: {payId: payment.pay_id, propName: 'payment'} }" class="link_box">
 					<h2 class="order_info_item_title">支付方式</h2>
 					<div class="order_info_item_content" v-if="payment.pay_name">
 						<p>{{payment.pay_name}}</p>
@@ -79,11 +79,12 @@
 
         <div class="order_info_box">
         	<div class="order_info_item">
-        		<router-link :to="{path: '/select_coupon', query: {recId: recId, bonusId: bonusId, bonusIds: couponEntity.bonus_ids}}" class="link_box">
+        		<!-- <router-link :to="{path: '/select_coupon', query: {recId: recId, bonusId: bonusId, bonusIds: couponEntity.bonus_ids}}" class="link_box"> -->
+        		<router-link :to="{path: '/settle_accounts/select_coupon', query: {recId: recId, bonusId: bonusData.couponId, bonusIds: couponEntity.bonus_ids, propName: 'bonusData'}}" class="link_box">
 					<h2 class="order_info_item_title">
 						优惠券
-						<span class="usable_coupon_tip" v-if="bonusId == 0">({{couponEntity.canUseCouponNum}}张可用)</span>
-						<span class="current_coupon_info">{{bonusText}}</span>
+						<span class="usable_coupon_tip" v-if="bonusData.couponId == 0">({{couponEntity.canUseCouponNum}}张可用)</span>
+						<span class="current_coupon_info">{{bonusData.couponText}}</span>
 					</h2>
 				</router-link>
         	</div>
@@ -190,18 +191,25 @@
         	</div>
         </div>
         <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
+
+        <transition name="slide-right">
+            <router-view v-on:childEmitUpdate="childEmitUpdate"></router-view>
+        </transition>
+
 	</div>
 </template>
 
 <script>
 	import alert from '../../components/common/alert.vue';
 	import payHelper from '../../config/wx_pay_helper.js';
+	import wxPayHelper from '../../config/wx_pay_helper.js';
+
+	var WXPAYROOT = process.env.API_WX_PAY_DEV;
+
 	export default {
 		data() {
 			return {
 				remark: '',
-				bonusId: 0,
-				bonusText: '',
 				isUsePoint: 0,
 				isUseRedPacket: 0,
 				isUseBalance: 0,
@@ -213,8 +221,12 @@
 				tipContentF: '',
 
 				addressId: localStorage.getItem('DEFAULT_CONSIGNEE_ADDRESS') || 0,
-				delievryTime: JSON.parse(localStorage.getItem('DELIEVRY_TIME')) || {},
-				payment: JSON.parse(localStorage.getItem('PAYMENT')) || {},
+				delievryTime: JSON.parse(localStorage.getItem('DELIEVRY_TIME')) || {'rectime': '', 'id': ''},
+				payment: JSON.parse(localStorage.getItem('PAYMENT')) || {'pay_name': '', 'pay_id': ''},
+				bonusData: {
+					'couponId': 0, 
+					'couponText': ''
+				},
 
 				goodsList: [],
 				couponEntity: {},
@@ -228,6 +240,23 @@
 		},
 
 		methods: {
+			/**
+			 * 供子路由触发事件调用
+			 * 此页面中地址管理，支付方式，收货方式和优惠券选择页面都通过子路由来呈现~页面不跳转~
+			 * 在子页面做完相应操作后此父路由需要更新对应的变量并重新请求数据，为统一操作~对data数据结构有所要求。具体流程如下：
+			 * 父路由页面的变量在子路由页面中发生修改~子路由页面在修改完变量后回到父路由页面并将修改的数据传递回父路由页面
+			 * 故所做操作为：在跳转到子路由时~将需要在子路由总做修改的父路由页面的变量的变量名通过路由参数传递给子路由，规定其key为propName
+			 * 同时为在进入子路由页面时显示上次离开子路由页面时的状态~再将对应变量的状态也通过路由参数传递给子路由~
+			 * 子路由页面在请求回来数据后根据路由参数还原之前的列表选中状态
+			 * 同时约定，子路由页面修改完变量后将修改的值放到以 updatePropName为key的对象
+			 * @param  {[type]} data [description]
+			 * @return {[type]}      [description]
+			 */
+			childEmitUpdate: function(data) {
+				this[data.propName] = data.updatePropName;
+				this.updateData();
+			},
+
 			handleData: function(data, cb) {
 				cb(data);
 			},
@@ -241,7 +270,7 @@
 				this.$request.get(this.$interface.GET_JIESUAN_LIST, {
 	                'userId': localStorage.getItem('USER_ID'),
 	                'recId': this.recId,
-	                'bonusId': this.bonusId,
+	                'bonusId': this.bonusData.couponId,
 	                'isUsePoint': this.isUsePoint,
 	                'isUseBalance': this.isUseBalance,
 	                'isStore': 0,
@@ -348,8 +377,10 @@
 			    return result;
 			},
 
-			pay: function(data) {
-				let domain = '//' + document.domain + '/';
+			/**
+			 * 组装支付码~之后将会将此数据发送到对应php接口以便获取调起微信支付所需的变量数据
+			 */
+			createPayCode: function(data) {
 				let payId = this.payment.pay_id;
 				let orderSn = data.OrderSn;
 				let orderAmount = data.OrderAmount;
@@ -358,9 +389,44 @@
 
 				let encodeStr = payId + '||' + orderSn + '||' + orderAmount + '||' + time + '||' + sign;
 				let payCode = this.base64Encode(encodeStr);
-				let url = domain + "api/pay/wap_pay.php?pay_code=" + payCode;
-				window.location = url;
-				// console.log(payHelper.callpay);
+				return payCode;
+			},
+
+			pay: function(data) {
+				// let domain = '//' + document.domain + '/';
+				// let url = domain + "api/pay/wap_pay.php?pay_code=" + payCode;
+				
+				// let url = domain + "api/wx_pay.php?pay_code=" + payCode;
+				// window.location = url;
+				// let url = "http://www.sanse.com/sanse_wap_v2/api/wx_pay.php?pay_code=" + payCode;
+				// {"error":1,"msg":"\u9a8c\u8bc1\u5931\u8d25\uff0c\u8bf7\u8fd4\u56de","pay_info":{"payment_id":"16","order_sn":"00001170729102544670056","order_amount":"12.01"}}
+
+
+				let payCode = this.createPayCode(data);
+				let url = "/wx_pay.php?pay_code=" + payCode;
+
+				wxPayHelper.wxPayGetRequest(url, null, (res)=> {
+					let data = res.data;
+					wxPayHelper.callpay(data);
+				})
+
+				/*this.$http({
+					method: 'GET',
+					url: url,
+				    baseURL: WXPAYROOT,
+				    withCredentials: false
+				})
+				.then(function (res) {
+					console.log(res);
+				})
+				.catch(function (err) {
+					let res = err.response;
+
+					if (err) {
+						window.alert('api error, HTTP CODE: ' + err)
+						return
+					}
+				})*/
 
 			},
 
@@ -379,7 +445,7 @@
 		                'changeValue': this.isUsePoint == 0 ? 0 : this.pointEntity.allowPoint,
 		                'recId': this.recId,
 		                'isStore': 0,
-		                'bonusId': this.bonusId,
+		                'bonusId': this.bonusData.couponId,
 		                'surplus': this.isUseBalance == 0 ? 0 : this.payEntity.canUsebalance,
 		                'postscript': this.remark || ' ',
 		                'conditionIds': this.conditionIds,
@@ -393,11 +459,7 @@
 
 		mounted() {
 			
-			if(this.$route.query.bonusData) {
-				let bonusData = JSON.parse(this.$route.query.bonusData);
-				this.bonusId = bonusData.couponId;
-				this.bonusText = bonusData.couponText;
-			}
+			console.log(wxPayHelper);
 
 			this.updateData((data) => {
 				// console.log(data);

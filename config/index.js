@@ -7,7 +7,8 @@ module.exports = {
         index: path.resolve(__dirname, '../dist/index.html'),
         assetsRoot: path.resolve(__dirname, '../dist'),
         assetsSubDirectory: 'static',
-        assetsPublicPath: '/vue_mobile/',
+        // assetsPublicPath: '/vue_mobile/',
+        assetsPublicPath: '/sanse_wap_v2/dist/',
         productionSourceMap: true,
         // Gzip off by default as many popular static hosts such as
         // Surge or Netlify already gzip all static assets for you.
@@ -35,6 +36,15 @@ module.exports = {
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
+                }
+            },
+            '/wx_pay_dev': {
+
+                // target: 'http://inno.mo2o.com.cn:8092/int_app/VER_SANSE_1_2_5/APPSERVICE.svc',
+                target: 'http://www.sanse.com/sanse_wap_v2/api',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/wx_pay_dev': ''
                 }
             }
         },

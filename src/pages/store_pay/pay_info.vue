@@ -23,7 +23,7 @@
 			</div>
 
 			<div class="info_item">
-				<router-link class="link" :to="{ path:'/select_coupon', query: {queryName: bonusInterface, bonusIds: bonusEntity.bonus_ids, preRouter: preRouter} }">
+				<router-link class="link" :to="{ path:'/pay_info/select_coupon', query: {queryName: bonusInterface, bonusIds: bonusEntity.bonus_ids, bonusId: bonusData.couponId, propName: 'bonusData'} }">
 				<!-- <router-link class="link" to="/select_coupon"> -->
 					<span class="info_item_name">优惠券</span>
 					<span class="info_item_value disable" v-if="bonusEntity.canUseCouponNum <= 0">暂无可用优惠券</span>
@@ -64,6 +64,11 @@
 		</div>
 
 		<div class="confirm_btn">确认</div>
+
+		<transition name="slide-right">
+            <router-view v-on:childEmitUpdate="childEmitUpdate"></router-view>
+        </transition>
+
 	</div>
 </template>
 
@@ -78,38 +83,55 @@
 						'pay_id': 2
 					}
 				],
+				bonusData: {
+					'couponId': 0,
+					'couponText': ''
+				},
+
 				bonusEntity: {},
 				orderinfoEntity: {},
 				userPointEntity: {},
 				bonusInterface: 'GET_OFFLINE_COUPONUS_LIST'
 			}
 		},
-		computed: {
-			preRouter: function() {
-				return document.URL.split(document.origin)[1];
+		methods: {
+			/**
+			 * 此函数是在子路由页面选择了某张优惠券时触发 childEmitUpdate事件而被调用的函数
+			 * 在接收了被修改的数据后需要重新发请求获取最新的数据，但是其中涉及到一个参数是从当前父路由页面的路由参数中获取的
+			 * 所以这里会出现一个问题如下：
+			 * 子路由选择优惠券页面选择好后会发生两件事，
+			 * 1、触发childEmitUpdate事件导致父路由页面中此函数执行~
+			 * 2、将路由后退到当前父路由页面
+			 * 所以问题是此函数的执行和路由的回退没有关系，此函数在调用 updateData函数更新数据的时候，可能路由还没来的及回退到父路由状态
+			 * 此时通过父路由参数获取的 paymentId 就为 undefined，此时用值为undefined的paymentId去请求刷新当前页面数据，请求返回结果便错误了
+			 * 所以此处加了一个setTimeout的延时~就是等路由回退完成获取到正确的 paymentId 后再通过调用 updateData 函数刷新页面数据
+			 */
+			childEmitUpdate: function(data) {
+				this[data.propName] = data.updatePropName;
+				setTimeout(() => {
+					this.updateData();
+				}, 320)
 			},
 
-			bonusData: function() {
-				if(this.$route.query.bonusData) {
-					return JSON.parse(this.$route.query.bonusData);
-				} else {
-					return {}
-				}
+			updateData() {
+				this.$store.commit('SHOW_LOAD');
+				// paymentId, bonusId = 0, IsUsePoint = 0
+				this.$request.post(this.$interface.GET_OFFLINE_JIESUANLIST, {
+					'paymentId': this.$route.query.paymentId,
+	                'bonusId': this.bonusData.couponId || 0,
+	                'IsUsePoint': 0
+	            }, (response) => {
+	            	let data = response.data;
+
+	            	this.bonusEntity = data.bonusEntity;
+	            	this.orderinfoEntity = data.orderinfoEntity;
+	            	this.userPointEntity = data.userPointEntity;
+	            	this.$store.commit('HIDE_LOAD');
+	            });
 			}
 		},
 		mounted() {
-			console.log(this.bonusData,'--------------');
-			// paymentId, bonusId = 0, IsUsePoint = 0
-			this.$request.post(this.$interface.GET_OFFLINE_JIESUANLIST, {
-				'paymentId': this.$route.query.paymentId,
-                'bonusId': 0,
-                'IsUsePoint': 0
-            }, (response) => {
-            	let data = response.data;
-            	this.bonusEntity = data.bonusEntity;
-            	this.orderinfoEntity = data.orderinfoEntity;
-            	this.userPointEntity = data.userPointEntity;
-            });
+			this.updateData();
 		}
 	}
 </script>

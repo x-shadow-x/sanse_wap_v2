@@ -54,9 +54,7 @@
                 pageIndex: 1,
                 isOutOfCoupon: this.$route.query.bonusId == 0,
                 recId: this.$route.query.recId,
-                preRouter: this.$route.query.preRouter,
                 bonusId: this.$route.query.bonusId || 0,
-                
 				couponRecord: []
 			}
 		},
@@ -84,17 +82,14 @@
                 }
 
                 currentCoupon.isSelect = true;
-                let bonusData = JSON.stringify({couponId: currentCoupon.bonus_id, couponText: currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'});
-                localStorage.setItem('SHOPPING_BAG_BONUS', JSON.stringify(bonusData));
-                // 
-                // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: currentCoupon.bonus_id, couponText: currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'});
+                let bonusData = {
+                    'couponId': currentCoupon.bonus_id, 
+                    'couponText': currentCoupon.discount == 0 ? currentCoupon.type_money + '元优惠券' : currentCoupon.discount + '折优惠券'
+                };
+                
                 setTimeout(() => {
-                    if(this.preRouter) {
-                        this.$router.push(this.preRouter + '&bonusData=' + bonusData);
-                    } else {
-                        this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
-                    }
-                    
+                    this.$emit('childEmitUpdate', {'propName': this.$route.query.propName, 'updatePropName': bonusData});
+                    this.$router.go(-1);
                 }, 320);
             },
 
@@ -106,20 +101,21 @@
                 }
 
                 this.isOutOfCoupon = true;
-                let bonusData = JSON.stringify({couponId: 0, couponText: ''});
-                localStorage.setItem('SHOPPING_BAG_BONUS', JSON.stringify(bonusData));
-                // this.$store.commit('SHOPPING_BAG_BONUS', {couponId: 0, couponText: ''});
+                let bonusData = {
+                    'couponId': 0,
+                    'couponText': ''
+                };
+
                 setTimeout(() => {
-                    if(this.preRouter) {
-                        this.$router.push(this.preRouter + '&bonusData=' + bonusData);
-                    } else {
-                        this.$router.push({path: '/settle_accounts', query: {recId: this.recId, bonusData: bonusData}});
-                    }
+                    this.$emit('childEmitUpdate', {'propName': this.$route.query.propName, 'updatePropName': bonusData});
+                    this.$router.go(-1);
                 }, 320);
             }
 		},
 
 		mounted() {
+
+            this.$store.commit('SET_TEST', 'tttt');
         
             // {user_id}&{bonus_ids}&{pageIndex}&{pageSize}
 			this.$request.get(this.interface, {
@@ -248,6 +244,8 @@
 
 	.record_list_box {
 		position: fixed;
+        left: 0;
+        top: 0;
 		width: 100%;
 		height: 100%;
 		margin: 0 auto;

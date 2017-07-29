@@ -117,7 +117,9 @@
 
 			confirmAddress() {
 				localStorage.setItem('DEFAULT_CONSIGNEE_ADDRESS', this.selectedAddressId);
+				this.$emit('childEmitUpdate', {'propName': this.$route.query.propName, 'updatePropName': this.selectedAddressId});
 				this.$router.go(-1);
+				
 			}
 		},
 

@@ -13,14 +13,20 @@
 	export default {
 		data() {
 			return {
-				delievryTimeList: [],
+				delievryTimeid: this.$route.query.delievryTimeId,
+				delievryTimeList: []
 			}
 		},
 
 		methods: {
 			handleData(data) {
 				data.forEach((item) => {
-					item.isSelect = false;
+					if(item.id == this.delievryTimeid) {
+						item.isSelect = true;
+					} else {
+						item.isSelect = false;
+					}
+					
 				});
 			},
 			selectdelievryTime: function(index) {
@@ -35,6 +41,7 @@
 				
 				localStorage.setItem('DELIEVRY_TIME', JSON.stringify(selectedDelievryTime));
 				setTimeout(() => {
+					this.$emit('childEmitUpdate', {'propName': this.$route.query.propName, 'updatePropName': selectedDelievryTime});
 					this.$router.go(-1);
 				}, 320);
 			}
@@ -54,7 +61,7 @@
 <style scoped>
 	.delievry_time_main {
 		position: fixed;
-		z-index: 12;
+		z-index: 13;
 		left: 0;
 		right: 0;
 		top: 0;

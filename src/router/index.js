@@ -120,7 +120,32 @@ export default [{
         component: settleAccounts,
         meta: {
             title: '结算'
-        }
+        },
+        children: [{
+            path: '/settle_accounts/select_coupon',
+            component: selectCoupon,
+            meta: {
+                title: '优惠券'
+            }
+        },{
+            path: '/settle_accounts/delievry_time',
+            component: delievryTime,
+            meta: {
+                title: '收货时间'
+            }
+        },{
+            path: '/settle_accounts/payment_list',
+            component: paymentList,
+            meta: {
+                title: '支付方式'
+            }
+        },{
+            path: '/settle_accounts/address_manager',
+            component: addressManager,
+            meta: {
+                title: '地址选择'
+            }
+        }]
     }, {
         path: '/delievry_time',
         component: delievryTime,
@@ -320,6 +345,13 @@ export default [{
         component: payInfo,
         meta: {
             title: '支付信息'
-        }
+        },
+        children: [{
+            path: '/pay_info/select_coupon',
+            component: selectCoupon,
+            meta: {
+                title: '优惠券'
+            }
+        }]
     }]
 }]

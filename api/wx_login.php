@@ -3,10 +3,8 @@
 
 define('IN_ECS', true);
 require(dirname(__FILE__) . '/includes/init.php');
-$act = $_REQUIEST['act'] ? $_REQUIEST['act'] : '' ;
-
+$act = $_REQUEST['act'] ? $_REQUEST['act'] : '' ;
 if($act == 'weixin_authorize'){
-	
 	$wx_login_openid = $_COOKIE['WeChat']['openid'];
 	if($wx_login_openid){
 		$wx_user_info = getWxExistUser($wx_login_openid);
