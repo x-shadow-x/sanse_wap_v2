@@ -97,7 +97,7 @@
 		mounted() {
 
 			if(!this.$helper.isLogin()) {
-                this.$router.push('/login');
+                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
 
             if(this.$store.state.userInfo.account_balance) {

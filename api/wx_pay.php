@@ -26,8 +26,8 @@ function wap_to_wxpay($pay_code){
 	include_once ROOT_PATH."api/pay/weixin3.36/WxPay.JsApiPay.php";
 	// echo(ROOT_PATH);exit(0);
 
-	// $openid = $_COOKIE['OS']['openid'];
-	$openid = 'oXaHIvvyopxuQomMSevuFMb2o_G4';
+	$openid = $_COOKIE['OS']['openid'];
+	// $openid = 'oXaHIvvyopxuQomMSevuFMb2o_G4';
 	if(!$openid){
 		$openid  = $_COOKIE['WeChat']['openid'];
 	}
@@ -84,6 +84,7 @@ function wap_to_wxpay($pay_code){
 	// printf_info($order);
 	$jsApiParameters = $tools->GetJsApiParameters($order);
 	// $jsApiParameters = json_decode($jsApiParameters,true);
+	write_log($jsApiParameters,'jsApiParameters');
 	echo $jsApiParameters;exit();
 	// echo json_encode(array('order_id'=>$order_id ,'pay_info'=>$jsApiParameters));exit();
 }

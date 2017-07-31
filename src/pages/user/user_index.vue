@@ -153,42 +153,41 @@
                 localStorage.removeItem('USER_ID'); 
                 localStorage.removeItem('COOKIE_ID'); 
                 localStorage.removeItem('GOODS_DETAIL_DATA');
-                this.$router.push('/login');
+                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
         },
         mounted() {
             if(!this.$helper.isLogin()) {
-                this.$router.push('/login');
+                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
+            } else {
+                this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+                    'userId': localStorage.getItem('USER_ID'),
+                    'jpushId': this.$store.state.jpushId,
+                    'channelId': this.$store.state.channelId,
+                    'appId': this.$store.state.appId,
+                    
+                }, (res) => {
+                    let data = res.data;
+                    this.userInfo = data;
+                    this.$store.commit('SET_USER_INFO', data);
+                })
+
+                this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
+                    'userId': localStorage.getItem('USER_ID')
+                    
+                }, (res) => {
+                    let data = res.data;
+                    this.orderInfo = data;
+                })
+
+
+                // 头部显示阈值
+                let threshold = $('#userCardBox').outerHeight() - $('#fnBox').outerHeight();
+                $(window).scroll(function() {
+                    var opacity = $(document).scrollTop() / threshold;
+                    this.headStyle['background'] = `rgba(0, 0, 0, ${opacity})`;
+                }.bind(this));
             }
-            
-
-            this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-                'userId': localStorage.getItem('USER_ID'),
-                'jpushId': this.$store.state.jpushId,
-                'channelId': this.$store.state.channelId,
-                'appId': this.$store.state.appId,
-                
-            }, (res) => {
-                let data = res.data;
-                this.userInfo = data;
-                this.$store.commit('SET_USER_INFO', data);
-            })
-
-            this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
-                'userId': localStorage.getItem('USER_ID')
-                
-            }, (res) => {
-                let data = res.data;
-                this.orderInfo = data;
-            })
-
-
-            // 头部显示阈值
-            let threshold = $('#userCardBox').outerHeight() - $('#fnBox').outerHeight();
-            $(window).scroll(function() {
-                var opacity = $(document).scrollTop() / threshold;
-                this.headStyle['background'] = `rgba(0, 0, 0, ${opacity})`;
-            }.bind(this));
         },
         components: {
             numTip

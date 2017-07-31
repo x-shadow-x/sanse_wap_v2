@@ -393,40 +393,20 @@
 			},
 
 			pay: function(data) {
-				// let domain = '//' + document.domain + '/';
-				// let url = domain + "api/pay/wap_pay.php?pay_code=" + payCode;
-				
-				// let url = domain + "api/wx_pay.php?pay_code=" + payCode;
-				// window.location = url;
-				// let url = "http://www.sanse.com/sanse_wap_v2/api/wx_pay.php?pay_code=" + payCode;
-				// {"error":1,"msg":"\u9a8c\u8bc1\u5931\u8d25\uff0c\u8bf7\u8fd4\u56de","pay_info":{"payment_id":"16","order_sn":"00001170729102544670056","order_amount":"12.01"}}
-
+				this.$store.commit('SHOW_LOAD');
 
 				let payCode = this.createPayCode(data);
 				let url = "/wx_pay.php?pay_code=" + payCode;
 
 				wxPayHelper.wxPayGetRequest(url, null, (res)=> {
 					let data = res.data;
-					wxPayHelper.callpay(data);
-				})
-
-				/*this.$http({
-					method: 'GET',
-					url: url,
-				    baseURL: WXPAYROOT,
-				    withCredentials: false
-				})
-				.then(function (res) {
-					console.log(res);
-				})
-				.catch(function (err) {
-					let res = err.response;
-
-					if (err) {
-						window.alert('api error, HTTP CODE: ' + err)
-						return
-					}
-				})*/
+					wxPayHelper.callpay(data, (msg) => {
+						this.tipContentF = msg;
+						this.isShowAlert = true;
+						// this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
+					});
+					this.$store.commit('HIDE_LOAD');
+				});
 
 			},
 

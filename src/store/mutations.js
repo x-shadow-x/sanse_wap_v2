@@ -7,7 +7,7 @@ const SET_GOODS_LIST_RECORD = 'SET_GOODS_LIST_RECORD'
 const PUSH_GOODS_LIST_RECORD = 'PUSH_GOODS_LIST_RECORD'
 const SET_USER_INFO = 'SET_USER_INFO'
 const SET_SHOPPING_BAG_NUM = 'SET_SHOPPING_BAG_NUM'
-// const SHOPPING_BAG_BONUS = 'SHOPPING_BAG_BONUS'
+const SET_LOGIN_ROUTER = 'SET_LOGIN_ROUTER'
 
 export default {
 
@@ -47,7 +47,7 @@ export default {
         state.shoppingBagNum = data;
     },
 
-    // [SHOPPING_BAG_BONUS](state, data) {
-    //     state.SHOPPING_BAG_BONUS = data;
-    // }
+    [SET_LOGIN_ROUTER](state, data) {
+        state.loginRouter = data;
+    }
 }

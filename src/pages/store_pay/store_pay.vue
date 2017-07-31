@@ -135,7 +135,7 @@
 
 		mounted() {
 			if(!this.$helper.isLogin()) {
-                this.$router.push('/login');
+                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
 			this.updateCode();
 			this.isScan();

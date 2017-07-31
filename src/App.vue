@@ -20,7 +20,14 @@
                 isShowLoad: false
             }
         },
+        // created() {
+        //     if(window.WeixinJSBridge) {
+        //         this.$store.commit('SET_LOGIN_ROUTER', '/wx_login');
+        //     }
+        // },
         mounted() {
+            console.log(this.$store.state.loginRouter);
+            
             // this.$store.commit('SET_USER_ID', '304014');
             // this.$store.commit('SET_COOKIE_ID', '23456006805d970d5438a354dc019fc295614979');
             this.$request.get(this.$interface.GETSTOREAGECOUNT, {

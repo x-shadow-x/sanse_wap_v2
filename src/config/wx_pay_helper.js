@@ -1,4 +1,4 @@
-var root = process.env.API_WX_PAY_DEV;
+var root = process.env.API_WX_PAY_ROOT;
 
 // 生产环境接口
 // http://fortest.innourl.com/sanse_wap_v2/dist/home
@@ -40,8 +40,7 @@ function apiAxios (method, url, params, success) {
 
 
 
-function jsApiCall (data) {
-	console.log(data, '=============');
+function jsApiCall (data, cb) {
 	if(!WeixinJSBridge) {
 		alert('请用微信浏览器打开');
 		return;
@@ -51,24 +50,33 @@ function jsApiCall (data) {
 		data,
 		function(res){
 			WeixinJSBridge.log(res.err_msg);
-			if(res.err_msg=="get_brand_wcpay_request:cancel"){
+			var msg = '';
+			if(res.err_msg=="get_brand_wcpay_request:cancel") {
 				//取消结算后的动作
-				alert('取消支付');
+				//alert('取消支付');
+				msg = '取消支付';
+				
             }
-          	if(res.err_msg=="get_brand_wcpay_request:ok"){
+          	if(res.err_msg=="get_brand_wcpay_request:ok") {
           		//支付成功后的动作
-          		alert('支付成功');
+          		// alert('支付成功');
+          		msg = '支付成功';
            	}
-		   	if(res.err_msg=="get_brand_wcpay_request:fail"){
+		   	if(res.err_msg=="get_brand_wcpay_request:fail") {
 		   		//支付失败后的动作
-		   		alert('支付失败');
+		   		// alert('支付失败');
+		   		msg = '支付失败';
+            }
+
+            if(typeof cb == 'function') {
+            	cb(msg);
             }
 		}
 	);
 }
 
 export default {
-	callpay: function(data) {
+	callpay: function(data, cb) {
 		if (typeof WeixinJSBridge == "undefined"){
 		    if( document.addEventListener ){
 		        document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
@@ -77,7 +85,7 @@ export default {
 		        document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
 		    }
 		}else{
-		    jsApiCall(data);
+		    jsApiCall(data, cb);
 		}
 	},
 

@@ -3,7 +3,9 @@
 
 define('IN_ECS', true);
 require(dirname(__FILE__) . '/includes/init.php');
-$act = $_REQUEST['act'] ? $_REQUEST['act'] : '' ;
+$act = $_REQUEST['act'] ? $_REQUEST['act'] : 'weixin_authorize' ;
+$redirect_url = $_REQUEST['original'] ? $_REQUEST['original'] : $_COOKIE['original'];
+setcookie('original',$redirect_url,0,'/sanse_wap_v2/');
 if($act == 'weixin_authorize'){
 	$wx_login_openid = $_COOKIE['WeChat']['openid'];
 	if($wx_login_openid){
@@ -14,7 +16,10 @@ if($act == 'weixin_authorize'){
 		}else{
 			$weixin_src = "AUTH";
 			$user_id = createWxUser($wx_user_info,$weixin_src,true);
-			echo $user_id;
+			//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
+			setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+			header('location:'.$redirect_url);exit();
+			// echo $user_id;
 		}
 	}else{
 		$req = "act=weixin_authorize_get_openid&is_authorize=1";
@@ -31,13 +36,19 @@ if($act == 'weixin_authorize'){
 	}
 	$weixin_src = "AUTH";
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
-	echo $user_id;
+	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
+	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+	header('location:'.$redirect_url);exit();
+	// echo $user_id;
 }elseif($act == 'weixin_authorize_done'){
 	$open_info = getOpenInfo();
 	$wx_user_info = getWxAuthorizeUser($open_info);
 	$weixin_src = "AUTH";
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
-	echo $user_id;
+	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
+	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+	header('location:'.$redirect_url);exit();
+	// echo $user_id;
 }elseif($act == 'auto_weixin_login'){
 	include_once('./includes/cls_weixin_login.php');//微信登录盘dua
 	$cls_weixin_login = new cls_weixin_login();

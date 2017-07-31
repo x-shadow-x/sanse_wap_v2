@@ -4,7 +4,7 @@ import mutations from './mutations'
 
 
 Vue.use(Vuex)
-
+  
 const state = {
     userId: '0',     // 全局使用的userid，个人中心页几乎各项数据的获取都需要此字段~同时此字段也被用来判断用户是否已经登录~默认为0表示没有登录
     cookieId: '0',   // 一个随机id~因在多个页面获取数据时需要用到故作全局配置~默认为 0
@@ -19,10 +19,8 @@ const state = {
     keyWord: '', // 当在商品搜索页输入关键词并跳转到搜索结果页时需先记录输入的关键词~以便再再次返回搜索页的时候直接显示上次输入的关键词
     userInfo: {},
     shoppingBagNum: 0,
-    // shoppingBagBonus: {
-    //     'couponId': 0,
-    //     'couponText': ''
-    // },
+    loginRouter: navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger' ? '/wx_login' : '/login', // 配置登录路由~机制为加载页面的时候检测页面是否是用微信打开~如果是则将此路由修改为/wx_login~对应wx_login.vue
+
     routerList: {
         '/home': 0,
 

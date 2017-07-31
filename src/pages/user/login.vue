@@ -39,6 +39,10 @@
             }
         },
 
+        mounted() {
+            console.log(666);
+        },
+
         methods: {
             sendIdentifyingCode() {
                 
