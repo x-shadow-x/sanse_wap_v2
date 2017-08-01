@@ -119,7 +119,7 @@
         
             // {user_id}&{bonus_ids}&{pageIndex}&{pageSize}
 			this.$request.get(this.interface, {
-				'userId': localStorage.getItem('USER_ID'),
+				'userId': localStorage.getItem('USER_ID') || 0,
 				'bonusIds': this.$route.query.bonusIds || 0,
 				'pageIndex': this.pageIndex++,
 				'pageSize': this.$interface.PAGE_SIZE
@@ -178,7 +178,7 @@
 
 			function pullUpAction () {
                 this.$request.get(this.interface, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'bonusIds': this.$route.query.bonusIds || 0,
                     'pageIndex': this.pageIndex++,
                     'pageSize': this.$interface.PAGE_SIZE

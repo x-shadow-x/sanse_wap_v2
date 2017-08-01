@@ -141,7 +141,7 @@
 
 	    	getShoppingBagNum() {
 	    		this.$request.get(this.$interface.GETSTOREAGECOUNT, {
-					'userId': localStorage.getItem('USER_ID'),
+					'userId': localStorage.getItem('USER_ID') || 0,
 	                'cookieId': this.$store.state.cookieId
 	            }, (response) => {
 	            	let data = response.data;
@@ -302,8 +302,8 @@
             	}, 100);
             	setTimeout(() => {
             		$('#addToShoppingBagTip').removeClass('animate');
-            		console.log(localStorage.getItem('USER_ID'));
-            		if(localStorage.getItem('USER_ID') != 0) {
+            		console.log(localStorage.getItem('USER_ID'), '----------');
+            		if(localStorage.getItem('USER_ID') && localStorage.getItem('USER_ID') != 0) {
 	            		// 已经登录了使用登录状态下添加到购物车的接口
 	            		this.addToShoppingBagRequest(index, this.$interface.CREATE_BUYCAR_INSERT, localStorage.getItem('USER_ID'), () => {this.getShoppingBagNum()});
 	            	} else {
@@ -316,7 +316,7 @@
 
             toggleCollectionRequest(interfaceName, cb) {
             	this.$request.get(interfaceName, {
-            		'userId': localStorage.getItem('USER_ID'),
+            		'userId': localStorage.getItem('USER_ID') || 0,
 					'goodsId': this.selectColorGoodsDetail.goods_id,
 					'cookieId': this.$store.state.cookieId,
 					'colorId': this.selectColorGoodsDetail.img_color
@@ -404,8 +404,9 @@
 	    },
 
 		mounted() {
+
 			let goodsDetailList = this.$store.state.goodsListRecord;
-			let selectGoodsDetailData = null;
+			let selectGoodsDetailData = {};
 			if(goodsDetailList.length == 0) {
 				let tempDataStr = localStorage.getItem('GOODS_DETAIL_DATA');
 				selectGoodsDetailData = JSON.parse(tempDataStr);
@@ -418,11 +419,12 @@
 		    });
 
 			// if(goodsDetailList.length == 0) {
-			if(!selectGoodsDetailData && goodsDetailList == 0) {
+			if(!selectGoodsDetailData && goodsDetailList == 0 || selectGoodsDetailData.goodsId != this.goodsId) {
+				console.log(this.goodsId, '---------------', localStorage.getItem('USER_ID'));
 				// store中未保存相应的数据，则可能是直接通过连接跳到详情页的，此时通过另一个接口根据goodsid直接拿对应的商品数据
 				this.$request.get(this.$interface.GET_GOODS_DETAIL_LIST_GOODSID_MESSAGE, {
 					'goodsId': this.goodsId,
-                    'userId': localStorage.getItem('USER_ID')
+                    'userId': localStorage.getItem('USER_ID') || 0
                 }, (response) => {
 					let data = response.data;
                     let goodsImageMessage = JSON.parse(data.GoodsImageMessage);

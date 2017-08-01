@@ -17,7 +17,7 @@
 
 <script>
     export default {
-        props: ['isShowAlert', 'tipTitleF', 'tipContentF', 'isBlackF'],
+        props: ['isShowAlert', 'tipTitleF', 'tipContentF', 'isBlackF', 'cbName'],
         data() {
             return {}
         },
@@ -34,7 +34,7 @@
         },
         methods: {
             handleConfirm() {
-                this.$emit('hideAlert');
+                this.$emit('hideAlert', this.cbName);
             }
         }
     }

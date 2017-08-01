@@ -62,13 +62,14 @@ init();
 
 Vue.use(VueRouter)
 const router = new VueRouter({
-    mode: 'history',
+    // mode: 'history',
     // base: '/vue_mobile/',
     base: '/sanse_wap_v2/dist/',
     routes
 })
 
 router.beforeEach((to, from, next) => {
+    console.log(this);
     document.title = to.meta.title;
     next()
 })

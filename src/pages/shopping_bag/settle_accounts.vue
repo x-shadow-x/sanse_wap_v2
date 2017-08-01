@@ -36,30 +36,33 @@
 			<div class="order_info_item">
 	            <h2 class="order_info_item_title">商品详情</h2>
 	            <div class="goods_item_box" v-for="item in goodsList" :key="item.goods_id">
-	                <div class="goods_img_box">
-	                    <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
-	                </div>
-	                <div class="goods_info_box">
-	                    <h2 class="goods_name">{{item.goods_name}}</h2>
+	            <!-- /goods_detail/?goodsId=14647&colorId=201 -->
+	                <router-link :to="{path: '/goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}">
+	                	<div class="goods_img_box">
+		                    <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
+		                </div>
+		                <div class="goods_info_box">
+		                    <h2 class="goods_name">{{item.goods_name}}</h2>
 
-	                    <div class="relative_box">
-	                        <p class="goods_attr">颜色：{{item.goods_color_value}}</p>
-	                        <span class="limited_tip" v-if="item.is_limited == 1 && item.goodsType != 2">限量/特别款</span>
-	                        <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
-	                    </div>
-	                    <p class="goods_attr">尺码：{{item.goods_size}}</p>
-	                    <div class="old_price_box">
-	                        <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
-	                    </div>
-	                    <div class="current_price_box">
-	                        <!-- <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span> -->
-	                        <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
-	                    </div>
-	                    <div class="goods_num_box">
-	                        <span class="goods_num">数量：{{item.number}}</span>
-	                    </div>
-	                </div>
-	                <div class="limited_rule_tip" v-if="item.is_limited == 1">本商品为限量/特别款商品，不与其他促销及优惠同享</div>
+		                    <div class="relative_box">
+		                        <p class="goods_attr">颜色：{{item.goods_color_value}}</p>
+		                        <span class="limited_tip" v-if="item.is_limited == 1 && item.goodsType != 2">限量/特别款</span>
+		                        <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
+		                    </div>
+		                    <p class="goods_attr">尺码：{{item.goods_size}}</p>
+		                    <div class="old_price_box">
+		                        <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+		                    </div>
+		                    <div class="current_price_box">
+		                        <!-- <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span> -->
+		                        <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+		                    </div>
+		                    <div class="goods_num_box">
+		                        <span class="goods_num">数量：{{item.number}}</span>
+		                    </div>
+		                </div>
+		                <div class="limited_rule_tip" v-if="item.is_limited == 1">本商品为限量/特别款商品，不与其他促销及优惠同享</div>
+	                </router-link>
 	            </div>
             </div>
         </div>
@@ -190,7 +193,7 @@
         		<span class="submit_order_btn" @click="submitOrder">提交订单</span>
         	</div>
         </div>
-        <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
+        <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="cbName" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
 
         <transition name="slide-right">
             <router-view v-on:childEmitUpdate="childEmitUpdate"></router-view>
@@ -203,8 +206,6 @@
 	import alert from '../../components/common/alert.vue';
 	import payHelper from '../../config/wx_pay_helper.js';
 	import wxPayHelper from '../../config/wx_pay_helper.js';
-
-	var WXPAYROOT = process.env.API_WX_PAY_DEV;
 
 	export default {
 		data() {
@@ -235,7 +236,8 @@
 				pointEntity: {},
 				redpacketEntity: {},
 				recId: this.$route.query.recId,
-				conditionIds: ' '
+				conditionIds: ' ',
+				cbName: '',  // 点击确认弹出框的确定按钮的时候执行的回调函数的函数名
 			}
 		},
 
@@ -261,14 +263,17 @@
 				cb(data);
 			},
 
-			hideAlert: function() {
+			hideAlert: function(cbName) {
+				if(cbName) {
+					this[cbName]();
+				}
 				this.isShowAlert = false;
 			},
 
 			updateData: function(cb) {
 				this.$store.commit('SHOW_LOAD');
 				this.$request.get(this.$interface.GET_JIESUAN_LIST, {
-	                'userId': localStorage.getItem('USER_ID'),
+	                'userId': localStorage.getItem('USER_ID') || 0,
 	                'recId': this.recId,
 	                'bonusId': this.bonusData.couponId,
 	                'isUsePoint': this.isUsePoint,
@@ -400,14 +405,13 @@
 
 				wxPayHelper.wxPayGetRequest(url, null, (res)=> {
 					let data = res.data;
-					wxPayHelper.callpay(data, (msg) => {
+					wxPayHelper.callpay(data, this, (msg) => {
+						this.cbName = 'jump';
 						this.tipContentF = msg;
 						this.isShowAlert = true;
-						// this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
 					});
 					this.$store.commit('HIDE_LOAD');
 				});
-
 			},
 
 			submitOrder: function() {
@@ -417,7 +421,7 @@
 				}
 
 				this.$request.post(this.$interface.ADD_ORDERINFO_FOR_CHANGE_BY_PRODUCTIDS, {
-		                'userId': localStorage.getItem('USER_ID'),
+		                'userId': localStorage.getItem('USER_ID') || 0,
 		                'addressId': this.addressId,
 		                'paymentId': this.payment.pay_id,
 		                'besttimeId': this.delievryTime.id,
@@ -432,8 +436,14 @@
 		                'redPacket': this.isUseRedPacket == 0 ? 0 : this.redpacketEntity.canUseRedPacket
 		            }, (response) => {
 		                let data = response.data;
+		                console.log(data);
+		                this.orderId = data.OrderId;
 		                this.pay(data);
 	            });
+			},
+
+			jump: function() {
+				this.$router.push({path: '/order_detail', query:{orderId: this.orderId}});
 			}
 		},
 

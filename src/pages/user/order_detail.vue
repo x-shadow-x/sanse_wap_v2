@@ -17,30 +17,32 @@
             <div class="order_info_item_box">
                 <h2 class="info_item_title">商品详情</h2>
                 <div class="goods_item_box" v-for="(item, index) in orderDetailList" :key="item.goodsId">
-                    <div class="goods_img_box">
-                        <img :src="item.img_url" :alt="item.goods_Name" class="goods_img">
-                    </div>
-                    <div class="goods_info_box">
-                        <h2 class="goods_name">{{item.goods_Name}}</h2>
+                    <router-link :to="{path: '/goods_detail/', query: {goodsId: item.goodsId, colorId: item.img_color}}">
+                        <div class="goods_img_box">
+                            <img :src="item.img_url" :alt="item.goods_Name" class="goods_img">
+                        </div>
+                        <div class="goods_info_box">
+                            <h2 class="goods_name">{{item.goods_Name}}</h2>
 
-                        <div class="relative_box">
-                            <p class="goods_attr">颜色：{{item.colorName}}</p>
-                            <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
+                            <div class="relative_box">
+                                <p class="goods_attr">颜色：{{item.colorName}}</p>
+                                <span class="point_goods_tip" v-if="item.goodsType == 2">积分商品</span>
+                            </div>
+                            <p class="goods_attr">尺码：{{item.sizeName}}</p>
+                            <div class="old_price_box">
+                                <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+                            </div>
+                            <div class="current_price_box">
+                                <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span>
+                                <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+                            </div>
+                            <div class="goods_num_box">
+                                <span class="goods_num">数量：{{item.goods_num}}</span>
+                                <!-- <router-link :to="{ path: '/apply_return', query: {orderId: orderEntity.order_id, productId: item.productId, goodsId: item.goodsId}}" class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'">申请退货</router-link> -->
+                                <span class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'" @click="applyReturn(index)">申请退货</span>
+                            </div>
                         </div>
-                        <p class="goods_attr">尺码：{{item.sizeName}}</p>
-                        <div class="old_price_box">
-                            <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
-                        </div>
-                        <div class="current_price_box">
-                            <span class="point" v-if="item.exchange_integral > 0">{{item.exchange_integral}}+</span>
-                            <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
-                        </div>
-                        <div class="goods_num_box">
-                            <span class="goods_num">数量：{{item.goods_num}}</span>
-                            <!-- <router-link :to="{ path: '/apply_return', query: {orderId: orderEntity.order_id, productId: item.productId, goodsId: item.goodsId}}" class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'">申请退货</router-link> -->
-                            <span class="apply_return" v-if="orderEntity.orderStatus == '已完成' && orderEntity.isallow_tuihuanhuo == '1'" @click="applyReturn(index)">申请退货</span>
-                        </div>
-                    </div>
+                    </router-link>
                 </div>
             </div>
 
@@ -126,7 +128,7 @@
         <div class="order_no_pay_handle_btn_box" v-if="orderEntity.orderStatus == '待付款'">
         <!-- <div class="order_no_pay_handle_btn_box"> -->
             <span class="cancel_order" @click="cancelOrder">取消订单</span>
-            <span class="pay_order">马上支付</span>
+            <span class="pay_order" @click="pay">马上支付</span>
         </div>
 
         <div class="cancel_order_reason_list_box" :class="{show: isShowCancelOrderReasonListBox}">
@@ -145,6 +147,7 @@
 
 <script>
     import confirm from '../../components/common/confirm.vue';
+    import wxPayHelper from '../../config/wx_pay_helper.js';
 
 	export default {
         data() {
@@ -159,7 +162,8 @@
                 isShowCancelOrderReasonListBox: false,
                 confirmCbName: '',
                 cancelReasonId: '',
-                restTime: 0
+                restTime: 0,
+                payment: JSON.parse(localStorage.getItem('PAYMENT')) || {'pay_name': '', 'pay_id': ''},
             }
         },
         methods: {
@@ -234,10 +238,55 @@
                 // {orderId}&{userId}&{cancelReasonId}
                 this.$request.get(this.$interface.CANCEL_ORDER_INFO, {
                     'orderId': this.$route.query.orderId,
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'cancelReasonId': this.cancelReasonId
                 }, (response) => {
                     this.$router.go(0);
+                });
+            },
+
+            base64Encode: function(str) {
+                var result;
+                result = encodeURIComponent(str);
+                result = unescape(result);
+                result = window.btoa(result);
+                return result;
+            },
+
+            /**
+             * 组装支付码~之后将会将此数据发送到对应php接口以便获取调起微信支付所需的变量数据
+             */
+            createPayCode: function(data) {
+                let payId = data.payId;
+                let orderSn = data.orderSn;
+                let orderAmount = data.orderAmount;
+                let time = parseInt(new Date().getTime() / 1000);
+                let sign = this.$md5(payId + orderSn + orderAmount + time + 'inno');
+
+                let encodeStr = payId + '||' + orderSn + '||' + orderAmount + '||' + time + '||' + sign;
+                let payCode = this.base64Encode(encodeStr);
+                return payCode;
+            },
+
+            pay: function() {
+                this.$store.commit('SHOW_LOAD');
+                let data = {
+                    payId: this.payment.pay_id,
+                    orderSn: this.orderEntity.order_sn,
+                    orderAmount: this.orderEntity.order_amount,
+                }
+                let payCode = this.createPayCode(data);
+                let url = "/wx_pay.php?pay_code=" + payCode;
+
+                wxPayHelper.wxPayGetRequest(url, null, (res)=> {
+                    let data = res.data;
+                    console.log(data, '=============');
+                    wxPayHelper.callpay(data, this, (msg) => {
+                        this.cbName = 'jump';
+                        this.tipContentF = msg;
+                        this.isShowAlert = true;
+                    });
+                    this.$store.commit('HIDE_LOAD');
                 });
             }
         },
@@ -248,6 +297,7 @@
                 'orderId': this.$route.query.orderId
             }, (response) => {
                 let data = response.data;
+                console.log(data);
 
                 this.orderDetailList = data.orderDetailList;
                 this.orderEntity = data.orderEntity;

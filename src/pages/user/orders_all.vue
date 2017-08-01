@@ -122,7 +122,7 @@
                         'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -167,7 +167,7 @@
                         'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++
@@ -201,7 +201,7 @@
                     'cookie_id': this.$store.state.cookieId,
                     'systype': 'wap'
                 },
-                'userId': localStorage.getItem('USER_ID'),
+                'userId': localStorage.getItem('USER_ID') || 0,
                 'orderStatus': this.orderStatus,
                 'pageSize': this.$interface.PAGE_SIZE,
                 'pageIndex': this.pageIndex++
@@ -232,7 +232,7 @@
                         'cookie_id': this.$store.state.cookieId,
                         'systype': 'wap'
                     },
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'orderStatus': this.orderStatus,
                     'pageSize': this.$interface.PAGE_SIZE,
                     'pageIndex': this.pageIndex++

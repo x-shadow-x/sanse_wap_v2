@@ -31,7 +31,7 @@ function apiAxios (method, url, params, success) {
 	})
 	.catch(function (err) {
 		let res = err.response;
-		if (err) {
+		if(err) {
 			window.alert('api error, HTTP CODE: ' + err)
 			return
 		}
@@ -41,14 +41,11 @@ function apiAxios (method, url, params, success) {
 
 
 function jsApiCall (data, cb) {
-	if(!WeixinJSBridge) {
-		alert('请用微信浏览器打开');
-		return;
-	}
+
 	WeixinJSBridge.invoke(
 		'getBrandWCPayRequest',
 		data,
-		function(res){
+		function(res) {
 			WeixinJSBridge.log(res.err_msg);
 			var msg = '';
 			if(res.err_msg=="get_brand_wcpay_request:cancel") {
@@ -76,14 +73,15 @@ function jsApiCall (data, cb) {
 }
 
 export default {
-	callpay: function(data, cb) {
-		if (typeof WeixinJSBridge == "undefined"){
-		    if( document.addEventListener ){
+	callpay: function(data, context, cb) {
+		if(typeof WeixinJSBridge == "undefined") {
+		    if( document.addEventListener ) {
 		        document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
-		    }else if (document.attachEvent){
+		    } else if(document.attachEvent) {
 		        document.attachEvent('WeixinJSBridgeReady', jsApiCall); 
 		        document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
 		    }
+		    cb('请用微信浏览器打开');
 		}else{
 		    jsApiCall(data, cb);
 		}

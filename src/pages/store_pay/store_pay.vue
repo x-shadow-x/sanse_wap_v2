@@ -114,7 +114,7 @@
 				}
 				// GET_OFFLINE_ORDERINFO
 				this.$request.get(this.$interface.GET_OFFLINE_ORDERINFO, {
-					'userId': localStorage.getItem('USER_ID'),
+					'userId': localStorage.getItem('USER_ID') || 0,
 	                'qrPayCode': this.payCode
 	            }, (response) => {
 	            	this.paymentId = response.data;

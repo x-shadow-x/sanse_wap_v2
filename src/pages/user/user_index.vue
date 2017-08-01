@@ -129,6 +129,7 @@
 <script>
 
     import numTip from '../../components/common/num_tip.vue';
+    import helper from '../../config/helper.js'
 
     export default {
         data() {
@@ -153,6 +154,7 @@
                 localStorage.removeItem('USER_ID'); 
                 localStorage.removeItem('COOKIE_ID'); 
                 localStorage.removeItem('GOODS_DETAIL_DATA');
+                helper.delCookie('WX_USER_ID');
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
         },
@@ -161,7 +163,7 @@
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             } else {
                 this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'jpushId': this.$store.state.jpushId,
                     'channelId': this.$store.state.channelId,
                     'appId': this.$store.state.appId,

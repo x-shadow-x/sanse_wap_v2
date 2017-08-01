@@ -17,7 +17,7 @@
                         <div class="select_box">
                             <span class="select_btn" :class="{active: item.selected}" @click="handleSelectedItem(index)"></span>
                         </div>
-                        <router-link to="'/home" class="goods_link">
+                        <router-link :to="{path: '/goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_link">
                             <div class="goods_img_box">
                                 <img :src="item.goods_img" :alt="item.goods_name" class="goods_img">
                             </div>
@@ -277,7 +277,7 @@
 
             updateShoppingBagNum() {
                 this.$request.get(this.$interface.GETSTOREAGECOUNT, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'cookieId': this.$store.state.cookieId
                 }, (response) => {
                     let data = response.data;
@@ -327,7 +327,7 @@
 
         mounted() {
             this.$request.get(this.$interface.GET_BUY_CAR_GOOD_LIST, {
-                'userId': localStorage.getItem('USER_ID'),
+                'userId': localStorage.getItem('USER_ID') || 0,
                 'cookieId': localStorage.getItem('COOKIE_ID')
             }, (response) => {
                 let data = response.data;
@@ -364,7 +364,7 @@
             function pullUpAction () {
 
                 this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'cookieId': this.$store.state.cookieId,
                     'favType': 2,
                     'pageSize': this.$interface.PAGE_SIZE,

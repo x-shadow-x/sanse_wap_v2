@@ -89,7 +89,7 @@
                 let selectedCollectionRecord = this.collectionRecord[index];
 
                 this.$request.get(this.$interface.DELETE_FAVOURITE_GOODS, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'goodsId': selectedCollectionRecord.goods_id,
                     'cookieId': this.$store.state.cookieId,
                     'colorId': selectedCollectionRecord.color_id
@@ -103,7 +103,7 @@
         mounted() {
 
             this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                'userId': localStorage.getItem('USER_ID'),
+                'userId': localStorage.getItem('USER_ID') || 0,
                 'cookieId': this.$store.state.cookieId,
                 'favType': 2,
                 'pageSize': this.$interface.PAGE_SIZE,
@@ -145,7 +145,7 @@
                 }
 
                 this.$request.get(this.$interface.GET_FAVOURITE_GOODS_LIST, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'cookieId': this.$store.state.cookieId,
                     'favType': 2,
                     'pageSize': this.$interface.PAGE_SIZE,

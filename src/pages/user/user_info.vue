@@ -153,7 +153,7 @@
                 this.oldUserName = this.userInfo.UserName;
             } else {
                 this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'jpushId': this.$store.state.jpushId,
                     'channelId': this.$store.state.channelId,
                     'appId': this.$store.state.appId,
@@ -183,7 +183,7 @@
             updateUserInfo() {
                 // {userId}&{userName}&{sex}&{birthday}&{email}
                 this.$request.get(this.$interface.UPDATEUSERS, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'userName': this.userInfo.UserName || this.oldUserName,
                     'sex': this.userInfo.Sex,
                     'birthday': this.userInfo.Birthday,
@@ -260,7 +260,7 @@
                 }
 
                 this.$request.get(this.$interface.MODIFYUSERNAME, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'captcha' : this.captcha,
                     'phoneNumber' : this.newPhoneNumber
                 }, (res) => {

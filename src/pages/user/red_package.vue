@@ -110,7 +110,7 @@
             	this.balance = this.$store.state.userInfo.red_packet;
             } else {
             	this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-	                'userId': localStorage.getItem('USER_ID'),
+	                'userId': localStorage.getItem('USER_ID') || 0,
 	                'jpushId': this.$store.state.jpushId,
 	                'channelId': this.$store.state.channelId,
 	                'appId': this.$store.state.appId,
@@ -134,7 +134,7 @@
 			}
 
 			this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
-				'userId': localStorage.getItem('USER_ID'),
+				'userId': localStorage.getItem('USER_ID') || 0,
 				'pageIndex': '1',
 				'pageSize': this.$interface.PAGE_SIZE
 			}, (response) => {
@@ -163,7 +163,7 @@
 			function pullUpAction () {
 
                 this.$request.get(this.$interface.GET_USER_REDPACK_LIST, {
-                    'userId': localStorage.getItem('USER_ID'),
+                    'userId': localStorage.getItem('USER_ID') || 0,
                     'pageIndex': '2',
                     'pageSize': this.$interface.PAGE_SIZE
                 }, (response) => {

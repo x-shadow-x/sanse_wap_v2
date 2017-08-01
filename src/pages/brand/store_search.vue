@@ -97,7 +97,7 @@
 
 			function pullUpAction () {
                 // this.$request.get(this.$interface.GET_MEMBERINFO_BONUSLIST, {
-                //     'userId': localStorage.getItem('USER_ID'),
+                //     'userId': localStorage.getItem('USER_ID') || 0,
                 //     'type': '1',
                 //     'pageIndex': this.pageIndex++,
                 //     'pageSize': this.$interface.PAGE_SIZE

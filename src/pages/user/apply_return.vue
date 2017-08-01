@@ -98,7 +98,7 @@
 
 					this.$request.get(this.$interface.CREATE_RESHIPORDER, {
 						'relatedOrderId': goodsInfo.relatedOrderId,
-						'userId': localStorage.getItem('USER_ID'),
+						'userId': localStorage.getItem('USER_ID') || 0,
 						'returnType': 1, // 目前只有退货，值为 1
 						'returnReasonId': this.returnData.returnReason.returnReasonId,
 						'returnRemark': this.returnData.problemDes.value,
