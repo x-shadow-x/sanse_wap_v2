@@ -141,11 +141,15 @@
             </ul>
         </div>
 
-        <confirm v-on:confirmEvent="handleConfirm" v-on:cancelEvent="handleCancel" :isShowConfirm="isShowConfirm" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="confirmCbName"></confirm>
+        <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="cbName" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
+
+        <confirm v-on:confirmEvent="handleConfirm" v-on:cancelEvent="handleCancel" :isShowConfirm="isShowConfirm" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="cbName"></confirm>
+
 	</div>
 </template>
 
 <script>
+    import alert from '../../components/common/alert.vue';
     import confirm from '../../components/common/confirm.vue';
     import wxPayHelper from '../../config/wx_pay_helper.js';
 
@@ -157,20 +161,22 @@
                 cancelOrderReasonList: [], // 取消订单原因列表
                 orderEntity: {},
                 isShowConfirm: false,
+                isShowAlert: false,
                 tipTitleF: '',
                 tipContentF: '',
                 isShowCancelOrderReasonListBox: false,
-                confirmCbName: '',
+                cbName: '',
                 cancelReasonId: '',
                 restTime: 0,
                 payment: JSON.parse(localStorage.getItem('PAYMENT')) || {'pay_name': '', 'pay_id': ''},
             }
         },
+
         methods: {
             confirmReceiveGoods() {
                 this.tipTitleF = ' ';
                 this.tipContentF = '确认收货吗'
-                this.confirmCbName = 'confirmReceiveGoodsCb';
+                this.cbName = 'confirmReceiveGoodsCb';
                 this.isShowConfirm = true;
             },
 
@@ -181,6 +187,13 @@
                 }, (res) => {
                     this.$router.go(-1);
                 })
+            },
+
+            hideAlert(cbName) {
+                if(cbName != '' && typeof this[cbName] == 'function') {
+                    this[cbName]();
+                }
+                this.isShowAlert = false;
             },
 
             handleConfirm(cbName) {
@@ -228,7 +241,7 @@
             selectReacon(index) {
                 this.tipTitleF = ' ';
                 this.tipContentF = '是否取消订单';
-                this.confirmCbName = 'confirmCancelOrder';
+                this.cbName = 'confirmCancelOrder';
                 this.isShowConfirm = true;
                 this.isShowCancelOrderReasonListBox = false;
                 this.cancelReasonId = this.cancelOrderReasonList[index]._id
@@ -280,24 +293,27 @@
 
                 wxPayHelper.wxPayGetRequest(url, null, (res)=> {
                     let data = res.data;
-                    console.log(data, '=============');
+
                     wxPayHelper.callpay(data, this, (msg) => {
-                        this.cbName = 'jump';
+                        this.cbName = 'reloadPage';
                         this.tipContentF = msg;
                         this.isShowAlert = true;
                     });
                     this.$store.commit('HIDE_LOAD');
                 });
+            },
+
+            reloadPage() {
+                this.$router.go(0);
             }
         },
 
 		mounted() {
-
+            
 			this.$request.get(this.$interface.GET_ALL_ORDER_ENTITY, {
                 'orderId': this.$route.query.orderId
             }, (response) => {
                 let data = response.data;
-                console.log(data);
 
                 this.orderDetailList = data.orderDetailList;
                 this.orderEntity = data.orderEntity;
@@ -320,6 +336,7 @@
             });
 		},
         components: {
+            alert,
             confirm
         }
 	}

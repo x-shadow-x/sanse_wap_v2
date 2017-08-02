@@ -5,7 +5,7 @@ define('IN_ECS', true);
 require(dirname(__FILE__) . '/includes/init.php');
 $act = $_REQUEST['act'] ? $_REQUEST['act'] : 'weixin_authorize' ;
 $redirect_url = $_REQUEST['original'] ? $_REQUEST['original'] : $_COOKIE['original'];
-setcookie('original',$redirect_url,0,'/sanse_wap_v2/');
+setcookie('original',$redirect_url,0,'/sanse_wap_v2/dist');
 if($act == 'weixin_authorize'){
 	$wx_login_openid = $_COOKIE['WeChat']['openid'];
 	if($wx_login_openid){
@@ -17,7 +17,7 @@ if($act == 'weixin_authorize'){
 			$weixin_src = "AUTH";
 			$user_id = createWxUser($wx_user_info,$weixin_src,true);
 			//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
-			setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+			setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
 			header('location:'.$redirect_url);exit();
 			// echo $user_id;
 		}
@@ -37,7 +37,7 @@ if($act == 'weixin_authorize'){
 	$weixin_src = "AUTH";
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
 	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
-	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
 	header('location:'.$redirect_url);exit();
 	// echo $user_id;
 }elseif($act == 'weixin_authorize_done'){
@@ -46,7 +46,7 @@ if($act == 'weixin_authorize'){
 	$weixin_src = "AUTH";
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
 	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
-	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/');
+	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
 	header('location:'.$redirect_url);exit();
 	// echo $user_id;
 }elseif($act == 'auto_weixin_login'){
