@@ -146,4 +146,7 @@ export default {
      * pageCount
      */
     'GET_OFFLINE_COUPONUS_LIST': '/Get_offlineCouponusList/', // 获取店铺支付优惠券
+
+    // payment_id
+    'GET_OFFLINE_ORDER_INFO_ENTITY': '/Get_offlineOrderInfo_Entity/', // 获取店铺支付支付信息
 }

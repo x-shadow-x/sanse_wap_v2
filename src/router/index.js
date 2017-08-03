@@ -17,6 +17,8 @@ const settleAccounts = r => require.ensure([], () => r(require('../pages/shoppin
 const storePay = r => require.ensure([], () => r(require('../pages/store_pay/store_pay.vue')), 'storePay')
 const historyPay = r => require.ensure([], () => r(require('../pages/store_pay/history_pay.vue')), 'storePay')
 const payInfo = r => require.ensure([], () => r(require('../pages/store_pay/pay_info.vue')), 'storePay')
+const storePayResult = r => require.ensure([], () => r(require('../pages/store_pay/store_pay_result.vue')), 'storePay')
+const checkstandPayInfo = r => require.ensure([], () => r(require('../pages/store_pay/checkstand_pay_info.vue')), 'storePay')
 
 const userIndex = r => require.ensure([], () => r(require('../pages/user/user_index.vue')), 'user')
 const blance = r => require.ensure([], () => r(require('../pages/user/blance.vue')), 'user')
@@ -339,7 +341,20 @@ export default [{
         component: historyPay,
         meta: {
             title: '历史支付'
-        }
+        },
+        children: [{
+            path: '/history_pay/store_pay_result',
+            component: storePayResult,
+            meta: {
+                title: '支付结果'
+            }
+        }, {
+            path: '/history_pay/checkstand_pay_info',
+            component: checkstandPayInfo,
+            meta: {
+                title: '收银台支付'
+            }
+        }]
     }, {
         path: '/pay_info',
         component: payInfo,

@@ -29,7 +29,8 @@
 			return {
 				payCode: '',
 				updateCodeTimer: 0,
-				validateIsScanTimer: 0
+				validateIsScanTimer: 0,
+				paymentId: 0
 			}
 		},
 
@@ -125,11 +126,14 @@
 	            	}
 	            });
 
-	            clearTimeout(this.validateIsScanTimer);
+				if(this.paymentId <= 0) {
+					clearTimeout(this.validateIsScanTimer);
 
-	            this.validateIsScanTimer = setTimeout(() => {
-	            	this.isScan();
-	            }, 2000);
+		            this.validateIsScanTimer = setTimeout(() => {
+		            	this.isScan();
+		            }, 2000);
+				}
+	            
 			}
 		},
 

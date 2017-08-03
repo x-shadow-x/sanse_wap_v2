@@ -103,4 +103,12 @@
     .slide-left-enter, .slide-left-leave-to {
         transform: translateX(-100%);
     }
+
+    .sanse_font_light {
+        font-family: 'sansefont_light'
+    }
+
+    .sanse_font_bold {
+        font-family: 'sansefont_bold';
+    }
 </style>

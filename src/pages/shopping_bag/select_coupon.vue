@@ -114,9 +114,6 @@
 		},
 
 		mounted() {
-
-            this.$store.commit('SET_TEST', 'tttt');
-        
             // {user_id}&{bonus_ids}&{pageIndex}&{pageSize}
 			this.$request.get(this.interface, {
 				'userId': localStorage.getItem('USER_ID') || 0,

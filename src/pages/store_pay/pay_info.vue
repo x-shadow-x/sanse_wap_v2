@@ -56,7 +56,10 @@
 				<h2 class="info_item_title">支付方式</h2>
 			</div>
 			<div class="info_item" v-for="item in paymentList">
-				<span class="info_item_name pay_way" :style="{backgroundImage: 'url(' + item.icon + ')'}">{{item.text}}</span>
+				<span class="info_item_name pay_way" :style="{backgroundImage: 'url(' + item.icon + ')'}">
+					{{item.text}}
+					<span class="prompt_tip" v-if="orderinfoEntity.is_first_reduction != 0"></span>
+				</span>
 				<span class="info_item_value">
 					<span class="check_btn"></span>
 				</span>
@@ -259,6 +262,18 @@
 		background: url('../../images/common/wechat_icon.png') left center no-repeat;
 		background-size: 20px auto;
 		padding-left: 24px;
+		position: relative;
+	}
+
+	.prompt_tip {
+		position: absolute;
+		left: 100%;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 103px;
+		height: 33px;
+		background: url('../../images/pay_info/prompt_icon.png') center no-repeat;
+		background-size: 100% auto;
 	}
 
 	.info_item_value_text {

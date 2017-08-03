@@ -59,6 +59,7 @@ const state = {
         '/store_pay': 4,
         '/history_pay': 50,
         '/pay_info': 51,
+        '/history_pay/store_pay_result': 52,
     },
     
 }
