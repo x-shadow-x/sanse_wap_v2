@@ -149,4 +149,16 @@ export default {
 
     // payment_id
     'GET_OFFLINE_ORDER_INFO_ENTITY': '/Get_offlineOrderInfo_Entity/', // 获取店铺支付支付信息
+    
+    // {layoutStyle} sanse-home-layout
+    'GET_AD_LIST': '/GetAd_List/', // 获取首页广告布局数据
+
+    /**
+     * {userId}
+     * {cookieId}
+     * {versionType} 还未有wap的接口~此处使用和ios相同的配置参数去获取系统配置 MAPP
+     * {systypes} 还未有wap的接口~此处使用和ios相同的配置参数去获取系统配置 IOS
+     * {companyId}
+     */
+    'GET_NEW_VERSION': '/Get_NewVersion/', // 获取系统配置
 }

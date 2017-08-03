@@ -62,9 +62,9 @@ init();
 
 Vue.use(VueRouter)
 const router = new VueRouter({
-    mode: 'history',
+    // mode: 'history',
     // base: '/vue_mobile/',
-    // base: '/sanse_wap_v2/dist/',
+    base: '/sanse_wap_v2/dist/',
     routes
 })
 

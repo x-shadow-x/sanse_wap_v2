@@ -39,10 +39,6 @@
             }
         },
 
-        mounted() {
-            console.log(666);
-        },
-
         methods: {
             sendIdentifyingCode() {
                 
@@ -56,10 +52,10 @@
                 }
                 this.dataInterface = this.$interface.SEND_SMS;
                 this.$request.get(this.$interface.SEND_SMS, {
-                	'userName' : this.phoneNumber,
-					'smsType' : 3,
-					'companyId' : this.$store.state.companyId,
-					'brandId' : this.$store.state.brandId
+                	'userName': this.phoneNumber,
+					'smsType': 3,
+					'companyId': this.$store.state.companyId,
+					'brandId': this.$store.state.brandId
                 }, (res) => {
                 	this.tipTitleF = '提示';
                 	this.tipContentF = '信息已发送，请耐心等待';

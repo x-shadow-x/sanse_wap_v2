@@ -171,7 +171,14 @@ export default [{
         component: userIndex,
         meta: {
             title: '会员中心'
-        }
+        },
+        children: [{
+            path: '/user_index/user_info',
+            component: userInfo,
+            meta: {
+                title: '个人资料'
+            }
+        }]
     }, {
         path: '/blance',
         component: blance,
@@ -214,12 +221,6 @@ export default [{
         component: myCommission,
         meta: {
             title: '我的提成'
-        }
-    }, {
-        path: '/user_info',
-        component: userInfo,
-        meta: {
-            title: '个人资料'
         }
     }, {
         path: '/bind_phone_number',

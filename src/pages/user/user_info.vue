@@ -115,6 +115,8 @@
             }
         },
 
+        props: ['userInfoF'],
+
         computed: {
             captchaList: function() {
                 var tempArr = this.captcha.split('');
@@ -146,25 +148,28 @@
             if(!this.$helper.isLogin()) {
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
-
-            if(this.$store.state.userInfo.MobileNo) {
-                // 此处MobileNo仅仅是用来判断是否已经获取过userInfo并存储到store了
-                this.userInfo = this.$store.state.userInfo;
-                this.oldUserName = this.userInfo.UserName;
-            } else {
-                this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-                    'userId': localStorage.getItem('USER_ID') || 0,
-                    'jpushId': this.$store.state.jpushId,
-                    'channelId': this.$store.state.channelId,
-                    'appId': this.$store.state.appId,
+            this.userInfo = this.userInfoF;
+            console.log(this.userInfoF)
+            console.log(this.userInfo.Sex);
+            this.oldUserName = this.userInfo.UserName;
+            // if(this.$store.state.userInfo.MobileNo) {
+            //     // 此处MobileNo仅仅是用来判断是否已经获取过userInfo并存储到store了
+            //     this.userInfo = this.$store.state.userInfo;
+            //     this.oldUserName = this.userInfo.UserName;
+            // } else {
+            //     this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+            //         'userId': localStorage.getItem('USER_ID') || 0,
+            //         'jpushId': this.$store.state.jpushId,
+            //         'channelId': this.$store.state.channelId,
+            //         'appId': this.$store.state.appId,
                     
-                }, (res) => {
-                    let data = res.data;
-                    this.userInfo = data;
-                    this.$store.commit('SET_USER_INFO', data);
-                    this.oldUserName = this.userInfo.UserName;
-                })
-            }
+            //     }, (res) => {
+            //         let data = res.data;
+            //         this.userInfo = data;
+            //         this.$store.commit('SET_USER_INFO', data);
+            //         this.oldUserName = this.userInfo.UserName;
+            //     })
+            // }
 
             $('#birthdayInput').date({
                 cb: () => {
@@ -457,7 +462,7 @@
         left: 0;
         top: 0;
         right: 0;
-        z-index: 2;
+        z-index: 12;
         height: 100%;
         overflow: visible;
         background: #efefef;

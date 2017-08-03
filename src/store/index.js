@@ -14,6 +14,9 @@ const state = {
     channelId: '0', // 固定的id值
     appId: '0',     // 固定的id值
     restTime: 5,    // 验证码重发时间
+    versionType: 'MAPP', // 还未有wap的接口~此处使用和ios相同的配置参数去获取系统配置（待用）
+    systypes: 'IOS',     // 还未有wap的接口~此处使用和ios相同的配置参数去获取系统配置（待用）
+    layoutStyle: 'sanse-home-layout', // 首页广告布局名
     goodsListRecord: [], // 记录商品列表当前加载的商品数据的状况~以便从商品详情页返回的时候还原之前的状态
     isShowLoad: false,
     keyWord: '', // 当在商品搜索页输入关键词并跳转到搜索结果页时需先记录输入的关键词~以便再再次返回搜索页的时候直接显示上次输入的关键词

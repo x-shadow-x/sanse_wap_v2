@@ -1,12 +1,20 @@
 <template>
     <div class="user_index_main">
          <div class="user_card_box" id="userCardBox">
-            <div class="fn_box" id="fnBox" :style="headStyle">
-                <div class="invite_friend_box">
-                    <span class="invite_friend_text">邀请好友</span>
-                    <img src="../../images/user_index/invite_friend_qr_code.png" alt="邀请好友二维码" class="invite_friend_qr_code">
+            <div class="fn_bar" id="fnBar" :style="headStyle">
+                <div class="user_info_breviary_box" v-if="showBreviary">
+                    <div class="user_img_box_breviary">
+                        <img src="../../images/common/default_user_icon.png" alt="会员头像" class="user_img_breviary">
+                    </div>
+                    <span class="user_name_breviary">{{userInfo.UserName}}</span>
                 </div>
-                <img src="../../images/user_index/message.png" alt="消息入口按钮" class="message">
+                <div class="fn_box">
+                    <div class="invite_friend_box">
+                        <span class="invite_friend_text">邀请好友</span>
+                        <img src="../../images/user_index/invite_friend_qr_code.png" alt="邀请好友二维码" class="invite_friend_qr_code">
+                    </div>
+                    <img src="../../images/user_index/message.png" alt="消息入口按钮" class="message">
+                </div>
             </div>
             <div class="user_info_box">
                 <div class="user_img_box">
@@ -96,7 +104,7 @@
                 </router-link>
             </li> -->
             <li class="user_fn_item user_data">
-                <router-link to="/user_info" class="user_fn_content ofh">
+                <router-link to="/user_index/user_info" class="user_fn_content ofh">
                     <span class="fl title_text">个人资料</span>
                     <span class="fr user_fn_tip">完善信息领取100积分</span>
                 </router-link>
@@ -122,6 +130,10 @@
                 </div>
             </li>
         </ul>
+
+        <transition name="slide-right">
+            <router-view :userInfoF="userInfo"></router-view>
+        </transition>
     </div>
 
 </template>
@@ -143,7 +155,8 @@
                     top: '-3px'
                 },
                 userInfo: {},
-                orderInfo: {}
+                orderInfo: {},
+                showBreviary: false
             }
         },
         methods: {
@@ -176,7 +189,6 @@
 
                 this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
                     'userId': localStorage.getItem('USER_ID')
-                    
                 }, (res) => {
                     let data = res.data;
                     this.orderInfo = data;
@@ -184,9 +196,12 @@
 
 
                 // 头部显示阈值
-                let threshold = $('#userCardBox').outerHeight() - $('#fnBox').outerHeight();
-                $(window).scroll(function() {
-                    var opacity = $(document).scrollTop() / threshold;
+                let threshold = $('#userCardBox').outerHeight() - $('#fnBar').outerHeight();
+
+                $('.user_index_main').scroll(function() {
+                    var opacity = $('.user_index_main').scrollTop() / threshold;
+                    console.log(opacity, '-----------', (opacity >= 1));
+                    this.showBreviary = (opacity >= 1);
                     this.headStyle['background'] = `rgba(0, 0, 0, ${opacity})`;
                 }.bind(this));
             }
@@ -201,6 +216,8 @@
 
     .user_index_main {
         background: #efefef;
+        height: 100%;
+        overflow: auto;
     }
 
     .user_fn_list {
@@ -375,17 +392,52 @@
         background: #e7e7e7;
     }
 
-    .fn_box {
-        text-align: right;
+    .fn_bar {
         position: fixed;
         width: 100%;
         left: 0;
         top: 0;
         padding-right: 4%;
         box-sizing: border-box;
+        height: 1.2rem;
         line-height: 1.2rem;
         background: rgba(0, 0, 0, 0);
-        z-index: 10000;
+        z-index: 3;
+    }
+
+    .user_info_breviary_box {
+        display: inline-block;
+        font-size: 9px;
+        margin-left: 4%;
+        color: #fff;
+    }
+
+    .user_img_box_breviary {
+        display: inline-block;
+        vertical-align: middle;
+        width: .6rem;
+        padding-top: .6rem;
+        position: relative;
+        border-radius: 10000px;
+        border: 2px solid #fff;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .user_img_breviary {
+        position: absolute;
+        width: 100%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .fn_box {
+        position: absolute;
+        right: 4%;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
     }
 
     .invite_friend_box {
@@ -395,12 +447,12 @@
         color: #fff;
         text-align: center;
         white-space: nowrap;
+        line-height: 1;
     }
 
     .invite_friend_text {
         display: inline-block;
         vertical-align: middle;
-        line-height: 20px;
     }
 
     .invite_friend_qr_code,
