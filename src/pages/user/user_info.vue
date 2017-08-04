@@ -13,7 +13,7 @@
             </div>
             <div class="info_item">
                 <span class="item_name">性别</span>
-                <span class="male_box" v-if="userInfo.Sex == 0">
+                <span class="male_box" v-if="userInfo.Sex != 1">
                     <i class="sex_icon male_icon"></i>
                     <span>男</span>
                 </span>
@@ -97,8 +97,6 @@
                 userInfo: {},
                 oldUserName: '', // 保存还未修改前的用户昵称~当用户因为误操作导致昵称为空并提交新编辑的信息的时候默认使用回最初的昵称
                 newPhoneNumber: '',
-
-
                 
                 isValidateStatus: false,
                 tip: '错误提示',
@@ -140,6 +138,10 @@
 
             bindPhoneTip: function() {
                 return this.userInfo.IsBindMobile == 1 ? '修改绑定' : '绑定手机';
+            },
+
+            handleInputedValidate: function() {
+                return this.userInfo.IsBindMobile == 1 ? 'modifyBindPhoneNumberByCaptcha' : 'bindPhoneNumberByCaptcha';
             }
         },
 
@@ -148,28 +150,28 @@
             if(!this.$helper.isLogin()) {
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
-            this.userInfo = this.userInfoF;
-            console.log(this.userInfoF)
-            console.log(this.userInfo.Sex);
+
+            this.userInfo = this.extendObj(this.userInfoF);
+            console.log(this);
+            // this.userInfo = this.userInfoF;
+
             this.oldUserName = this.userInfo.UserName;
-            // if(this.$store.state.userInfo.MobileNo) {
-            //     // 此处MobileNo仅仅是用来判断是否已经获取过userInfo并存储到store了
-            //     this.userInfo = this.$store.state.userInfo;
-            //     this.oldUserName = this.userInfo.UserName;
-            // } else {
-            //     this.$request.get(this.$interface.GET_USERINFO_PUSH, {
-            //         'userId': localStorage.getItem('USER_ID') || 0,
-            //         'jpushId': this.$store.state.jpushId,
-            //         'channelId': this.$store.state.channelId,
-            //         'appId': this.$store.state.appId,
+
+            if(Object.keys(this.userInfo).length > 0) {
+                this.oldUserName = this.userInfo.UserName;
+            } else {
+                this.$request.get(this.$interface.GET_USERINFO_PUSH, {
+                    'userId': localStorage.getItem('USER_ID') || 0,
+                    'jpushId': this.$store.state.jpushId,
+                    'channelId': this.$store.state.channelId,
+                    'appId': this.$store.state.appId,
                     
-            //     }, (res) => {
-            //         let data = res.data;
-            //         this.userInfo = data;
-            //         this.$store.commit('SET_USER_INFO', data);
-            //         this.oldUserName = this.userInfo.UserName;
-            //     })
-            // }
+                }, (res) => {
+                    let data = res.data;
+                    this.userInfo = data;
+                    this.oldUserName = this.userInfo.UserName;
+                })
+            }
 
             $('#birthdayInput').date({
                 cb: () => {
@@ -181,6 +183,19 @@
         },
 
         methods: {
+            // 浅拷贝
+            extendObj() {
+                let args = Array.apply(null, arguments);
+                let res = {};
+                for(let i = 0, len = args.length; i < len; i++) {
+                    let currentObj = args[i];
+                    for(let key in currentObj) {
+                        res[key] = currentObj[key]
+                    }
+                }
+                return res;
+            },
+
             hideAlert() {
                 this.isShowAlert = false;
             },
@@ -189,21 +204,27 @@
                 // {userId}&{userName}&{sex}&{birthday}&{email}
                 this.$request.get(this.$interface.UPDATEUSERS, {
                     'userId': localStorage.getItem('USER_ID') || 0,
-                    'userName': this.userInfo.UserName || this.oldUserName,
+                    'userName': this.userInfo.UserName,
                     'sex': this.userInfo.Sex,
-                    'birthday': this.userInfo.Birthday,
+                    'birthday': this.userInfo.Birthday || ' ',
                     'email': this.userInfo.Email || ' ', // 若没有输入邮箱~则必须传入空格
                 }, (res) => {
                     let data = res.data;
-                    console.log(data)
+                    this.$emit('updateUserInfo')
                 })
             },
 
             saveUserName() {
+                if(!this.userInfo.UserName) {
+                    return;
+                }
                 this.updateUserInfo();
                 console.log('保存昵称');
             },
             saveEmail() {
+                if(!this.userInfo.Email) {
+                    return;
+                }
                 this.updateUserInfo();
                 console.log('保存邮箱');
             },
@@ -212,7 +233,8 @@
                 setTimeout(() => {
                     $(e.target).removeClass('rotate');
                 }, 320);
-                if(this.userInfo.Sex == 0) {
+                console.log(this.userInfo.Sex)
+                if(this.userInfo.Sex != 1) {
                     this.userInfo.Sex = 1;
                 } else {
                     this.userInfo.Sex = 0;
@@ -257,8 +279,8 @@
                 }, 1000);
             },
 
+            // 修改绑定手机号处理函数
             modifyBindPhoneNumberByCaptcha() {
-
                 if(!this.newPhoneNumber || !this.captcha) {
                     this.isShowAlert = true;
                     return;
@@ -277,28 +299,74 @@
                             this.isShowTip = false;
                         }, 1000);
                         return;
-                    } else if(res.code == 0){
-                        // todo---------------询问是否合并资产
                     } else {
                         this.closeValidate();
                     }
                 }, null, {
                     cb: (res) => {
                         let code = res.data.code;
-                        if(code == '0' || code == '-1' || code == '1' || code == '-9999') {
+                        if(code == '-1') {
                             return true;
                         }
                     }
                 });
             },
 
+            // 绑定手机号处理函数
+            bindPhoneNumberByCaptcha() {
+                
+                this.$request.get(this.$interface.SystemWeiXin_BindMobile, {
+                    'userId': localStorage.getItem('USER_ID') || 0,
+                    'phoneNumber': this.newPhoneNumber,
+                    'msgcode': this.captcha
+                }, (res) => {
+                    console.log(res);
+                    if(res.code == -1) {
+                        this.tip = res.msg;
+                        this.isShowTip = true;
+                        setTimeout(() => {
+                            this.isShowTip = false;
+                        }, 1000);
+                        return;
+                    } else if(res.code == 0) {
+                        // todo 询问是否合并资产
+                        this.transferUserInfo('接口返回的另一个userid');
+                    } else {
+                        this.closeValidate();
+                    }
+                }, null, {
+                    cb: (res) => {
+                        let code = res.data.code;
+                        if(code == '-1') {
+                            return true;
+                        }
+                    }
+                });
+            },
+
+            transferUserInfo(userId) {
+                this.$request.get(this.$interface.SYS_TRANSFER_USERINFO, {
+                    'fromUserid': localStorage.getItem('USER_ID') || 0,
+                    'toUserid': userId
+                }, (res) => {
+                    console.log(res);
+                    
+                    // 关闭验证码弹窗
+                    this.closeValidate();
+                });
+            },
+
+            showTip(msg) {
+                this.tip = msg;
+                this.isShowTip = true;
+                setTimeout(() => {
+                    this.isShowTip = false;
+                }, 1000);
+            },
+
             validatePhoneHanlde() {
                 if(!(/^1[34578]\d{9}$/.test(this.newPhoneNumber))) {
-                    this.tip = '手机号码不正确';
-                    this.isShowTip = true;
-                    setTimeout(() => {
-                        this.isShowTip = false;
-                    }, 1000);
+                    this.showTip('手机号码不正确');
                     return;
                 }
                 this.captcha = '';
@@ -327,7 +395,8 @@
         watch: {
             'captcha' (to, from) {
                 if(to.length >= 6) {
-                    this.modifyBindPhoneNumberByCaptcha();
+                    if(this.userInfo.IsBindMobile)
+                    this[this.handleInputedValidate]();
                 }
             }
         },

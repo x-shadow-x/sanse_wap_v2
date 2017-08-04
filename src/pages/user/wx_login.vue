@@ -23,13 +23,11 @@
             }
         },
 
-        mounted() {
-        	console.log(this.original, '--------------', window.location.href);
-        },
-
         methods: {
             wxLogin() {
-            	window.location.href = root + "/wx_login.php?act=weixin_authorize&original=" + this.original;
+            	let tempUrl = root + "/wx_login.php?act=weixin_authorize&original=" + this.original;
+            	let urlArr = tempUrl.split('#');
+            	window.location.href = root + "/wx_login.php?act=weixin_authorize&original=" + urlArr[0] + '&hash=' + urlArr[1];
             }
         }
     }

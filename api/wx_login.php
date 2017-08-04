@@ -4,8 +4,9 @@
 define('IN_ECS', true);
 require(dirname(__FILE__) . '/includes/init.php');
 $act = $_REQUEST['act'] ? $_REQUEST['act'] : 'weixin_authorize' ;
-$redirect_url = $_REQUEST['original'] ? $_REQUEST['original'] : $_COOKIE['original'];
-setcookie('original',$redirect_url,0,'/sanse_wap_v2/dist');
+$redirect_url = $_REQUEST['original'] ? $_REQUEST['original'].'#'.$_REQUEST['hash'] : $_COOKIE['original'];
+// echo($redirect_url);exit(0);
+setcookie('original',$redirect_url, 0, '/sanse_wap_v2/');
 if($act == 'weixin_authorize'){
 	$wx_login_openid = $_COOKIE['WeChat']['openid'];
 	if($wx_login_openid){

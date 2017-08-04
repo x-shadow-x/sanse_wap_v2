@@ -161,4 +161,17 @@ export default {
      * {companyId}
      */
     'GET_NEW_VERSION': '/Get_NewVersion/', // 获取系统配置
+
+    // {openid}&{unionid}&{userid}  res.code = 0 的时候询此接口会返回另外一个userid~此时应该询问是否合并资产
+    'GET_NEW_VERSION': '/SYS_USER_BIND_WXUSER/', // 绑定微信
+ 
+    /**
+     * {userId}&{mobile}
+     * {msgcode}  用户填写的短信验证码
+     * res.code = 0 的时候询此接口会返回另外一个userid~此时应该询问是否合并资产
+     */
+    'SystemWeiXin_BindMobile': '/SystemWeiXin_BindMobile/', // 绑定手机
+
+    // {from_userid}&{to_userid}
+    'SYS_TRANSFER_USERINFO': '/SysTransferUserInfo/', // 资产转移
 }

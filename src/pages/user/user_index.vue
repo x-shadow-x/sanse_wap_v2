@@ -132,7 +132,7 @@
         </ul>
 
         <transition name="slide-right">
-            <router-view :userInfoF="userInfo"></router-view>
+            <router-view :userInfoF="userInfo" v-on:updateUserInfo="updateUserInfo"></router-view>
         </transition>
     </div>
 
@@ -159,6 +159,7 @@
                 showBreviary: false
             }
         },
+
         methods: {
             /**
              * 退出登录仅需清楚相关的localStorage
@@ -169,12 +170,9 @@
                 localStorage.removeItem('GOODS_DETAIL_DATA');
                 helper.delCookie('WX_USER_ID');
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
-            }
-        },
-        mounted() {
-            if(!this.$helper.isLogin()) {
-                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
-            } else {
+            },
+
+            updateData() {
                 this.$request.get(this.$interface.GET_USERINFO_PUSH, {
                     'userId': localStorage.getItem('USER_ID') || 0,
                     'jpushId': this.$store.state.jpushId,
@@ -184,8 +182,20 @@
                 }, (res) => {
                     let data = res.data;
                     this.userInfo = data;
-                    this.$store.commit('SET_USER_INFO', data);
                 })
+            },
+
+            updateUserInfo() {
+                this.updateData();
+            }
+        },
+
+        mounted() {
+            if(!this.$helper.isLogin()) {
+                console.log(window.location.href, '----------000------------');
+                this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
+            } else {
+                this.updateData();
 
                 this.$request.get(this.$interface.GET_APP_ORDERCOUNT_BY_USERID, {
                     'userId': localStorage.getItem('USER_ID')
