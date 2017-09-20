@@ -163,7 +163,7 @@ export default {
     'GET_NEW_VERSION': '/Get_NewVersion/', // 获取系统配置
 
     // {openid}&{unionid}&{userid}  res.code = 0 的时候询此接口会返回另外一个userid~此时应该询问是否合并资产
-    'GET_NEW_VERSION': '/SYS_USER_BIND_WXUSER/', // 绑定微信
+    'SYS_USER_BIND_WXUSER': '/SYS_USER_BIND_WXUSER/', // 绑定微信
  
     /**
      * {userId}&{mobile}

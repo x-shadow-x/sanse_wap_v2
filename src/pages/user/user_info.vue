@@ -47,7 +47,7 @@
                     <span class="binded_wechat_tip">已绑定</span>
                 </div>
                 <div class="unbind_wechat_box" v-else>
-                    <span class="unbind_wechat_tip">绑定微信</span>
+                    <span class="unbind_wechat_tip" @click="bindWx">绑定微信</span>
                 </div>
             </div>
         </div>
@@ -86,10 +86,12 @@
 </template>
 
 <script>
-    import '../../plugins/date/date.css'
-    import '../../plugins/date/date.js'
+    import '../../plugins/date/date.css';
+    import '../../plugins/date/date.js';
 
     import alert from '../../components/common/alert.vue';
+
+    var root = process.env.API_WX_PAY_ROOT;
 
     export default {
         data() {
@@ -151,8 +153,9 @@
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             }
 
+            console.log(window.location.href);
+
             this.userInfo = this.extendObj(this.userInfoF);
-            console.log(this);
             // this.userInfo = this.userInfoF;
 
             this.oldUserName = this.userInfo.UserName;
@@ -183,6 +186,44 @@
         },
 
         methods: {
+
+            bindWx() {
+
+                let tempUrl = root + "/wx_login.php?act=bind_weixin_authorize&original=" + window.location.href;
+                let urlArr = tempUrl.split('#');
+                // console.log(root + "/wx_login.php?act=bind_weixin_authorize&original=" + urlArr[0] + '&hash=' + urlArr[1]);
+                window.location.href = root + "/wx_login.php?act=bind_weixin_authorize&original=" + urlArr[0] + '&hash=' + urlArr[1];
+
+
+                // this.$request.get(this.$interface.SYS_USER_BIND_WXUSER, {
+                //     'openId': localStorage.getItem('WX_USER_OPENID'),
+                //     'unionId': localStorage.getItem('WX_UNIONID'),
+                //     'userId': localStorage.getItem('USER_ID') || 0,
+                // }, (res) => {
+                //     console.log(res);
+                //     if(res.code == -1) {
+                //         this.tip = res.msg;
+                //         this.isShowTip = true;
+                //         setTimeout(() => {
+                //             this.isShowTip = false;
+                //         }, 1000);
+                //         return;
+                //     } else if(res.code == 0) {
+                //         // todo 询问是否合并资产
+                //         this.transferUserInfo('接口返回的另一个userid');
+                //     } else {
+                //         this.closeValidate();
+                //     }
+                // }, null, {
+                //     cb: (res) => {
+                //         let code = res.data.code;
+                //         if(code == '-1') {
+                //             return true;
+                //         }
+                //     }
+                // });
+            },
+            
             // 浅拷贝
             extendObj() {
                 let args = Array.apply(null, arguments);
@@ -345,6 +386,7 @@
             },
 
             transferUserInfo(userId) {
+                console.log(userId);
                 this.$request.get(this.$interface.SYS_TRANSFER_USERINFO, {
                     'fromUserid': localStorage.getItem('USER_ID') || 0,
                     'toUserid': userId

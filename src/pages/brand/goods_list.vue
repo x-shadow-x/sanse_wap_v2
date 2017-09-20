@@ -1,5 +1,5 @@
 <template>
-	<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar, disable_scroll: disableScroll}" @scroll="scrollHandle($event)" @touchstart="beforeScroll($event)" @touchmove="handleMove($event)">
+	<div class="goods_list_out_box">
 		<div class="category_bar" v-if="showCategoryBar">
 			<div class="category_box">
 				<ul class="category_list">
@@ -18,6 +18,7 @@
 			</div>
 			<router-link to="/goods_search" class="search_btn"></router-link>
 		</div>
+
 		<div class="filter_bar" :class="{hide: hideFilterBar}">
             <div class="filter_bar_box">
                 <span class="new_good_icon"></span>
@@ -38,77 +39,86 @@
     			</div>
             </div>
 		</div>
-		<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}" @touchstart.stop="" @touchmove.stop="" @scroll.stop="">
-			<div class="filter_list_box" @click.stop="">
-				<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
-					<div class="filter_list">
-						<div class="prototype_box goods_pro" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
-							<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
-							<ul class="prototype_list">
-								<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index" :data-attr-value="item.attr_value">{{item.attr_value}}</li>
-							</ul>
+	
+		<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar, disable_scroll: disableScroll}" @scroll="scrollHandle($event)" @touchstart="beforeScroll($event)" @touchmove="handleMove($event)">
+			
+			
+			<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}" @touchstart.stop="" @touchmove.stop="" @scroll.stop="">
+				<div class="filter_list_box" @click.stop="">
+					<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
+						<div class="filter_list">
+							<div class="prototype_box goods_pro" v-for="(goodPropertyItem, goodPropertyIndex) in goodPropertyListArray" @click="handleSelectProp($event)">
+								<h2 class="prototype_title">{{goodPropertyItem.PropertyName}}</h2>
+								<ul class="prototype_list">
+									<li class="prototype_item" v-for="(item, index) in goodPropertyItem.GoodPropertyArray" :data-attr-id="item.attr_id" :data-property-index="goodPropertyIndex" :data-index="index" :data-attr-value="item.attr_value">{{item.attr_value}}</li>
+								</ul>
+							</div>
+							<div class="prototype_box goods_color" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
+								<h2 class="prototype_title">颜色</h2>
+								<ul class="prototype_list">
+									<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
+								</ul>
+							</div>
 						</div>
-						<div class="prototype_box goods_color" v-if="colorPropertyListArray.length > 0" @click="handleSelectProp($event, 'color')">
-							<h2 class="prototype_title">颜色</h2>
-							<ul class="prototype_list">
-								<li class="prototype_item" v-for="item in colorPropertyListArray" :data-colorcat-id="item.ColorPropertyArray[0].colorcat_id">{{item.PropertyName}}</li>
-							</ul>
+						<div class="handle_btn_box">
+							<span class="btn" @click="resetFilter">重新筛选</span>
+							<span class="btn confirm_btn" @click="confirmFilter">确认</span>
 						</div>
-					</div>
-					<div class="handle_btn_box">
-						<span class="btn" @click="resetFilter">重新筛选</span>
-						<span class="btn confirm_btn" @click="confirmFilter">确认</span>
-					</div>
-				</template>
-				<template v-else>
-					<i class="empty_filter_icon"></i>
-					<span class="empty_filter_tip">暂无筛选条件！</span>
-				</template>
+					</template>
+					<template v-else>
+						<i class="empty_filter_icon"></i>
+						<span class="empty_filter_tip">暂无筛选条件！</span>
+					</template>
+				</div>
 			</div>
-		</div>
 
-        <div class="goods_list_box" :class="{top: !showCategoryBar}" id="goodsListBox">
-    		<ul class="goods_list" v-if="!isGoodsListEmpty">
-                <li class="goods_item" v-for="(item, index) in goodsList">
-                    <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
-                    	<div class="img_box">
-                            <img :data-src="item.goods_img" :alt="item.goods_name" class="goods_img lazyload">
-                        </div>
-                        <div class="goods_info_box">
-                            <h2 class="goods_name">{{item.goods_name}}</h2>
-                            <div class="price_box">
-                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
-                                <div class="current_price_box">
-                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
-                                </div>
-                                <div class="old_price_box">
-                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
-                                </div>
-                            </div>
-                            <div class="date_box">
-                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
-                            </div>
-                        </div>
-                    </router-link>
-                </li>
-            </ul>
-            <div class="empty_goods_list_box" v-else>
-	        	<div class="empty_goods_list_tip">
-	        		<i class="empty_goods_list_icon"></i>
-	        		<p class="empty_goods_list_text">暂无商品</p>
-	        	</div>
+	        <div class="goods_list_box" :class="{top: !showCategoryBar}" id="goodsListBox">
+	    		<ul class="goods_list" v-if="!isGoodsListEmpty">
+	                <li class="goods_item" v-for="(item, index) in goodsList">
+	                    <router-link :to="{path: 'goods_detail/', query: {goodsId: item.goods_id, colorId: item.img_color}}" class="goods_detail_link">
+	                    	<div class="img_box">
+	                            <img :data-src="item.goods_img" :alt="item.goods_name" class="goods_img lazyload">
+	                        </div>
+	                        <div class="goods_info_box">
+	                            <h2 class="goods_name">{{item.goods_name}}</h2>
+	                            <div class="price_box">
+	                                <img src="../../images/goods_list/special_price_icon.png" alt="特价icon" class="special_price_tip" v-if="item.sale_type == 4">
+	                                <div class="current_price_box">
+	                                    <span class="money_tip">¥</span><span class="price">{{item.price}}</span>
+	                                </div>
+	                                <div class="old_price_box">
+	                                    <span class="money_tip">¥</span><span class="price">{{item.market_price}}</span>
+	                                </div>
+	                            </div>
+	                            <div class="date_box">
+	                                <i class="date_icon"></i><span class="date">{{item.onsale_time.split(' ')[0]}}</span>
+	                            </div>
+	                        </div>
+	                    </router-link>
+	                </li>
+	            </ul>
+	            <div class="empty_goods_list_box" v-else>
+		        	<div class="empty_goods_list_tip">
+		        		<i class="empty_goods_list_icon"></i>
+		        		<p class="empty_goods_list_text">暂无商品</p>
+		        	</div>
+		        </div>
+	            <div :class="{transparent: !isMore || isGoodsListEmpty}">
+	                <div id="pullUp">
+	                    <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
+	                </div>
+	            </div>
 	        </div>
-            <div :class="{transparent: !isMore || isGoodsListEmpty}">
-                <div id="pullUp">
-                    <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多</span>
-                </div>
-            </div>
-        </div>
-        <div class="page_tip_box" v-if="showPageTip">
-        	<span class="current_page">{{currentPage}}</span>
-        	<span class="total_page">{{totalPage}}</span>
-        </div>
-        <span class="scroll_to_top" v-if="showScrollToTop" @click="scrollToTop"></span>
+	        <div class="page_tip_box" v-if="showPageTip">
+	        	<span class="current_page">{{currentPage}}</span>
+	        	<span class="total_page">{{totalPage}}</span>
+	        </div>
+	        <span class="scroll_to_top" v-if="showScrollToTop" @click="scrollToTop"></span>
+
+	        <transition name="slide-right">
+	            <router-view></router-view>
+	        </transition>
+		</div>
 	</div>
 </template>
 
@@ -177,7 +187,8 @@
                 hideFilterBar: false,
                 isLoading: false, // 自己实现滚动加载，用来判断当前是都已经在加载了~避免滚动底部后多次加载数据
                 goodsList: [],
-                pageIndex: 1
+                pageIndex: 1,
+                timeId: 0 // 函数节流setTimeout的id
 			}
 		},
 
@@ -359,7 +370,6 @@
 						this.isMore = true;
 					}
 					if(this.pageIndex == 2) {
-                        console.log(123);
 						// 目前是第一页的数据~直接将data.dataList赋值给this.goodsList
 						this.goodsList = data.dataList;
 						this.scrollToTop();
@@ -385,6 +395,8 @@
 					}, 320);
 
 					this.$store.commit('HIDE_LOAD');
+
+					localStorage.setItem('GOODSLIST', JSON.stringify(this.goodsList));
 
 				});
 			},
@@ -468,13 +480,32 @@
                 }
             },
 
-			scrollHandle(e) {
-				if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
-                    if(!this.isLoading) {
-                        this.loadMoreData();
-                    }
-				}
-			},
+            scrollHandle(e) {
+            	console.log(e.target)
+            	clearTimeout(this.timeId);
+            	this.timeId = setTimeout((e) => {
+            		if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
+	                    if(!this.isLoading) {
+	                        this.loadMoreData();
+	                    }
+					}
+					localStorage.setItem('SCROLLTOP', $(e.target).scrollTop());
+            	}, 320, e);
+            },
+
+			// scrollHandle(e) {
+			// 	if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
+   //                  if(!this.isLoading) {
+   //                      this.loadMoreData();
+   //                  }
+			// 	}
+
+			// 	if($(e.target).scrollTop() > 0) {
+			// 		this.showPageTip = true;
+			// 	} else {
+			// 		this.showPageTip = false;
+			// 	}
+			// },
 
             getAppPropertyList() {
                 this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
@@ -502,24 +533,42 @@
 
             this.getAppPropertyList();
 
-			this.getDefaultData(function(data) {
-				this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
-				this.goodsItemStep = -2 / (this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
-			});
+            let goodsListStr = localStorage.getItem('GOODSLIST');
+
+            if(goodsListStr) {
+            	this.goodsList = JSON.parse(goodsListStr);
+            	console.log(localStorage.getItem('SCROLLTOP'));
+            	
+            	setTimeout(() => {
+            		$(".goods_list_main").animate({ scrollTop: localStorage.getItem('SCROLLTOP') },0); 
+            	}, 500);
+            } else {
+            	this.getDefaultData(function(data) {
+					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
+					this.goodsItemStep = -2 / (this.$interface.PAGE_SIZE * $('.goods_item').outerHeight(true));
+				});
+            }
+			
 		}
 	}
 </script>
 
 <style scoped>
-	.goods_list_main {
+	.goods_list_out_box {
 		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 2;
+	}
+
+	.goods_list_main {
+		height: 100%;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
 	    z-index: 2;
-	    left: 0;
-	    right: 0;
-	    top: 0;
-	    bottom: 0;
 	    background: #fff;
-	    overflow: auto;
 	}
 
     .goods_list_main.disable_scroll {
@@ -532,7 +581,7 @@
 		top: 0;
 		width: 100%;
 		border-bottom: 1px solid #efefef;
-		z-index: 5;
+		z-index: 2;
         background: #fff;
 	}
 

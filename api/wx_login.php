@@ -19,6 +19,8 @@ if($act == 'weixin_authorize'){
 			$user_id = createWxUser($wx_user_info,$weixin_src,true);
 			//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
 			setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
+			setcookie('WX_USER_OPENID',$wx_user_info['openid'],0,'/sanse_wap_v2/dist');
+			setcookie('WX_UNIONID',$wx_user_info['unionid'],0,'/sanse_wap_v2/dist');
 			header('location:'.$redirect_url);exit();
 			// echo $user_id;
 		}
@@ -39,6 +41,8 @@ if($act == 'weixin_authorize'){
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
 	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
 	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
+	setcookie('WX_USER_OPENID',$wx_user_info['openid'],0,'/sanse_wap_v2/dist');
+	setcookie('WX_UNIONID',$wx_user_info['unionid'],0,'/sanse_wap_v2/dist');
 	header('location:'.$redirect_url);exit();
 	// echo $user_id;
 }elseif($act == 'weixin_authorize_done'){
@@ -48,6 +52,8 @@ if($act == 'weixin_authorize'){
 	$user_id = createWxUser($wx_user_info,$weixin_src,true);
 	//echo 'location:'.$redirect_url.'?user_id='.$user_id;exit;
 	setcookie('WX_USER_ID',$user_id,0,'/sanse_wap_v2/dist');
+	setcookie('WX_USER_OPENID',$wx_user_info['openid'],0,'/sanse_wap_v2/dist');
+	setcookie('WX_UNIONID',$wx_user_info['unionid'],0,'/sanse_wap_v2/dist');
 	header('location:'.$redirect_url);exit();
 	// echo $user_id;
 }elseif($act == 'auto_weixin_login'){
@@ -59,4 +65,16 @@ if($act == 'weixin_authorize'){
 	}else{
 		echo '异常';
 	}
+}elseif($act == 'bind_weixin_authorize'){
+	weixin_authorize(true,'act=get_wechat_msg&is_authorize=1');
+}elseif($act == 'get_wechat_msg'){
+	$open_info = getOpenInfo();
+	$wx_user_info = getWxAuthorizeUser($open_info);
+
+	if(!$wx_user_info['openid']){
+		echo "<script>alert('绑定失败');";exit();
+	}
+	$unionid = $wx_user_info['unionid'] ? $wx_user_info['unionid'] : ' ';
+	setcookie('WX_USER_OPENID',$wx_user_info['openid'],0,'/sanse_wap_v2/dist');
+	setcookie('WX_UNIONID',$unionid,0,'/sanse_wap_v2/dist');
 }

@@ -27,10 +27,15 @@ export default {
         let userId = localStorage.getItem('USER_ID');
         if (!userId) {
             let wxUserId = getCookie('WX_USER_ID');
+            let wxUserOpenId = getCookie('WX_USER_OPENID');
+            let wxUnionId = getCookie('WX_UNIONID');
+
             if (!wxUserId) {
                 return false;
             } else {
                 localStorage.setItem('USER_ID', wxUserId);
+                localStorage.setItem('WX_USER_OPENID', wxUserOpenId);
+                localStorage.setItem('WX_UNIONID', wxUnionId);
                 return true;
             }
         } else {

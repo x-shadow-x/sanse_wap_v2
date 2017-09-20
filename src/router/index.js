@@ -92,7 +92,14 @@ export default [{
         component: goodsList,
         meta: {
             title: '商品列表'
-        }
+        },
+        children: [{
+            path: '/goods_list/goods_detail',
+            component: goodsDetail,
+            meta: {
+                title: '商品详情'
+            }
+        }]
     }, {
         path: '/goods_search',
         component: goodsSearch,

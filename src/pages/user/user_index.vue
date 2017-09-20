@@ -165,7 +165,9 @@
              * 退出登录仅需清楚相关的localStorage
              */
             logout() {
-                localStorage.removeItem('USER_ID'); 
+                localStorage.removeItem('USER_ID');
+                localStorage.removeItem('WX_USER_OPENID');
+                localStorage.removeItem('WX_UNIONID');
                 localStorage.removeItem('COOKIE_ID'); 
                 localStorage.removeItem('GOODS_DETAIL_DATA');
                 helper.delCookie('WX_USER_ID');

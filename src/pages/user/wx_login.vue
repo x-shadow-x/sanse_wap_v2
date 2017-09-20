@@ -14,7 +14,7 @@
 </template>
 
 <script>
-	var root = process.env.API_WX_PAY_ROOT
+	var root = process.env.API_WX_PAY_ROOT;
 
     export default {
         data() {
