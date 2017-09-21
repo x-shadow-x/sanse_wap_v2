@@ -196,7 +196,7 @@
         <alert :isShowAlert="isShowAlert" :tipTitleF="tipTitleF" :tipContentF="tipContentF" :cbName="cbName" :isBlackF="true" v-on:hideAlert="hideAlert"></alert>
 
         <transition name="slide-right">
-            <router-view v-on:childEmitUpdate="childEmitUpdate"></router-view>
+            <router-view v-on:childEmitUpdate="childEmitUpdate" class="transition_container"></router-view>
         </transition>
 
 	</div>

@@ -59,10 +59,6 @@
 
 <style scoped>
     .home_main {
-        background: #fff;
-    }
-
-    .down_load_link {
         position: fixed;
         left: 0;
         right: 0;
@@ -70,6 +66,11 @@
         bottom: 1.4rem;
         z-index: 0;
         background: #323232;
+    }
+
+    .down_load_link {
+        display: block;
+        height: 100%;
     }
 
     .home_bg {

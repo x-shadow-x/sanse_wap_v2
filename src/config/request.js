@@ -90,7 +90,7 @@ function apiAxios (method, url, params, success, failure, extendParams) {
 	})
 	.then(function (res) {
 		if(typeof extendParams.cb == 'function' && extendParams.cb(res)) {
-			// 一些请求整个流程是正确成功的~但是返回的code不一定是1~
+			// 并不是所有返回-1状态的请求都是错误的~一些请求整个流程是正确成功~但是返回的code不一定是1~
 			// 此时在发送请求的时候传递一个回调函数做处理~以便此处可以正确执行到成功的回调
 			if (typeof success == 'function') {
 				success(res.data);

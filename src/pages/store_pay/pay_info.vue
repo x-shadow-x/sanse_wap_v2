@@ -69,7 +69,7 @@
 		<div class="confirm_btn">确认</div>
 
 		<transition name="slide-right">
-            <router-view v-on:childEmitUpdate="childEmitUpdate"></router-view>
+            <router-view v-on:childEmitUpdate="childEmitUpdate" class="transition_container"></router-view>
         </transition>
 
 	</div>

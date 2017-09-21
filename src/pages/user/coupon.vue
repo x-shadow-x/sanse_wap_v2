@@ -9,7 +9,7 @@
 			</li>
 		</ul>
 		<transition :name="transitionName">
-            <router-view></router-view>
+            <router-view class="transition_container"></router-view>
         </transition>
 	</div>
 </template>

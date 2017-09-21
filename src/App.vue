@@ -1,7 +1,7 @@
 <template>
     <div class="main_app">
         <transition :name="transitionName">
-            <router-view></router-view>
+            <router-view class="transition_container"></router-view>
         </transition>
         <footer-bar></footer-bar>
         <load :show="this.$store.state.isShowLoad"></load>
@@ -84,24 +84,25 @@
         background-size: 32px auto;
     }
 
-    .slide-right-enter-active {
-        transition: all .32s;
-    }
-    .slide-right-leave-active {
-        transition: all .32s;
-    }
-    .slide-right-enter, .slide-right-leave-to {
-        transform: translateX(100%);
+
+    .slide-left-enter-active, .slide-left-leave-active {
+        opacity: 1;
     }
 
-    .slide-left-enter-active {
-        transition: all .32s;
+    .slide-right-enter-active, .slide-right-leave-active {
+        opacity: 1;
     }
-    .slide-left-leave-active {
-        transition: all .32s;
+
+    .slide-right-enter, .slide-right-leave-to {
+        opacity: 0;
     }
+
     .slide-left-enter, .slide-left-leave-to {
-        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    .transition_container {
+        transition: opacity .5s;
     }
 
     .sanse_font_light {

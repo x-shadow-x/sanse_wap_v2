@@ -132,7 +132,7 @@
         </ul>
 
         <transition name="slide-right">
-            <router-view :userInfoF="userInfo" v-on:updateUserInfo="updateUserInfo"></router-view>
+            <router-view :userInfoF="userInfo" v-on:updateUserInfo="updateUserInfo" class="transition_container"></router-view>
         </transition>
     </div>
 
@@ -194,7 +194,6 @@
 
         mounted() {
             if(!this.$helper.isLogin()) {
-                console.log(window.location.href, '----------000------------');
                 this.$router.push({path: this.$store.state.loginRouter, query:{original: window.location.href}});
             } else {
                 this.updateData();

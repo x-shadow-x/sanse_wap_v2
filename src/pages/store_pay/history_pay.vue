@@ -19,7 +19,7 @@
 			</div>
 		</div>
 		<transition name="slide-right">
-            <router-view :selectRecord="selectRecord"></router-view>
+            <router-view :selectRecord="selectRecord" class="transition_container"></router-view>
         </transition>
 	</div>
 </template>
@@ -228,18 +228,6 @@
 		display: inline-block;
 		vertical-align: middle;
 	}
-
-	.slide-right-enter-active {
-        transition: all .32s;
-    }
-
-    .slide-right-leave-active {
-        transition: all .32s;
-    }
-
-    .slide-right-enter, .slide-right-leave-to {
-        transform: translateX(100%);
-    }
 
     .click_hover {
     	position: absolute;

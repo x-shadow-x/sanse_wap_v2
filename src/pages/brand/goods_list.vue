@@ -43,7 +43,7 @@
 		<div class="goods_list_main" @click="reset" :class="{top: !showCategoryBar, disable_scroll: disableScroll}" @scroll="scrollHandle($event)" @touchstart="beforeScroll($event)" @touchmove="handleMove($event)">
 			
 			
-			<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList}" @touchstart.stop="" @touchmove.stop="" @scroll.stop="">
+			<div class="filter_list_out_box" :class="{show: toggleMap.isShowFilterList, top: hideFilterBar}" @touchstart.stop="" @touchmove.stop="" @scroll.stop="">
 				<div class="filter_list_box" @click.stop="">
 					<template v-if="colorPropertyListArray.length > 0 && goodPropertyListArray.length > 0">
 						<div class="filter_list">
@@ -115,9 +115,6 @@
 	        </div>
 	        <span class="scroll_to_top" v-if="showScrollToTop" @click="scrollToTop"></span>
 
-	        <transition name="slide-right">
-	            <router-view></router-view>
-	        </transition>
 		</div>
 	</div>
 </template>
@@ -396,7 +393,7 @@
 
 					this.$store.commit('HIDE_LOAD');
 
-					localStorage.setItem('GOODSLIST', JSON.stringify(this.goodsList));
+					// localStorage.setItem('GOODSLIST', JSON.stringify(this.goodsList));
 
 				});
 			},
@@ -481,7 +478,6 @@
             },
 
             scrollHandle(e) {
-            	console.log(e.target)
             	clearTimeout(this.timeId);
             	this.timeId = setTimeout((e) => {
             		if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
@@ -489,23 +485,10 @@
 	                        this.loadMoreData();
 	                    }
 					}
-					localStorage.setItem('SCROLLTOP', $(e.target).scrollTop());
+					sessionStorage.setItem('SCROLLTOP', $(e.target).scrollTop());
+					sessionStorage.setItem('GOODSLIST', JSON.stringify(this.goodsList));
             	}, 320, e);
             },
-
-			// scrollHandle(e) {
-			// 	if($(e.target).scrollTop() + $(window).height() >= $('#goodsListBox').height()) {
-   //                  if(!this.isLoading) {
-   //                      this.loadMoreData();
-   //                  }
-			// 	}
-
-			// 	if($(e.target).scrollTop() > 0) {
-			// 		this.showPageTip = true;
-			// 	} else {
-			// 		this.showPageTip = false;
-			// 	}
-			// },
 
             getAppPropertyList() {
                 this.$request.get(this.$interface.GET_APP_PROPERTY_LIST, {
@@ -522,7 +505,6 @@
 		},
 
 		mounted() {
-
 			if(this.$route.query.funcType == 'SE') {
 				this.showCategoryBar = false;
 				document.title = '搜索结果' + decodeURI(this.$route.query.keyWord);
@@ -533,15 +515,14 @@
 
             this.getAppPropertyList();
 
-            let goodsListStr = localStorage.getItem('GOODSLIST');
+            let goodsListStr = sessionStorage.getItem('GOODSLIST');
 
             if(goodsListStr) {
             	this.goodsList = JSON.parse(goodsListStr);
-            	console.log(localStorage.getItem('SCROLLTOP'));
-            	
+            	 
             	setTimeout(() => {
-            		$(".goods_list_main").animate({ scrollTop: localStorage.getItem('SCROLLTOP') },0); 
-            	}, 500);
+            		$(".goods_list_main").animate({ scrollTop: sessionStorage.getItem('SCROLLTOP') },320);
+            	}, 100);
             } else {
             	this.getDefaultData(function(data) {
 					this.totalPage = Math.ceil(data.recordsNumber / this.$interface.PAGE_SIZE);
@@ -787,6 +768,10 @@
 	}
 
 	.goods_list_main.top .filter_list_out_box {
+		top: 1.2rem;
+	}
+
+	.filter_list_out_box.top {
 		top: 1.2rem;
 	}
 
